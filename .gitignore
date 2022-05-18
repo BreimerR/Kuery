@@ -1,0 +1,9 @@
+**/build
+**/.idea
+**/.gradle
+local.properties
+**/cmake-build-debug
+**/*.a
+**/java*.hprof*
+**/yarn.lock
+**/java_pid30112.hprof.928jp4.b.ij/**

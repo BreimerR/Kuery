@@ -1,0 +1,6 @@
+# headers = mariadb/mysql.h
+# headerFilter = mariadb/*
+
+linkerOpts.osx = -L/opt/local/lib -lmariadb3
+linkerOpts.linux = -L/usr/local/lib/mariadb -lmariadb
+compilerOpts.linux = -I/usr/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu

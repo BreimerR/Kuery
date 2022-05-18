@@ -1,0 +1,18 @@
+#  just incase it fails afain clean or add this back not sure why it works now
+compilerOpts.linux= -I/usr/include \
+                    -I/usr/local/include \
+                    -I/usr/include/x86_64-linux-gnu
+linkerOpts.linux= -L/usr/lib/x86_64-linux-gnu -lsqlite3 \
+                  -L/usr/lib/x86_64-linux-gnu -lc \
+                  -L/usr/lib -lc \
+                  -L/usr/lib/x86_64-linux-gnu -ldl \
+                  -L/usr/lib -ldl \
+                  -L/usr/lib/x86_64-linux-gnu -lm \
+                  -L/usr/lib -lm \
+                  -L/usr/lib/x86_64-linux-gnu -lglib-2.0 \
+                  -L/opt/usr/lib -lpthread \
+                  -L/usr/local/lib -lpthread \
+                  -L/usr/lib/x86_64-linux-gnu -lpthread
+
+linkerOpts.linux_x64 =  -lpthread -ldl -lm -lreadline -lncurses
+linkerOpts.macos_x64 = -lpthread -ldl

@@ -1,0 +1,8 @@
+CREATE TABLE `foo`
+(
+    id      INTEGER PRIMARY KEY UNIQUE,
+    name    TEXT(50)  DEFAULT 'bar',
+    dob     TEXT  DEFAULT DATE('now'),
+    /*NOT SURE ABOUT BLOB SIZE REFRESH SQLITE*/
+    picture BLOB(122) DEFAULT NULL
+);
