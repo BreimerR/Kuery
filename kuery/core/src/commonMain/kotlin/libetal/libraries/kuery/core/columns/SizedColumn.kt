@@ -1,42 +1,47 @@
 package libetal.libraries.kuery.core.columns
 
-import libetal.libraries.kuery.core.entities.Entity
-import libetal.libraries.kuery.core.expressions.Expression
+import libetal.kotlin.laziest
 
-abstract class SizedColumn<T, N : Number> : Column<T> {
+open class SizedColumn<T, N : Number> : Column<T> {
 
     val size: N?
 
     constructor(
         name: String,
-        table: Entity<*>,
+        baseSql: String,
         default: T? = null,
-        size: N? = null
+        size: N? = null,
+        parser: (String?) -> T,
     ) : super(
         name,
-        table,
-        default
+        baseSql + (size?.let { "($it)" } ?: ""),
+        default,
+        parser
     ) {
         this.size = size
     }
 
     constructor(
         name: String,
-        table: Entity<*>,
+        baseSql: String,
         size: N? = null,
-        primary: Boolean
+        primary: Boolean,
+        nullable: Boolean = !primary,
+        parser: (String?) -> T,
     ) : super(
         name,
-        table,
-        primary
+        baseSql + (size?.let { "($it)" } ?: ""),
+        primary,
+        nullable,
+        parser
     ) {
         this.size = size
     }
 
-    abstract val unSizedSql: String
+    override val createSql: String by laziest {
+        baseSql + primarySql + nullableSql
+    }
 
-    override val createSql: String
-        get() = unSizedSql + (size?.let { "($it)" } ?: "")
 
 }
 

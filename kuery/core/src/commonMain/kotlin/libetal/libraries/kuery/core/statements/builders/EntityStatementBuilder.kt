@@ -10,8 +10,14 @@ abstract class EntityStatementBuilder<T, E : Entity<T>, S : Statement<T, E>>(
     vararg val columns: Column<*>,
     val entity: E
 ) : StatementBuilder {
+
+    /**
+     * Extras cover anything in a statement such as
+     * FROM *
+     * WHERE [TRUE|<EXPRESSION>]
+     **/
     abstract fun build(extras: String): S
 
-    fun <T, E : Entity<T>> E.buildFrom(where: String) = build("FROM `${name}` WHERE $where")
+    fun <T, E : Entity<T>> E.buildWhere(where: String) = build("FROM `${name}` WHERE $where")
 
 }

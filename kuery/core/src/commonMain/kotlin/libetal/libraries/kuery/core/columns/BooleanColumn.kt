@@ -7,19 +7,22 @@ class BooleanColumn : Column<Boolean> {
 
     constructor(
         name: String,
-        table: Entity<*>,
         default: Boolean? = null
-    ) : super(name, table, default)
+    ) : super(name, "`$name` BOOLEAN", default, ::toBoolean)
 
     constructor(
         name: String,
-        table: Entity<*>
-    ) : super(name, table, false)
+    ) : super(name, "`$name` BOOLEAN", false, ::toBoolean)
+
 
     override val createSql: String by laziest {
-        "`$name` BOOLEAN" + (default?.let { " DEFAULT $it" } ?: "")
+        baseSql + (default?.let { " DEFAULT $it" } ?: "")
     }
 
     override fun Boolean.defaultSql(): String = this.toString()
 
 }
+
+
+fun toBoolean(string: String?) =
+    string?.toBoolean() ?: throw NullPointerException("Received null value from db for a non null field")

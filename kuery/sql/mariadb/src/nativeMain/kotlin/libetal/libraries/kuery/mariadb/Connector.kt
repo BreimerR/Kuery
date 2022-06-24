@@ -3,16 +3,18 @@ package libetal.libraries.kuery.mariadb
 import kotlinx.cinterop.get
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kuery.interop.mariadb.mysql_free_result
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.statements.Create
-import libetal.libraries.kuery.core.statements.Statement
+import libetal.libraries.kuery.core.entities.extensions.name
+import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.mariadb.exceptions.MariaDbException
 import libetal.libraries.kuery.mariadb.interop.*
-import kotlin.coroutines.CoroutineContext
+import libetal.libraries.kuery.mariadb.statements.CreateResult
+import libetal.libraries.kuery.mariadb.statements.DeleteResult
+import libetal.libraries.kuery.mariadb.statements.InsertResult
+import libetal.libraries.kuery.mariadb.statements.SelectResult
 
 actual class Connector actual constructor(
     actual val database: String,
@@ -20,9 +22,9 @@ actual class Connector actual constructor(
     actual val password: String,
     actual val host: String,
     actual val port: UInt
-) {
+) : libetal.libraries.kuery.core.Connector {
 
-    val connection by laziest {
+    private val connection by laziest {
         Mysql.realConnect(
             host,
             user,
@@ -31,6 +33,8 @@ actual class Connector actual constructor(
             port
         )
     }
+
+    override fun query(sqlStatement: String) = connection.query(sqlStatement) == 0
 
     /**
      * Don't use flows if the function isn't suspended
@@ -48,44 +52,83 @@ actual class Connector actual constructor(
      * In the case of specific columns selected a Map<TableName,Map<Column,Value>>
      * Should be utilized. But if the unspecified columns are nullable then T being return storage should be used
      **/
-    infix fun <Class, E : libetal.libraries.kuery.core.entities.Entity<Class>> query(statement: Statement<Class, E>) =
-        flow {
+    infix fun <Class, E : libetal.libraries.kuery.core.entities.Entity<Class>> query(
+        statement: Statement<Class, E>
+    ) = flow {
 
-            val executed = connection.query(statement.toString())
-
-            if (executed == 0) {
-                when (statement) {
-                    is Create<Class, E> -> { // CREATE doesn't have results
-                        emit("Created" to "Success")
-                        return@flow
-                    }
+        if (query(statement.toString())) {
+            when (statement) {
+                is Create<Class, E> -> { // CREATE doesn't have results
+                    emit(
+                        CreateResult(
+                            name = statement.entity.name,
+                            type = statement.type,
+                            null
+                        )
+                    )
+                    return@flow
                 }
-                val result = connection.useResult() ?: throw NullPointerException("Unexpected null results")
+                is Delete<Class, E> -> { // DELETE doesn't have results
+                    emit(
+                        DeleteResult(
+                            table = statement.entity.name,
+                            null
+                        )
+                    )
+                    return@flow
+                }
+                is Select<Class, E> -> { // Select has results
+                    val results = connection.useResult() ?: throw NullPointerException("Unexpected null results")
 
-                val numColumns = connection.fieldCount.toInt()
+                    val numColumns = connection.fieldCount.toInt()
 
-                while (true) {
-                    val row = result.row ?: break
-                    var i = 0
-                    while (i < numColumns) {
-                        val column = (result fetchFieldDirect i.toUInt())?.pointed ?: break
-                        val columnTable = column.table?.toKString() ?: throw NullPointerException("Failed to read table")
-                        val columnName = column.name?.toKString() ?: throw NullPointerException("Unexpected null result")
-                        val columnValue = row[i]?.toKString() ?: throw NullPointerException("Unexpected null result")
+                    while (true) {
+                        val row = results.row ?: break
+                        var i = 0
+                        while (i < numColumns) {
+                            val column = (results fetchFieldDirect i.toUInt())?.pointed ?: break
+                            val statementColumn = statement.columns[i]
+                            val value = row[i]?.toKString()
+                            val statementValue = value?.let {
+                                statementColumn.parse(it)
+                            } ?: if (statementColumn.nullable)
+                                null
+                            else
+                                throw RuntimeException("Null Received for non null column `${statement.entity.name}`.${statementColumn.name}")
 
-                        emit(columnName to columnValue)
-                        i++
+                            emit(
+                                SelectResult(
+                                    table = column.table?.toKString() ?: throw NullPointerException("Failed to read table"),
+                                    columnName = column.name?.toKString()
+                                        ?: throw NullPointerException("Unexpected null result"),
+                                    value = value
+                                )
+                            )
+                            i++
+                        }
+
+                        // emit the whole row instead
+
                     }
 
-                    mysql_free_result(result)
+                    mysql_free_result(results)
 
                 }
 
+                is Insert<Class, E> -> {
+                    emit(
+                        InsertResult(
+                            into = statement.entity.name
+                        )
+                    )
+                }
 
-            } else {
-                throw RuntimeException("Connection Error:${connection.errorCode} ${connection.errorMessage}")
             }
-        }
+
+        } else throw MariaDbException(connection.errorCode, connection.errorMessage)
+
+    }
+
 
     @Suppress("unused")
     actual fun close() {

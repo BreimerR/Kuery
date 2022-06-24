@@ -4,16 +4,29 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.expressions.Expression
 
-abstract class Column<T>(
+/**
+ * A map of properties makes more
+ * sense here than to have different
+ * classes for each column
+ **/
+open class Column<T>(
     val name: String,
-    table: Entity<*>,
+    open val baseSql: String,
     val primary: Boolean = false,
+    val nullable: Boolean = false,
+    val parser: (String?) -> T
 ) {
 
     var default: T? = null
         protected set
 
-    constructor(name: String, table: Entity<*>, default: T? = null) : this(name, table, false) {
+    constructor(name: String, baseSql: String, default: T? = null, parser: (String?) -> T) : this(
+        name,
+        baseSql,
+        false,
+        false,
+        parser
+    ) {
         this.default = default
     }
 
@@ -45,19 +58,30 @@ abstract class Column<T>(
         TODO("")
     }
 
-    abstract val createSql: String
+    open val createSql: String by laziest {
+        baseSql
+    }
 
-    abstract fun T.defaultSql(): String
+    val nullableSql by laziest {
+        if (nullable) "" else " NOT NULL"
+    }
+
+
+    // Can be a passed argument with default converter lambda
+    open fun T.defaultSql(): String = throw RuntimeException("Implementation pending: Column.kt 58")
 
     open val defaultKeyWord: String = "DEFAULT"
 
     val defaultSql by laziest {
-        (default?.let { " $defaultKeyWord ${it.defaultSql()}" } ?: "")
+        if (primary) "" else (default?.let { " $defaultKeyWord ${it.defaultSql()}" } ?: "")
     }
 
     val primarySql by laziest {
         if (primary) " PRIMARY KEY" else ""
     }
+
+    // TODO make abstract once all are correctly implementing
+    open fun parse(value: String?): T = parser(value)
 
     override fun toString(): String = identifier
 
@@ -66,3 +90,20 @@ abstract class Column<T>(
 
 }
 
+class FinalColumn<T>(
+    name: String,
+    sql: String,
+    primary: Boolean = false,
+    nullable: Boolean = false,
+    val toSqlString: (T) -> String = { it.toString() },
+    parser: (String?) -> T
+) : Column<T>(
+    name,
+    sql,
+    primary,
+    nullable,
+    parser
+) {
+    override val T.sqlString: String
+        get() = toSqlString(this)
+}

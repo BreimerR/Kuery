@@ -21,7 +21,9 @@ class UpdateStatementBuilder<T, E : Entity<T>>(entity: E) :
         expressions += UpdateExpression("""`$identifier` = ${value.sqlString}""")
     }
 
-    override fun build(extras: String) = Update("$sql $extras", entity)
+    override fun build(extras: String) = Update("$sql $extras", entity).also { updateStatement ->
+        updateStatement.columns.addAll(columns)
+    }
 
 }
 

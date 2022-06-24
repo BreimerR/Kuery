@@ -9,7 +9,7 @@ expect class Connector(
     password: String = "",
     host: String = "localhost",
     port: UInt = 3306u
-) {
+) : libetal.libraries.kuery.core.Connector {
     val host: String
     val user: String
     val password: String

@@ -23,6 +23,6 @@ object Users : IdEntity<User>() {
 
     val isPuppy = boolean("id")
 
-    override fun getEntityTableName(): String = "users"
+    override fun getEntityName(): String = "users"
 
 }

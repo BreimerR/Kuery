@@ -7,42 +7,42 @@ class Text : CharacterSequence<String> {
 
     constructor(
         name: String,
-        table: Entity<*, *, *>,
         size: Int = 55,
         collate: String? = null,
         uniqueOn: String? = null,
         unique: Boolean = false,
         primary: Boolean = false,
+        parser: (String?) -> String,
     ) : super(
         name,
-        table,
+        "`$name` TEXT",
         size,
         collate,
         uniqueOn,
         unique,
-        primary
+        primary,
+        parser
     )
 
     constructor(
         name: String,
-        table: Entity<*, *, *>,
         default: String? = null,
         size: Int = 55,
         collate: String? = null,
         uniqueOn: String? = null,
-        unique: Boolean = false
+        unique: Boolean = false,
+        parser: (String?) -> String,
     ) : super(
         name,
-        table,
+        "`$name` TEXT",
         size,
         default,
         collate,
         uniqueOn,
-        unique
+        unique,
+        parser
     )
 
-    override val unSizedSql: String
-        get() = "`$name` TEXT"
 
     override fun String.defaultSql(): String = "'$this'"
 

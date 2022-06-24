@@ -12,15 +12,17 @@ class CharColumn : SizedColumn<Char, Int> {
 
     constructor(
         name: String,
-        table: Entity<*, *, *>,
         collate: String? = null,
         uniqueOn: String? = null,
-        unique: Boolean = false
+        unique: Boolean = false,
+        parser: (String?) -> Char,
     ) : super(
         name,
-        table,
+        "`$name` TEXT",
         1,
-        false
+        false,
+        false,
+        parser
     ) {
         this.collate = collate
         this.uniqueOn = uniqueOn
@@ -29,25 +31,23 @@ class CharColumn : SizedColumn<Char, Int> {
 
     constructor(
         name: String,
-        table: Entity<*, *, *>,
         default: Char? = null,
         collate: String? = null,
         uniqueOn: String? = null,
-        unique: Boolean = false
+        unique: Boolean = false,
+        parser: (String?) -> Char
     ) : super(
         name,
-        table,
+        "`$name` TEXT",
         default,
-        1
+        1,
+        parser
     ) {
         this.collate = collate
         this.uniqueOn = uniqueOn
         this.unique = unique
 
     }
-
-    override val unSizedSql: String
-        get() = "`$name` TEXT"
 
     override fun Char.defaultSql(): String = this.toString()
 

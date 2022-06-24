@@ -3,10 +3,10 @@ package libetal.libraries.kuery.sqlite.database
 import libetal.kotlin.debug.info
 import libetal.libraries.kuery.core.expressions.extensions.AND
 import libetal.libraries.kuery.core.expressions.extensions.OR
+import libetal.libraries.kuery.core.statements.CREATE
 import libetal.libraries.kuery.core.statements.SELECT
 import libetal.libraries.kuery.core.statements.extensions.WHERE
 import libetal.libraries.kuery.sqlite.core.columns.extensions.equals
-import libetal.libraries.kuery.sqlite.database.Database.CREATE
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -42,7 +42,9 @@ class SelectTest {
         TAG info Users.isPuppy.createSql
         TAG info Users.blobby.createSql
 
-        val statement = CREATE TABLE Users
+        val statement = with(Database){
+            CREATE TABLE Users
+        }
         assertEquals("CREATE TABLE `users` ( )", statement.toString())
 
     }

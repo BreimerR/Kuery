@@ -12,11 +12,9 @@ class DateColumn : Column<LocalDate> {
 
     constructor(
         name: String,
-        table: Entity<*, *, *>,
         primary: Boolean = false
     ) : super(
         name,
-        table,
         primary
     )
 
@@ -37,21 +35,22 @@ class DateColumn : Column<LocalDate> {
      **/
     constructor(
         name: String,
-        table: Entity<*, *, *>,
         default: LocalDate? = null,
         format: String? = null
     ) : super(
         name,
-        table,
         default
     ) {
         if (default == null && format != null) throw RuntimeException("Can't set format if default date isn't provided")
         this.format = format
     }
 
+    override val baseSql: String
+        get() = "`$name` TEXT"
+
     override val createSql: String by laziest {
         // DATETIME DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
-        "`$name` TEXT$defaultSql"
+        baseSql + defaultSql + nullableSql
     }
 
     override val defaultKeyWord: String by laziest {

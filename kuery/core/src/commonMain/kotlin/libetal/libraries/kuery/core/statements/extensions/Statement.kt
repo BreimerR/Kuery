@@ -3,7 +3,6 @@
 package libetal.libraries.kuery.core.statements.extensions
 
 import libetal.libraries.kuery.core.entities.Entity
-import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.expressions.Expression
 import libetal.libraries.kuery.core.expressions.WhereScope
 import libetal.libraries.kuery.core.statements.Statement
@@ -19,7 +18,7 @@ infix fun <T, E : Entity<T>, S : Statement<T, E>> EntityStatementBuilder<T, E, S
     WHERE(expressionBuilder(WhereScope()))
 
 infix fun <T, E : Entity<T>, S : Statement<T, E>> EntityStatementBuilder<T, E, S>.WHERE(expression: Expression): S =
-    entity.buildFrom(expression.sql)
+    entity.buildWhere(expression.sql)
 
 infix fun <T, E : Entity<T>, S : Statement<T, E>> EntityStatementBuilder<T, E, S>.WHERE(boolean: Boolean): S =
-    entity.buildFrom("$boolean")
+    entity.buildWhere("$boolean")

@@ -10,13 +10,14 @@ abstract class CharacterSequence<C : CharSequence> : SizedColumn<C, Int> {
 
     constructor(
         name: String,
-        table: Entity<*>,
+        defaultSql: String,
         size: Int = 55,
         collate: String?,
         uniqueOn: String? = null,
         unique: Boolean = false,
-        primary: Boolean = false
-    ) : super(name, table, size, primary) {
+        primary: Boolean = false,
+        parser: (String?) -> C,
+    ) : super(name, defaultSql, size, primary, false, parser) {
         this.collate = collate
         this.uniqueOn = uniqueOn
         this.unique = unique
@@ -24,13 +25,14 @@ abstract class CharacterSequence<C : CharSequence> : SizedColumn<C, Int> {
 
     constructor(
         name: String,
-        table: Entity<*>,
+        defaultSql: String,
         size: Int = 55,
         default: C? = null,
         collate: String?,
         uniqueOn: String? = null,
-        unique: Boolean = false
-    ) : super(name, table, default, size) {
+        unique: Boolean = false,
+        parser: (String?) -> C,
+    ) : super(name, defaultSql, default, size, parser) {
         this.collate = collate
         this.uniqueOn = uniqueOn
         this.unique = unique

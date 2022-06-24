@@ -11,14 +11,14 @@ class VarChar : SizedColumn<String, Int> {
 
     constructor(
         name: String,
-        table: Entity<*>,
         size: Int = 55,
         collate: String = "",
         uniqueOn: String = "",
         unique: Boolean = false,
         primary: Boolean = false,
-        autoIncrement: Boolean = false
-    ) : super(name, table, size, primary) {
+        autoIncrement: Boolean = false,
+        parser: (String?) -> String
+    ) : super(name, "`$name` VARCHAR", size, primary, false, parser) {
         this.collate = collate
         this.uniqueOn = uniqueOn
         this.unique = unique
@@ -27,20 +27,20 @@ class VarChar : SizedColumn<String, Int> {
 
     constructor(
         name: String,
-        table: Entity<*>,
         default: String = "",
         size: Int = 55,
         collate: String = "",
         uniqueOn: String = "",
         unique: Boolean = false,
-        autoIncrement: Boolean = false
-    ) : super(name, table, default, size) {
+        autoIncrement: Boolean = false,
+        parser: (String?) -> String
+    ) : super(name, "`$name` VARCHAR", default, size, parser) {
         this.collate = collate
         this.uniqueOn = uniqueOn
         this.unique = unique
         this.autoIncrement = autoIncrement
     }
 
-    override val createSql: String
-        get() = "`$name` VARCHAR($size)"
+    override fun String.defaultSql(): String = sqlString
+
 }

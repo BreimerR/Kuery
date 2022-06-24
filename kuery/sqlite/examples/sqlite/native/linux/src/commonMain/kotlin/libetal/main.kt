@@ -8,9 +8,10 @@ import libetal.libraries.kuery.core.statements.extensions.WHERE
 
 private const val TAG = "Main";
 
+/*
 fun main(vararg arguments: String) {
     val statement = SELECT * Users WHERE (Users.id equals 12L)
 
     TAG info "statement.toString()"
 
-}
+}*/

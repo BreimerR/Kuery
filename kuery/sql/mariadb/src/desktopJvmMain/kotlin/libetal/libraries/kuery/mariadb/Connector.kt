@@ -12,7 +12,7 @@ actual class Connector actual constructor(
     actual val password: String,
     actual val host: String,
     actual val port: UInt
-) {
+) : libetal.libraries.kuery.core.Connector {
 
     val connection by laziest {
         DriverManager.getConnection("jdbc:mariadb://$host:$port/$database?user=$user&password=$password")
@@ -20,11 +20,20 @@ actual class Connector actual constructor(
     }
 
     actual infix fun <T, E : Entity<T>> execute(statement: Statement<T, E>): Flow<T> {
+        val execute = query(statement.sql)
         TODO("Not yet implemented")
     }
 
     actual fun close() {
         connection.close()
+    }
+
+    override fun query(sqlStatement: String): Boolean {
+        val statement = connection.createStatement()
+
+        val executed = statement.execute(sqlStatement)
+
+        return executed
     }
 
 

@@ -1,7 +1,6 @@
 package libetal.libraries.kuery.core.statements.builders
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.CharacterSequence
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.name
@@ -15,7 +14,6 @@ class InsertStatementBuilder<T, E : Entity<T>>(entity: E) :
     }
 
     infix fun <C> Column<C>.set(value: C) {
-
 
         val values = map[identifier] ?: mutableListOf<String>().also {
             map[identifier] = it
@@ -63,7 +61,9 @@ class InsertStatementBuilder<T, E : Entity<T>>(entity: E) :
 
         }
 
-    override fun build(extras: String) = Insert("$sql $extras", entity)
+    override fun build(extras: String) = Insert("$sql $extras", entity).also {
+        it.columns.addAll(columns)
+    }
 
     companion object {
         private const val TAG = "InsertStatementBuilder"

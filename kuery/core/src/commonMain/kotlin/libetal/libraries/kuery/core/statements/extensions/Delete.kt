@@ -13,7 +13,4 @@ infix fun <T, E : Entity<T>> DELETE.FROM(entity: E) =
 infix fun <T, E : Entity<T>> DELETE.ALL(entity: E) =
     times(entity)
 
-infix fun <T, E : Entity<T>> Delete<T, E>.WHERE(expression: Expression) = apply {
-    append("WHERE ${expression.sql}")
-}
-
+infix fun <T, E : Entity<T>> Delete<T, E>.WHERE(expression: Expression) = Delete("$sql WHERE ${expression.sql}", entity)

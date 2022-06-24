@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import libetal.libraries.*
+import org.jetbrains.kotlin.konan.library.konanPlatformLibraryPath
 
 val kotlinVersion: String by project
 
@@ -39,17 +40,36 @@ kotlin {
     }
 
     nativeTargets {
+        val srcDir = File(projectDir, "src")
+        val nativeInteropDir = File(srcDir, "nativeInterop")
+        val nativeInteropKotlinDir = File(nativeInteropDir, "kotlin")
+        val nativeInteropDefFile = File(nativeInteropKotlinDir, "interop.def")
+        nativeInteropDefFile.outputStream().use { stream ->
+            stream.writer().use { writer ->
+                writer.write(
+                    """
+                    |# DO NOT EDIT FILE 
+                    |headers = sqlite3.h library.h
+                    |compilerOpts.linux= -I/usr/include \
+                    |                    -I/usr/local/include \
+                    |                    -I/usr/include/x86_64-linux-gnu \
+                    |                    -I$nativeInteropDir/sqlite3/src
+                    |staticLibraries = libsqlite3_interop.a libsqlite3.a
+                    |libraryPaths = /usr/local/lib /usr/lib $nativeInteropDir/sqlite3/cmake-build-debug
+                """.trimMargin()
+                )
+            }
+        }
+
         val main by compilations.getting
         val sqlite3Interop by main.cinterops.creating {
-            val nativeInteropDir = "$projectDir/src/nativeInterop"
-            defFile = File("$nativeInteropDir/kotlin/interop.def")
-            compilerOpts.add("-I/$nativeInteropDir/sqlite3/src")
-            headers(
-                fileTree("$nativeInteropDir/sqlite3/src") {
-                    include("**/*.h")
-                    include("**/*.hpp")
-                }
-            )
+            defFile = nativeInteropDefFile
+            // headers(
+            //     fileTree("$nativeInteropDir/sqlite3/src") {
+            //         include("**/*.h")
+            //         include("**/*.hpp")
+            //     }
+            // )
 
             packageName = "libetal.interop.sqlite3"
 

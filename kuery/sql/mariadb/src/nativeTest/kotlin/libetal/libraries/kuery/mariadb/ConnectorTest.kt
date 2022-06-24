@@ -15,9 +15,12 @@ import libetal.libraries.kuery.mariadb.StatementTest.Companion.selectAllUsers
 import libetal.libraries.kuery.mariadb.database.Database
 import libetal.libraries.kuery.mariadb.database.tables.User
 import libetal.libraries.kuery.mariadb.database.tables.Users
+import libetal.libraries.kuery.mariadb.statements.CreateResult
 import platform.posix.sleep
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ConnectorTest : TestCase {
 
@@ -26,9 +29,14 @@ class ConnectorTest : TestCase {
 
     }
 
+    fun simpleCreateTable() = StatementTest.createSimpleTableStatement query { result ->
+        assertTrue(result is CreateResult)
+        assertNull(result.error, "Failed to create database")
+    }
+
     @Test
-    fun executeSimpleSelect() = selectAllUsers query { (column, value) ->
-        println("$column $value")
+    fun executeSimpleSelect() = selectAllUsers query {
+
     }
 
     val results by laziest {

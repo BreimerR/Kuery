@@ -3,10 +3,13 @@ package libetal.libraries.kuery.mariadb
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.Kuery
-import libetal.libraries.kuery.core.columns.BooleanColumn
+import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.FinalColumn
+import libetal.libraries.kuery.core.exceptions.MalformedStoredData
+import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.statements.Statement
 import libetal.libraries.kuery.mariadb.columns.*
-import libetal.libraries.kuery.mariadb.entities.Entity
+import libetal.libraries.kuery.mariadb.entities.TableEntity
 
 abstract class Kuery(
     private val database: String = "test",
@@ -14,7 +17,7 @@ abstract class Kuery(
     private val password: String = "",
     private val host: String = "localhost",
     private val port: UInt = 3306u
-) : Kuery<Entity<*>>() {
+) : Kuery<TableEntity<*>>() {
 
     val connector: Connector by laziest {
         Connector(
@@ -26,80 +29,141 @@ abstract class Kuery(
         )
     }
 
-    override fun Entity<*>.long(name: String) = long(name, false)
+    override fun TableEntity<*>.long(name: String) = long(name, false)
 
-    fun Entity<*>.long(name: String, primary: Boolean) =
-        registerColumn(name) { usableEntityName ->
-            LongColumn(usableEntityName, this, primary = primary)
+    fun TableEntity<*>.long(name: String, primary: Boolean) = registerColumn(name) { columnName ->
+        FinalColumn(columnName, "$columnName INT ", primary, false) { result ->
+            result ?: throw UnexpectedNull(this, columnName)
+            result.toLongOrNull() ?: throw MalformedStoredData(this, columnName)
         }
+    }
 
-    override fun Entity<*>.int(name: String, primary: Boolean) =
-        int(name, null)
-
-    fun Entity<*>.int(name: String, size: Int? = null, primary: Boolean = false) =
-        registerColumn(name) { usableName ->
-            IntColumn(usableName, this, size, primary)
+    override fun TableEntity<*>.int(name: String, size: Int?, primary: Boolean) = registerColumn(name) { columnName ->
+        FinalColumn(columnName, "$columnName INT ", primary, false) { result ->
+            result ?: throw UnexpectedNull(this, columnName)
+            result.toIntOrNull() ?: throw MalformedStoredData(this, columnName)
         }
-
-    override fun Entity<*>.float(name: String) =
-        float(name, null, null)
+    }
 
     /**TODO
      * WATCH: JU JITSU  Nicholas Cage not add just take
      * OR:KILL CHAIN
      **/
-    fun Entity<*>.float(name: String, size: Float? = null, default: Float? = null) =
-        registerColumn(name) { usableName ->
-            FloatColumn(usableName, this, size, default)
+    override fun TableEntity<*>.float(name: String, size: Float?, default: Float?) =
+        registerColumn(name) { columnName ->
+            val defaultSql = default?.let { " DEFAULT $default" } ?: ""
+            val maxSql = size?.let { "($size) " } ?: ""
+            FinalColumn(columnName, "$columnName FLOAT$maxSql$defaultSql", false, false) { result ->
+                result ?: throw UnexpectedNull(this, columnName)
+                result.toFloatOrNull() ?: throw MalformedStoredData(this, columnName)
+            }
         }
 
-    override fun Entity<*>.char(name: String) =
+    override fun TableEntity<*>.char(name: String) =
         char(name, null)
 
-    fun Entity<*>.char(name: String, default: Char?) = registerColumn(name) { usableName ->
-        CharColumn(usableName, this, default)
+    fun TableEntity<*>.char(name: String, default: Char?) = registerColumn(name) { columnName ->
+        val defaultSql = default?.let { " DEFAULT '$it'" } ?: ""
+        FinalColumn(
+            columnName,
+            sql = "`$columnName` CHAR$defaultSql",
+            primary = false,
+            nullable = false
+        ) {
+            it?.toCharArray()?.getOrNull(0) ?: throw UnexpectedNull(this, columnName)
+        }
     }
 
-    override fun Entity<*>.date(name: String) =
-        registerColumn(name) { usableName ->
-            DateColumn(usableName, this)
+    override fun TableEntity<*>.date(name: String) = registerColumn(name) { columnName ->
+        FinalColumn(
+            columnName,
+            "`$columnName` DATE $NOT_NULL",
+            primary = false,
+            nullable = false,
+            {
+                "'$it'"
+            }
+        ) { result ->
+            result ?: throw UnexpectedNull(this, columnName)
+            LocalDate.parse(result)
         }
+    }
 
-    fun Entity<*>.date(
+    fun TableEntity<*>.date(
         name: String,
-        default: LocalDate? = null,
-        format: String? = null
-    ) =
-        registerColumn(name) { usableName ->
-            DateColumn(
-                usableName,
-                this,
-                default,
-                default?.let { format ?: throw RuntimeException("Can't set date without a date format") })
+        default: LocalDate,
+        format: String
+    ) = registerColumn(name) { columnName ->
+        val defaultSql = " DEFAULT STR_TO_DATE('$default','$format')"
+        FinalColumn(
+            columnName,
+            "`$columnName` DATE$defaultSql $NOT_NULL",
+            primary = false,
+            nullable = false,
+            {
+                "'$it'"
+            }
+        ) { result ->
+            result ?: throw UnexpectedNull(this, columnName)
+            LocalDate.parse(result)
+        }
+    }
+
+    override fun TableEntity<*>.string(name: String, size: Int, default: String?): Column<String> =
+        registerColumn(name) { columnName ->
+            val defaultSql = default?.let { " DEFAULT $default" } ?: ""
+            val maxSql = "($size)"
+            FinalColumn(
+                columnName,
+                "`$columnName` VARCHAR$maxSql$defaultSql $NOT_NULL",
+                primary = false,
+                nullable = false,
+                {
+                    "'$it'"
+                }
+            ) { result ->
+                result ?: throw UnexpectedNull(this, columnName)
+            }
         }
 
-    override fun Entity<*>.string(name: String, size: Int, default: String?) =
-        registerColumn(name) { usableName ->
-            StringColumn(usableName, this, size, default)
+    override fun TableEntity<*>.nullableString(name: String, size: Int, default: String?): Column<String?> =
+        registerColumn(name) { columnName ->
+            val maxSql = "($size)"
+            val defaultSql = default?.let { " DEFAULT '$it'" } ?: ""
+            FinalColumn(
+                columnName,
+                "`$columnName` VARCHAR$maxSql$defaultSql",
+                primary = false,
+                nullable = false,
+                {
+                    it?.let {
+                        "'$it'"
+                    } ?: ""
+                }
+            ) { result ->
+                result
+            }
         }
 
-    // Something missing here forgetting
-    fun Entity<*>.string(name: String, size: Int, primary: Boolean = false) =
-        registerColumn(name) { usableName ->
-            StringColumn(usableName, this, size, primary)
+    override fun TableEntity<*>.boolean(name: String, default: Boolean?) = registerColumn(name) { columnName ->
+        val defaultSql = default?.let { " DEFAULT ${if (it) "true" else "false"}" } ?: ""
+
+        FinalColumn(columnName,
+            "$columnName BOOLEAN$defaultSql",
+            primary = false,
+            nullable = false,
+            {
+                if (it) "true" else "false"
+            }
+        ) { result ->
+            result ?: throw UnexpectedNull(this, columnName)
+            result.toBooleanStrictOrNull() ?: throw MalformedStoredData(this, columnName)
         }
 
-    override fun Entity<*>.boolean(name: String) =
-        boolean(name, false)
-
-    fun Entity<*>.boolean(name: String, default: Boolean) =
-        registerColumn(name) { usableName ->
-            BooleanColumn(usableName, this, default)
-        }
+    }
 
     override fun <T, E : libetal.libraries.kuery.core.entities.Entity<T>> execute(statement: Statement<T, E>) {
         connector.execute(statement)
     }
-
 
 }

@@ -6,7 +6,7 @@ abstract class Entity<T> {
      * Implementation of this property as a function
      * will reduce override conflicts
      **/
-    abstract fun getEntityTableName(): String
+    abstract fun getEntityName(): String
 
     /**
      * Implementation of this property as a function
@@ -22,3 +22,8 @@ abstract class Entity<T> {
     }
 
 }
+
+
+abstract class TableEntity<T> : Entity<T>()
+
+abstract class ViewEntity<T> : Entity<T>()

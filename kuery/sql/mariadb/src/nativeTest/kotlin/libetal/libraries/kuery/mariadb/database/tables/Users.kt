@@ -3,7 +3,7 @@ package libetal.libraries.kuery.mariadb.database.tables
 import kotlinx.datetime.LocalDate
 import libetal.libraries.kuery.mariadb.database.Database.date
 import libetal.libraries.kuery.mariadb.database.Database.string
-import libetal.libraries.kuery.mariadb.entities.Entity
+import libetal.libraries.kuery.mariadb.entities.TableEntity
 
 
 data class User(
@@ -11,12 +11,12 @@ data class User(
     val dateOfBirth: LocalDate
 )
 
-object Users : Entity<User>() {
+object Users : TableEntity<User>() {
 
     val name = string("name")
 
     val dob = date("dob")
 
-    override fun getEntityTableName(): String = "users"
+    override fun getEntityName(): String = "users"
 
 }

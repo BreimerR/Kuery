@@ -1,21 +1,29 @@
 package libetal.libraries.kuery.core.columns
 
-import libetal.libraries.kuery.core.entities.Entity
+import libetal.kotlin.laziest
 
-abstract class NumberColumn<N : Number> : SizedColumn<N, N> {
+open class NumberColumn<N : Number> : SizedColumn<N, N> {
     constructor(
         name: String,
-        table: Entity<*>,
+        defaultSql: String,
         size: N? = null,
-        primary: Boolean = false
-    ) : super(name, table, size, primary)
+        primary: Boolean = false,
+        nullable: Boolean = !primary,
+        parser: (String?) -> N,
+    ) : super(name, defaultSql, size, primary, nullable, parser)
 
     constructor(
         name: String,
-        table: Entity<*>,
+        defaultSql: String,
         size: N? = null,
-        default: N? = null
-    ) : super(name, table, default, size)
+        default: N? = null,
+        parser: (String?) -> N,
+    ) : super(name, defaultSql, default, size, parser)
 
+    override val createSql: String by laziest {
+        super.createSql + primarySql + defaultSql
+    }
+
+    override fun N.defaultSql(): String = toString()
 
 }

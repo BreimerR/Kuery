@@ -1,29 +1,43 @@
 package libetal.libraries.kuery.mariadb
 
+import kotlinx.datetime.*
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.extensions.equals
 import libetal.libraries.kuery.core.statements.*
-import libetal.libraries.kuery.core.statements.extensions.FROM
-import libetal.libraries.kuery.core.statements.extensions.INTO
-import libetal.libraries.kuery.core.statements.extensions.VALUES
-import libetal.libraries.kuery.core.statements.extensions.WHERE
+import libetal.libraries.kuery.core.statements.extensions.*
 import libetal.libraries.kuery.mariadb.database.Database
+import libetal.libraries.kuery.mariadb.database.tables.User
 import libetal.libraries.kuery.mariadb.database.tables.Users
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class StatementTest {
 
-
     @Test
     fun testCreateTable() {
         assertEquals(
-            """|CREATE TABLE `users` (
-               |    `name` VARCHAR(55),
-               |    `dob` DATE
+            """|CREATE TABLE IF NOT EXISTS `users` (
+               |    `name` VARCHAR(55) NOT NULL,
+               |    `dob` DATE NOT NULL
                |);
             """.trimMargin(),
             createSimpleTableStatement.toString()
+        )
+    }
+
+    @Test
+    fun testDropSimpleTable() {
+        assertEquals(
+            """DROP TABLE `users`""",
+            dropSimpleTable.toString()
+        )
+    }
+
+    @Test
+    fun testDropTableIfExists() {
+        assertEquals(
+            """DROP TABLE IF EXISTS `users`""",
+            dropTableIfExistsStatement.toString()
         )
     }
 
@@ -34,12 +48,12 @@ class StatementTest {
 
     @Test
     fun testSimpleInsertStatementBuild() {
-        assertEquals("INSERT INTO `users` (`name`) VALUES ('Breimer')", insertNewUser.toString())
+        assertEquals("INSERT INTO `users` (`name`, `dob`) VALUES ('Breimer', '$date')", insertNewUser.toString())
     }
 
     @Test
     fun simpleSelectStatement() {
-        assertEquals("SELECT * FROM `users` WHERE true", selectAllUsers.toString())
+        assertEquals("SELECT `name`, `dob` FROM `users` WHERE true", selectAllUsers.toString())
     }
 
     @Test
@@ -48,7 +62,7 @@ class StatementTest {
     }
 
     @Test
-    fun simpleDeleteStatementBuild() { // TODO: Investigate in some crazy situation userName was in lowerCase from deleteNewUser.toString()
+    fun simpleDeleteStatementBuild() { // TODO: Investigate in some crazy situation userName was in lowerCase from deleteNewUser.toString() Trust me it happened once without lowering anywhere. I'm not crazy.
         assertEquals("DELETE FROM `users` WHERE `name` == '$userName'", deleteNewUser.toString())
     }
 
@@ -63,16 +77,23 @@ class StatementTest {
         const val userName = "Breimer"
 
         val selectAllUsers by laziest {
-            SELECT ALL Users WHERE true
+            SELECT * Users WHERE true
         }
 
         val selectSpecificUsersColumns by laziest {
             SELECT(Users.name) FROM Users WHERE true
         }
 
+        val date by laziest {
+            Clock.System.now().toLocalDateTime(TimeZone.UTC).date
+        }
+
         val insertNewUser by laziest {
-            INSERT INTO Users VALUES {
+            (INSERT INTO Users VALUES {
                 it.name set userName
+                it.dob set date
+            }).also {
+                println("SQL: $it")
             }
         }
 
@@ -82,8 +103,16 @@ class StatementTest {
 
         val createSimpleTableStatement by laziest {
             with(Database) {
-                CREATE TABLE Users
+                CREATE TABLE Users  // TODO IF NOT EXISTS
             }
+        }
+
+        val dropTableIfExistsStatement by laziest {
+            dropSimpleTable IF EXISTS
+        }
+
+        val dropSimpleTable by laziest {
+            DROP TABLE Users
         }
 
     }
