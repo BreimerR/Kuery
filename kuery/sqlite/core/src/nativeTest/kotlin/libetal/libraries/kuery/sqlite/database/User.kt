@@ -2,12 +2,11 @@ package libetal.libraries.kuery.sqlite.database
 
 
 import libetal.libraries.kuery.sqlite.core.entities.IdEntity
-import libetal.libraries.kuery.sqlite.database.Database.numeric
-import libetal.libraries.kuery.sqlite.database.Database.text
 import libetal.libraries.kuery.sqlite.database.Database.blob
+import libetal.libraries.kuery.sqlite.database.Database.boolean
 import libetal.libraries.kuery.sqlite.database.Database.long
 import libetal.libraries.kuery.sqlite.database.Database.real
-import libetal.libraries.kuery.sqlite.database.Database.boolean
+import libetal.libraries.kuery.sqlite.database.Database.text
 
 
 class User

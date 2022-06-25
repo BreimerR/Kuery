@@ -1,7 +1,6 @@
 package libetal.libraries.kuery.core.columns
 
-import libetal.libraries.kuery.core.entities.Entity
-
+/*
 class VarChar : SizedColumn<String, Int> {
 
     private val collate: String
@@ -43,4 +42,4 @@ class VarChar : SizedColumn<String, Int> {
 
     override fun String.defaultSql(): String = sqlString
 
-}
+}*/

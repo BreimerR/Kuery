@@ -1,9 +1,6 @@
 package libetal.libraries.kuery.sqlite.core.columns
 
-import libetal.libraries.kuery.core.columns.CharacterSequence
-import libetal.libraries.kuery.sqlite.core.entities.Entity
-
-class Text : CharacterSequence<String> {
+/*class Text : CharacterSequence<String> {
 
     constructor(
         name: String,
@@ -46,4 +43,4 @@ class Text : CharacterSequence<String> {
 
     override fun String.defaultSql(): String = "'$this'"
 
-}
+}*/

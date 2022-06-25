@@ -8,9 +8,4 @@ import libetal.libraries.kuery.core.entities.Entity
  * an instance of the required
  * database
  **/
-abstract class KSQL : Kuery<Entity<*>>() {
-    fun <ET, E : Entity<ET>> E.boolean(name: String = "", default: Boolean? = null) = registerColumn(name) {
-        BooleanColumn(it, default)
-    }
-
-}
+abstract class KSQL : Kuery<Entity<*>>()

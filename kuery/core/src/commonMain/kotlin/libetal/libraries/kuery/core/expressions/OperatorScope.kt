@@ -1,7 +1,5 @@
 package libetal.libraries.kuery.core.expressions
 
-import libetal.kotlin.debug.info
-import libetal.libraries.kuery.core.columns.CharacterSequence
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.columns.extensions.lessOrEqual as extensionLerOrEqual
 import libetal.libraries.kuery.core.columns.extensions.startsWith as extStartsWith
@@ -24,7 +22,7 @@ class OperatorScope(expression: Expression, val operator: String) : StatementSco
         expressions += it
     }
 
-    infix fun CharacterSequence<*>.startsWith(value: kotlin.CharSequence) = extStartsWith(value).also {
+    infix fun <C : CharSequence> Column<C>.startsWith(value: CharSequence) = extStartsWith(value).also {
         expressions += it
     }
 

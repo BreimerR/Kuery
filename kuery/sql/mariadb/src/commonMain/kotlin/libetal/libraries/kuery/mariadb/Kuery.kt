@@ -4,11 +4,9 @@ import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.Kuery
 import libetal.libraries.kuery.core.columns.Column
-import libetal.libraries.kuery.core.columns.FinalColumn
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.statements.Statement
-import libetal.libraries.kuery.mariadb.columns.*
 import libetal.libraries.kuery.mariadb.entities.TableEntity
 
 abstract class Kuery(
@@ -32,14 +30,14 @@ abstract class Kuery(
     override fun TableEntity<*>.long(name: String) = long(name, false)
 
     fun TableEntity<*>.long(name: String, primary: Boolean) = registerColumn(name) { columnName ->
-        FinalColumn(columnName, "$columnName INT ", primary, false) { result ->
+        Column(columnName, "$columnName INT ", primary, false) { result ->
             result ?: throw UnexpectedNull(this, columnName)
             result.toLongOrNull() ?: throw MalformedStoredData(this, columnName)
         }
     }
 
     override fun TableEntity<*>.int(name: String, size: Int?, primary: Boolean) = registerColumn(name) { columnName ->
-        FinalColumn(columnName, "$columnName INT ", primary, false) { result ->
+        Column(columnName, "$columnName INT ", primary, false) { result ->
             result ?: throw UnexpectedNull(this, columnName)
             result.toIntOrNull() ?: throw MalformedStoredData(this, columnName)
         }
@@ -53,7 +51,7 @@ abstract class Kuery(
         registerColumn(name) { columnName ->
             val defaultSql = default?.let { " DEFAULT $default" } ?: ""
             val maxSql = size?.let { "($size) " } ?: ""
-            FinalColumn(columnName, "$columnName FLOAT$maxSql$defaultSql", false, false) { result ->
+            Column(columnName, "$columnName FLOAT$maxSql$defaultSql", false, false) { result ->
                 result ?: throw UnexpectedNull(this, columnName)
                 result.toFloatOrNull() ?: throw MalformedStoredData(this, columnName)
             }
@@ -64,7 +62,7 @@ abstract class Kuery(
 
     fun TableEntity<*>.char(name: String, default: Char?) = registerColumn(name) { columnName ->
         val defaultSql = default?.let { " DEFAULT '$it'" } ?: ""
-        FinalColumn(
+        Column(
             columnName,
             sql = "`$columnName` CHAR$defaultSql",
             primary = false,
@@ -75,7 +73,7 @@ abstract class Kuery(
     }
 
     override fun TableEntity<*>.date(name: String) = registerColumn(name) { columnName ->
-        FinalColumn(
+        Column(
             columnName,
             "`$columnName` DATE $NOT_NULL",
             primary = false,
@@ -95,7 +93,7 @@ abstract class Kuery(
         format: String
     ) = registerColumn(name) { columnName ->
         val defaultSql = " DEFAULT STR_TO_DATE('$default','$format')"
-        FinalColumn(
+        Column(
             columnName,
             "`$columnName` DATE$defaultSql $NOT_NULL",
             primary = false,
@@ -113,7 +111,7 @@ abstract class Kuery(
         registerColumn(name) { columnName ->
             val defaultSql = default?.let { " DEFAULT $default" } ?: ""
             val maxSql = "($size)"
-            FinalColumn(
+            Column(
                 columnName,
                 "`$columnName` VARCHAR$maxSql$defaultSql $NOT_NULL",
                 primary = false,
@@ -130,7 +128,7 @@ abstract class Kuery(
         registerColumn(name) { columnName ->
             val maxSql = "($size)"
             val defaultSql = default?.let { " DEFAULT '$it'" } ?: ""
-            FinalColumn(
+            Column(
                 columnName,
                 "`$columnName` VARCHAR$maxSql$defaultSql",
                 primary = false,
@@ -148,7 +146,7 @@ abstract class Kuery(
     override fun TableEntity<*>.boolean(name: String, default: Boolean?) = registerColumn(name) { columnName ->
         val defaultSql = default?.let { " DEFAULT ${if (it) "true" else "false"}" } ?: ""
 
-        FinalColumn(columnName,
+        Column(columnName,
             "$columnName BOOLEAN$defaultSql",
             primary = false,
             nullable = false,

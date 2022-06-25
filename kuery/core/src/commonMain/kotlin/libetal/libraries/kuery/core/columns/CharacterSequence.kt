@@ -1,7 +1,6 @@
 package libetal.libraries.kuery.core.columns
 
-import libetal.libraries.kuery.core.entities.Entity
-
+/*
 abstract class CharacterSequence<C : CharSequence> : SizedColumn<C, Int> {
 
     val collate: String?
@@ -38,4 +37,4 @@ abstract class CharacterSequence<C : CharSequence> : SizedColumn<C, Int> {
         this.unique = unique
     }
 
-}
+}*/

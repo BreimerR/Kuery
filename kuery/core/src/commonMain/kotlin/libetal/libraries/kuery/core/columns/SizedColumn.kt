@@ -2,7 +2,7 @@ package libetal.libraries.kuery.core.columns
 
 import libetal.kotlin.laziest
 
-open class SizedColumn<T, N : Number> : Column<T> {
+/*open class SizedColumn<T, N : Number> : Column<T> {
 
     val size: N?
 
@@ -43,7 +43,7 @@ open class SizedColumn<T, N : Number> : Column<T> {
     }
 
 
-}
+}*/
 
 
 

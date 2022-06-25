@@ -2,7 +2,7 @@ package libetal.libraries.kuery.core.columns
 
 import libetal.kotlin.laziest
 
-open class NumberColumn<N : Number> : SizedColumn<N, N> {
+/*open class NumberColumn<N : Number> : SizedColumn<N, N> {
     constructor(
         name: String,
         defaultSql: String,
@@ -26,4 +26,4 @@ open class NumberColumn<N : Number> : SizedColumn<N, N> {
 
     override fun N.defaultSql(): String = toString()
 
-}
+}*/

@@ -1,7 +1,7 @@
 package libetal.libraries.kuery.sqlite.core
 
 import kotlinx.datetime.LocalDate
-import libetal.libraries.kuery.core.columns.FinalColumn
+import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.Kuery as CoreKuery
@@ -11,7 +11,6 @@ import libetal.libraries.kuery.sqlite.core.database.extensions.addListener
 import libetal.libraries.kuery.sqlite.core.database.listeners.ConnectorListener
 import libetal.libraries.kuery.sqlite.core.entities.Entity
 import libetal.libraries.kuery.core.tableEntities
-import libetal.libraries.kuery.sqlite.core.columns.*
 import libetal.libraries.kuery.sqlite.core.database.Connector
 
 /**
@@ -30,7 +29,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     fun Entity<*, *, *>.text(name: String = "", default: String? = null) =
         registerColumn(name) {
-            FinalColumn(it, "$it TEXT", primary = false, nullable = false) { result ->
+            Column(it, "$it TEXT", primary = false, nullable = false) { result ->
                 result ?: throw MalformedStoredData(this, it)
             }
         }
@@ -43,7 +42,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     ) =
         registerColumn(name) { columnName ->
             val sizeSql = size?.let { "($size)" } ?: ""
-            FinalColumn(
+            Column(
                 columnName,
                 "$columnName NUMERIC$sizeSql $NOT_NULL",
                 primary,
@@ -56,7 +55,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
         }
 
     fun Entity<*, *, *>.real(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
-        FinalColumn(
+        Column(
             columnName,
             "`$name` REAL",
             primary,
@@ -83,7 +82,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     }
 
     fun Entity<*, *, *>.blob(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
-        FinalColumn(
+        Column(
             columnName,
             "`$columnName` BLOB",
             primary,
@@ -142,7 +141,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     fun Entity<*, *, *>.char(name: String, default: Char?) =
         registerColumn(name) { columnName ->
-            FinalColumn(
+            Column(
                 columnName,
                 "`$columnName` TEXT",
                 primary = false,
@@ -157,7 +156,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     override fun Entity<*, *, *>.date(name: String) =
         registerColumn(name) { columnName ->
-            FinalColumn(
+            Column(
                 columnName,
                 "`$columnName` TEXT",
                 false,
@@ -184,7 +183,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     fun Entity<*, *, *>.date(name: String, default: LocalDate? = null, format: String? = null) =
         registerColumn(name) { columnName ->
             val defaultSql = default?.let{ " DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))"} ?: ""
-            FinalColumn(
+            Column(
                 columnName,
                 "`$columnName` TEXT$defaultSql $NOT_NULL",
                 false,
@@ -205,7 +204,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     override fun Entity<*, *, *>.string(name: String, size: Int, default: String?) =
         registerColumn(name) { columnName ->
-            FinalColumn(
+            Column(
                 columnName,
                 "`$columnName` TEXT",
                 primary = false,
@@ -226,7 +225,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     override fun Entity<*, *, *>.boolean(name: String, default: Boolean?) = registerColumn(name) { columnName ->
         val defaultSql = default?.let { " DEFAULT ${if (it) "1" else "0"}" } ?: ""
 
-        FinalColumn(
+        Column(
             columnName,
             "`$columnName` NUMBER$defaultSql $NOT_NULL",
             primary = false,
