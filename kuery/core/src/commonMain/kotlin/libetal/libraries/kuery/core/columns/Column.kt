@@ -8,13 +8,14 @@ import libetal.libraries.kuery.core.expressions.Expression
  * sense here than to have different
  * classes for each column
  **/
-/*open class Column<T>(
-    val name: String,
-    open val baseSql: String,
-    val primary: Boolean = false,
-    val nullable: Boolean = false,
-    val parser: (String?) -> T
-)*/
+/**TODO
+ * class Column<T>(
+ *  val name: String,
+ *  val baseSql: String,
+ *  val primary: Boolean = false,
+ *  val nullable: Boolean = false,
+ *  val parser: (String?) -> T)
+ **/
 
 class Column<T>(
     val name: String,

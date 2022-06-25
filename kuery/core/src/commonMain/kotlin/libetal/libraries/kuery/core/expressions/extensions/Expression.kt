@@ -13,13 +13,13 @@ val Expression.OrOperatorScope
     get() = OperatorScope(this, "OR")
 
 infix fun Expression.AND(expressionBuilder: OperatorScope.() -> Unit): Expression = apply {
-    val scope = AndOperatorScope
+    val scope = OperatorScope(this, "AND")
     expressionBuilder(scope)
     sql = scope.sql
 }
 
 infix fun Expression.OR(expression: OperatorScope.() -> Unit): Expression = apply {
-    val scope = OrOperatorScope
+    val scope = OperatorScope(this, "OR")
     expression(scope)
     sql = scope.sql
 }
