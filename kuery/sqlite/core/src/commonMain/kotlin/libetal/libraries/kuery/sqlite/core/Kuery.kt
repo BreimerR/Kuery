@@ -55,31 +55,67 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
             }
         }
 
-    fun Entity<*, *, *>.real(name: String = "") = registerColumn(name) { columnName ->
-        Real(columnName, false)
+    fun Entity<*, *, *>.real(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
+        FinalColumn(
+            columnName,
+            "`$name` REAL",
+            primary,
+            false,
+            {
+                "$it"
+            }
+        ) {
+            it ?: throw UnexpectedNull(this, columnName)
+            val actions = listOf(String::toDouble, String::toFloat, String::toLong, String::toInt)
+
+            var result: Number? = null
+
+            for (action in actions) {
+                result = try {
+                    action(it)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            result ?: throw MalformedStoredData(this, columnName)
+        }
     }
 
     fun Entity<*, *, *>.blob(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
-        Blob(columnName, primary)
         FinalColumn(
             columnName,
             "`$columnName` BLOB",
             primary,
             nullable = false,
-            {
+            { it: Any ->
                 it.toString()
             }
         ) {
             throw RuntimeException("Not sure of the representation for this one")
-            Any()
         }
 
     }
 
-    @Suppress("UNCHECKED_CAST")
+/*    @Suppress("UNCHECKED_CAST")
     fun Entity<*, *, *>.boolean(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
-        BooleanColumn(columnName, primary)
-    }
+        FinalColumn(
+            columnName,
+            "`$columnName` BLOB",
+            primary,
+            nullable = false,
+            { it: Any ->
+                it.toString()
+            }
+        ) { result ->
+            result ?: throw UnexpectedNull(this, columnName)
+            when (result) {
+                "1" -> true
+                "0" -> false
+                else -> throw MalformedStoredData(this, columnName)
+            }
+        }
+    }*/
 
     @Suppress("UNCHECKED_CAST")
     override fun Entity<*, *, *>.long(name: String) = numeric(name) { columnName, result ->
@@ -120,13 +156,50 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
         }
 
     override fun Entity<*, *, *>.date(name: String) =
-        registerColumn(name) { usableName ->
-            DateColumn(usableName, false)
+        registerColumn(name) { columnName ->
+            FinalColumn(
+                columnName,
+                "`$columnName` TEXT",
+                false,
+                nullable = false,
+                {
+                    "'$it'"
+                }
+            ) { result ->
+                result ?: throw UnexpectedNull(this, columnName)
+                try {
+                    LocalDate.parse(result)
+                } catch (e: Exception) {
+                    throw MalformedStoredData(this, columnName)
+                }
+            }
         }
 
+    /** TODO
+     * Not sure about the implementation of default
+     * here yet
+     * but can easily be changed once solved
+     * "DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))"
+     **/
     fun Entity<*, *, *>.date(name: String, default: LocalDate? = null, format: String? = null) =
-        registerColumn(name) { usableName ->
-            DateColumn(usableName, false)
+        registerColumn(name) { columnName ->
+            val defaultSql = default?.let{ " DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))"} ?: ""
+            FinalColumn(
+                columnName,
+                "`$columnName` TEXT$defaultSql $NOT_NULL",
+                false,
+                nullable = false,
+                {
+                    "'$it'"
+                }
+            ) { result ->
+                result ?: throw UnexpectedNull(this, columnName)
+                try {
+                    LocalDate.parse(result)
+                } catch (e: Exception) {
+                    throw MalformedStoredData(this, columnName)
+                }
+            }
         }
 
 
@@ -145,6 +218,11 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
             }
         }
 
+    /**
+     * SQLite doesn't support booleans
+     * thus need to store this value as an integer and
+     * retrieve as int and convert to boolean
+     **/
     override fun Entity<*, *, *>.boolean(name: String, default: Boolean?) = registerColumn(name) { columnName ->
         val defaultSql = default?.let { " DEFAULT ${if (it) "1" else "0"}" } ?: ""
 

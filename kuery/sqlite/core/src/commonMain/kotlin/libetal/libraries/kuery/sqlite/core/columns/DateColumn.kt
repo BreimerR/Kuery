@@ -5,6 +5,7 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.sqlite.core.entities.Entity
 
+/*
 class DateColumn : Column<LocalDate> {
 
     var format: String? = null
@@ -18,7 +19,8 @@ class DateColumn : Column<LocalDate> {
         primary
     )
 
-    /**
+    */
+/**
      * DEFAULT VALUE SUPPORT IS DIFFERENT HERE AS IT CAN CONTAIN
      * BUT THIS DEPENDS ON IF WE WANT TO CALCULATE IT FROM THE DATABASE ON THE RUNNING SERVER
      * IMPLEMENTATION.
@@ -32,7 +34,8 @@ class DateColumn : Column<LocalDate> {
      *      5. UNIXEPOCH(time-value, modifier, modifier, ...)
      *      6. STRFTIME(format, time-value, modifier, modifier, ...)
      *   > Where time-value can be [```now``` | ```most date formats```]
-     **/
+     **//*
+
     constructor(
         name: String,
         default: LocalDate? = null,
@@ -59,4 +62,4 @@ class DateColumn : Column<LocalDate> {
 
     override fun LocalDate.defaultSql(): String = toString() // Default value could be a lambda that returns LocalDate
 
-}
+}*/
