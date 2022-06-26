@@ -15,9 +15,6 @@ class SelectStatementBuilder<T, E : Entity<T>>(entity: E, vararg columns: Column
 }
 
 
-fun <T, E : Entity<T>> Array<out Column<*>>.toSql(entity: E): String =
-    joinToString("`, `") { it.identifier }.let {
-        "`$it`"
-    }
+
 
 

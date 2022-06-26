@@ -24,11 +24,5 @@ abstract class Statement<T, E : Entity<T>>(val sql: String, val entity: E) {
 }
 
 
-abstract class Result(val error: RuntimeException? = null) {
-    val failed
-        get() = error != null
 
-    val errorMessage
-        get() = error?.message ?: ""
-}
 

@@ -9,12 +9,12 @@ import kuery.interop.mariadb.mysql_free_result
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.core.statements.results.CreateResult
+import libetal.libraries.kuery.core.statements.results.DeleteResult
+import libetal.libraries.kuery.core.statements.results.InsertResult
+import libetal.libraries.kuery.core.statements.results.SelectResult
 import libetal.libraries.kuery.mariadb.exceptions.MariaDbException
 import libetal.libraries.kuery.mariadb.interop.*
-import libetal.libraries.kuery.mariadb.statements.CreateResult
-import libetal.libraries.kuery.mariadb.statements.DeleteResult
-import libetal.libraries.kuery.mariadb.statements.InsertResult
-import libetal.libraries.kuery.mariadb.statements.SelectResult
 
 actual class Connector actual constructor(
     actual val database: String,
