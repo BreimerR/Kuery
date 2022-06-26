@@ -1,6 +1,6 @@
 package libetal.libraries.kuery.core
 
-import libetal.libraries.kuery.core.columns.BooleanColumn
+
 import libetal.libraries.kuery.core.entities.Entity
 
 /**

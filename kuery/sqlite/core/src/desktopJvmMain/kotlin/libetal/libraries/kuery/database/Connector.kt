@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.Statement
 
-class Connector(override val dbName: String) : CoreConnector {
+class Connector(override val dbName: String, val version: Int) : CoreConnector {
 
     override suspend fun executeSQL(statement: Statement<*, *>): Unit = withContext(Dispatchers.IO) {
         TODO("")

@@ -121,10 +121,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         allprojects {
             freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
-            freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
+            // freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
         }
         kotlin.sourceSets.all {
-            languageSettings.optIn("kotlin.RequiresOptIn")
             languageSettings.optIn("kotlin.RequiresOptIn")
         }
     }

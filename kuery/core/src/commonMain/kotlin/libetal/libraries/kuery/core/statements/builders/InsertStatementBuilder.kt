@@ -32,6 +32,8 @@ class InsertStatementBuilder<T, E : Entity<T>>(entity: E) :
 
             var k = 0
             val keys = map.keys.toList()
+            if (keys.isEmpty())
+                throw RuntimeException("Need to set values inside INSERT INTO TableName VALUES { ${entity::class.simpleName}.columnName set compatibleColumnTypeValue }")
             val lK = map.keys.size
             var v = 0
 
