@@ -1,12 +1,17 @@
 package libetal.libraries.kuery.mariadb
 
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.extensions.equals
 import libetal.libraries.kuery.core.statements.*
-import libetal.libraries.kuery.core.statements.extensions.*
+import libetal.libraries.kuery.core.statements.Existence.EXISTS
+import libetal.libraries.kuery.core.statements.extensions.FROM
+import libetal.libraries.kuery.core.statements.extensions.INTO
+import libetal.libraries.kuery.core.statements.extensions.VALUES
+import libetal.libraries.kuery.core.statements.extensions.WHERE
 import libetal.libraries.kuery.mariadb.database.Database
-import libetal.libraries.kuery.mariadb.database.tables.User
 import libetal.libraries.kuery.mariadb.database.tables.Users
 import kotlin.test.Test
 import kotlin.test.assertEquals

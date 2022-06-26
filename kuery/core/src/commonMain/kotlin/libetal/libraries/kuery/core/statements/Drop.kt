@@ -9,8 +9,7 @@ class Drop<Class, E : Entity<Class>>(entity: E, val type: Entity.Type = Entity.T
         entity
     ) {
 
-    infix fun IF(exists: EXISTS) = Drop(entity, type, true)
+    infix fun IF(existence: Existence) = Drop(entity, type, existence.state)
 
 }
 
-object EXISTS
