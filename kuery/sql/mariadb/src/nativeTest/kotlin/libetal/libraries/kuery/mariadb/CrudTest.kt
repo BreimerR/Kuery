@@ -1,14 +1,13 @@
 package libetal.libraries.kuery.mariadb
 
-import libetal.libraries.kuery.mariadb.StatementTest.Companion.createSimpleTableStatement
-import libetal.libraries.kuery.mariadb.StatementTest.Companion.dropTableIfExistsStatement
+import libetal.libraries.kuery.core.statements.results.CreateResult
+import libetal.libraries.kuery.core.statements.results.DeleteResult
+import libetal.libraries.kuery.core.statements.results.InsertResult
+import libetal.libraries.kuery.core.statements.results.SelectResult
 import libetal.libraries.kuery.mariadb.StatementTest.Companion.insertNewUser
 import libetal.libraries.kuery.mariadb.StatementTest.Companion.selectAllUsers
 import libetal.libraries.kuery.mariadb.StatementTest.Companion.selectSpecificUsersColumns
-import libetal.libraries.kuery.mariadb.statements.CreateResult
-import libetal.libraries.kuery.mariadb.statements.DeleteResult
-import libetal.libraries.kuery.mariadb.statements.InsertResult
-import libetal.libraries.kuery.mariadb.statements.SelectResult
+
 import kotlin.test.*
 
 class CrudTest : TestCase {
