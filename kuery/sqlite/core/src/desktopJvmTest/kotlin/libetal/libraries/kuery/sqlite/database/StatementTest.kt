@@ -22,7 +22,7 @@ class StatementTest {
         assertEquals(
             """CREATE TABLE IF NOT EXISTS `users` (
             |    user NUMERIC NOT NULL,
-            |    name TEXT,
+            |    name TEXT NOT NULL,
             |    age NUMERIC NOT NULL
             |);
         """.trimMargin(), createTableStatement.toString()

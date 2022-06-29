@@ -27,4 +27,11 @@ interface TestCase {
         }
     }
 
+
+    fun test(){
+        val ubyte: UInt = 0u
+        val m = 1
+        val isZero = ubyte == 0u
+    }
+
 }

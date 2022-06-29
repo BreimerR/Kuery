@@ -1,6 +1,7 @@
 package libetal.libraries.kuery.sqlite.core
 
 import kotlinx.datetime.LocalDate
+import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
@@ -19,7 +20,7 @@ import libetal.libraries.kuery.sqlite.core.database.Connector
  **/
 abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
-    val connector: Connector by lazy {
+    val connector: Connector by laziest {
         init().also {
             it.addListener(this)
         }
@@ -29,7 +30,8 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     fun Entity<*, *, *>.text(name: String = "", default: String? = null) =
         registerColumn(name) {
-            Column(it, "$it TEXT", primary = false, nullable = false) { result ->
+            val defaultSql = default?.let { " DEFAULT '$default'" } ?: ""
+            Column(it, "$it TEXT $NOT_NULL$defaultSql", primary = false, nullable = false) { result ->
                 result ?: throw MalformedStoredData(this, it)
             }
         }
@@ -96,7 +98,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     }
 
-/*    @Suppress("UNCHECKED_CAST")
+    /*@Suppress("UNCHECKED_CAST")
     fun Entity<*, *, *>.boolean(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
         FinalColumn(
             columnName,
@@ -182,7 +184,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
      **/
     fun Entity<*, *, *>.date(name: String, default: LocalDate? = null, format: String? = null) =
         registerColumn(name) { columnName ->
-            val defaultSql = default?.let{ " DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))"} ?: ""
+            val defaultSql = default?.let { " DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))" } ?: ""
             Column(
                 columnName,
                 "`$columnName` TEXT$defaultSql $NOT_NULL",

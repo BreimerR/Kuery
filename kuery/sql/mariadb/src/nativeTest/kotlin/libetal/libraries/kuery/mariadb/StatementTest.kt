@@ -7,11 +7,9 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.extensions.equals
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.Existence.EXISTS
-import libetal.libraries.kuery.core.statements.extensions.FROM
-import libetal.libraries.kuery.core.statements.extensions.INTO
-import libetal.libraries.kuery.core.statements.extensions.VALUES
-import libetal.libraries.kuery.core.statements.extensions.WHERE
+import libetal.libraries.kuery.core.statements.extensions.*
 import libetal.libraries.kuery.mariadb.database.Database
+import libetal.libraries.kuery.mariadb.database.Database.TABLE
 import libetal.libraries.kuery.mariadb.database.tables.Users
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -73,7 +71,7 @@ class StatementTest {
 
     @Test
     fun simpleUpdateStatementBuild() {
-
+        assertEquals("UPDATE `users` SET `name` = 'Breimer' WHERE `name` == 'Lazie'", updateSimpleTableStatement.toString())
     }
 
 
@@ -103,13 +101,20 @@ class StatementTest {
         }
 
         val deleteNewUser by laziest {
-            DELETE * Users WHERE (Users.name equals userName)
+            val statement = DELETE * Users WHERE (Users.name equals userName)
+
+
+
         }
 
         val createSimpleTableStatement by laziest {
-            with(Database) {
-                CREATE TABLE Users  // TODO IF NOT EXISTS
-            }
+            CREATE TABLE Users  // TODO IF NOT EXISTS
+        }
+
+        val updateSimpleTableStatement by laziest {
+            UPDATE TABLE Users SET {
+                Users.name to "Breimer"
+            } WHERE (Users.name equals "Lazie")
         }
 
         val dropTableIfExistsStatement by laziest {
