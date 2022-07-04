@@ -4,6 +4,7 @@ package libetal.libraries.kuery.core.statements.extensions
 
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.expressions.Expression
+import libetal.libraries.kuery.core.expressions.SimpleExpression
 import libetal.libraries.kuery.core.expressions.WhereScope
 import libetal.libraries.kuery.core.statements.Statement
 import libetal.libraries.kuery.core.statements.builders.EntityStatementBuilder
@@ -18,7 +19,9 @@ infix fun <T, E : Entity<T>, S : Statement<T, E>> EntityStatementBuilder<T, E, S
     WHERE(expressionBuilder(WhereScope()))
 
 infix fun <T, E : Entity<T>, S : Statement<T, E>> EntityStatementBuilder<T, E, S>.WHERE(expression: Expression): S =
-    entity.buildWhere(expression.sql)
+    entity.buildWhere(expression.sql.let {
+        if (it[0] == '(') it.substring(1, it.length - 1) else it
+    })
 
 infix fun <T, E : Entity<T>, S : Statement<T, E>> EntityStatementBuilder<T, E, S>.WHERE(boolean: Boolean): S =
     entity.buildWhere("$boolean")

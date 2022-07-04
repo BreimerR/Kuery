@@ -25,10 +25,8 @@ class SelectTest {
     fun selectSimpleAnd() {
 
         val statement = SELECT ALL Users WHERE (Users.name equals "Breimer" AND {
-            Users.isPuppy equals true
+            Users.isPuppy equivalent true
         })
-
-        TAG info statement.toString()
 
         assertEquals("SELECT * FROM `users` WHERE `users.name` == 'Breimer' AND `users.isPuppy` == 1", statement.toString())
 
@@ -53,7 +51,7 @@ class SelectTest {
         @Test
         fun selectSimpleOr() {
             val statement = SELECT * Users WHERE (Users.name equals "Breimer" OR {
-                Users.isPuppy equals true
+                Users.isPuppy equivalent true
             })
 
             TAG info statement.toString()

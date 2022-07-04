@@ -11,6 +11,7 @@ val androidCompileSdkVersion by project {
     it.toString().toInt()
 }
 
+
 val minSdkVersion by project {
     it.toString().toInt()
 }
@@ -25,6 +26,7 @@ val sqliteProjectGroup: String by extra
 
 plugins {
     kotlin("multiplatform")
+    id("com.android.library")
     `maven-publish`
 }
 
@@ -32,6 +34,9 @@ group = sqliteProjectGroup
 version = "$projectVersion-3" // this should represent the version of sqlite i.e 1.0.0-3
 
 kotlin {
+    android {
+
+    }
     jsTarget()
     desktopJvm()
     isMac {
@@ -90,11 +95,19 @@ kotlin {
             }
         }
 
+        val androidMain by getting {
+            dependencies {
+                api("androidx.annotation:annotation:1.4.0")
+            }
+        }
+
         val jsMain by getting
         val jsTest by getting
 
         val desktopJvmMain by getting
-        val desktopJvmTest by getting
+        val desktopJvmTest by getting {
+
+        }
 
         val nativeMain by getting {
         }
@@ -109,5 +122,20 @@ kotlin {
                 implementation("junit:junit:4.13.2")
             }
         }*/
+    }
+}
+
+
+android {
+    compileSdk = androidCompileSdkVersion
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+
+    defaultConfig {
+        minSdk = minSdkVersion
+        targetSdk = targetSdkVersion
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }

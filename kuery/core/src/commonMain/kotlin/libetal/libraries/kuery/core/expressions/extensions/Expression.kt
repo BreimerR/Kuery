@@ -3,7 +3,9 @@
 package libetal.libraries.kuery.core.expressions.extensions
 
 import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.expressions.SimpleExpression
 import libetal.libraries.kuery.core.expressions.Expression
+import libetal.libraries.kuery.core.expressions.JoinedExpression
 import libetal.libraries.kuery.core.expressions.OperatorScope
 
 val Expression.AndOperatorScope
@@ -18,12 +20,24 @@ infix fun Expression.AND(expressionBuilder: OperatorScope.() -> Unit): Expressio
     sql = scope.sql
 }
 
+infix fun Expression.AND(expression: Expression): Expression = JoinedExpression(
+    this,
+    Expression.Operators.AND,
+    expression
+)
+
+infix fun Expression.OR(expression: Expression): Expression = JoinedExpression(
+    this,
+    Expression.Operators.OR,
+    expression
+)
+
 infix fun Expression.OR(expression: OperatorScope.() -> Unit): Expression = apply {
     val scope = OperatorScope(this, "OR")
     expression(scope)
     sql = scope.sql
 }
 
-fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: String) = Expression(identifier, operator, value.sqlString)
-fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: Expression.Operator) =
-    Expression(identifier, operator, value.sqlString)
+fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: String) = SimpleExpression<T>(name, operator, value.sqlString)
+fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: Expression.Operators) =
+    SimpleExpression<T>(name, operator, value.sqlString)

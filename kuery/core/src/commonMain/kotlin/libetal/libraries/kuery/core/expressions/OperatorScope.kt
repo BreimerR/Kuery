@@ -1,29 +1,39 @@
 package libetal.libraries.kuery.core.expressions
 
+import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.columns.extensions.lessOrEqual as extensionLerOrEqual
 import libetal.libraries.kuery.core.columns.extensions.startsWith as extStartsWith
 
-class OperatorScope(expression: Expression, val operator: String) : StatementScope() {
-
-    val expressions by lazy {
-        mutableListOf<Expression>(expression)
-    }
+class OperatorScope(private var expression: Expression?, val operator: String) : StatementScope {
 
     val sql
-        get() = expressions.joinToString(" $operator ")
+        get() = expression?.toString() ?: throw RuntimeException("Inappropriate OperatorScope Used")
 
-    @Suppress("CovariantEquals")
-    infix fun <T> Column<T>.equals(value: T) = value.equalsExpression.also {
-        expressions += it
+    @Suppress("CovariantEquals") // TODO: This isn't the best due to operator problems
+    infix fun <T> Column<T>.equals(value: T) = equivalent(value)
+
+    /**
+     * TODO:
+     * This might be best for the api and should be the
+     * recommended use case
+     **/
+    infix fun <T> Column<T>.equivalent(value: T) {
+        expression + value.equalsExpression
     }
 
     infix fun <T> Column<T>.lessOrEqual(value: T) = extensionLerOrEqual(value).also {
-        expressions += it
+        expression + it
     }
 
     infix fun <C : CharSequence> Column<C>.startsWith(value: CharSequence) = extStartsWith(value).also {
-        expressions += it
+        expression + it
+    }
+
+    private operator fun Expression?.plus(right: Expression) {
+        expression = this?.let {
+            JoinedExpression(it, Expression.Operators(operator), right)
+        } ?: right
     }
 
     companion object {

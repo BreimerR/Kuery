@@ -31,7 +31,9 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     fun Entity<*, *, *>.text(name: String = "", default: String? = null) =
         registerColumn(name) {
             val defaultSql = default?.let { " DEFAULT '$default'" } ?: ""
-            Column(it, "$it TEXT $NOT_NULL$defaultSql", primary = false, nullable = false) { result ->
+            Column(it, "$it TEXT $NOT_NULL$defaultSql", primary = false, nullable = false, {value ->
+                "'$value'"
+            }) { result ->
                 result ?: throw MalformedStoredData(this, it)
             }
         }
@@ -249,16 +251,12 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     override fun <T, E : libetal.libraries.kuery.core.entities.Entity<T>> execute(statement: Statement<T, E>) {
         // Connector.INSTANCE.execute(statement)
+        connector.execute(statement)
     }
 
     override fun onCreate(connector: Connector) = tableEntities.forEach { (entity, columns) ->
         val sql = INSERT
     }
-
-    /* val CREATE by lazy {
-         CreateStatementFactory(this)
-     }*/
-
 
 }
 

@@ -7,7 +7,7 @@ import libetal.libraries.kuery.sqlite.database.Database.long
 import libetal.libraries.kuery.sqlite.database.Database.text
 
 object Users : IdEntity<User>() {
-    override val id = long("user")
+    override val id = long("id")
     val name = text("name")
     val age = int("age")
     override fun getEntityName(): String = "users"

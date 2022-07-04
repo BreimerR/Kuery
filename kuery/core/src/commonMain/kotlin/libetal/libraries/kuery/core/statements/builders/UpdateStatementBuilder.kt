@@ -18,7 +18,7 @@ class UpdateStatementBuilder<T, E : Entity<T>>(entity: E) :
         get() = "SET " + expressions.joinToString(",") { it.toString() }
 
     infix fun <T> Column<T>.to(value: T) {
-        expressions += UpdateExpression("""`$identifier` = ${value.sqlString}""")
+        expressions += UpdateExpression("""`$name` = ${value.sqlString}""")
     }
 
     override fun build(extras: String) = Update("$sql $extras", entity).also { updateStatement ->

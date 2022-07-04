@@ -15,8 +15,8 @@ class InsertStatementBuilder<T, E : Entity<T>>(entity: E) :
 
     infix fun <C> Column<C>.set(value: C) {
 
-        val values = map[identifier] ?: mutableListOf<String>().also {
-            map[identifier] = it
+        val values = map[name] ?: mutableListOf<String>().also {
+            map[name] = it
         }
 
         values += value.sqlString
