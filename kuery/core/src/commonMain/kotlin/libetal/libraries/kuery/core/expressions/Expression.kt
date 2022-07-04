@@ -1,12 +1,12 @@
 package libetal.libraries.kuery.core.expressions;
 
-import libetal.kotlin.laziest
-
 abstract class Expression<T>(val left: T, val operator: String, val right: T) {
 
     abstract val sql: String
 
     abstract val boundSql: String
+
+    abstract val columnValues: List<Pair<String, String>>
 
     enum class Operators(private val op: String) {
         EQUALS("="),

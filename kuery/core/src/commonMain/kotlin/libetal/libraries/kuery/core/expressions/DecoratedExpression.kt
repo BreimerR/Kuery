@@ -13,7 +13,7 @@ class DecoratedExpression<T> : Expression<String> {
         postfix: String = ""
     ) : this(left.name, operator, with(left) { right.sqlString }, prefix, postfix)
 
-    constructor(
+    private constructor(
         column: String,
         operator: Operators,
         value: String,
@@ -36,6 +36,11 @@ class DecoratedExpression<T> : Expression<String> {
 
     override val boundSql: String by laziest {
         "`$left` $operator ?"
+    }
+    override val columnValues: List<Pair<String, String>> by laziest {
+        listOf(
+            left to right
+        )
     }
 
 }

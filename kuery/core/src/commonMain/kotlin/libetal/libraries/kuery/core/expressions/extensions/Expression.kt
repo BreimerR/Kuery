@@ -8,36 +8,31 @@ import libetal.libraries.kuery.core.expressions.Expression
 import libetal.libraries.kuery.core.expressions.JoinedExpression
 import libetal.libraries.kuery.core.expressions.OperatorScope
 
-val Expression.AndOperatorScope
-    get() = OperatorScope(this, "AND")
-
-val Expression.OrOperatorScope
-    get() = OperatorScope(this, "OR")
-
-infix fun Expression.AND(expressionBuilder: OperatorScope.() -> Unit): Expression = apply {
+infix fun Expression<*>.AND(expressionBuilder: OperatorScope.() -> Unit): Expression<*> = run {
     val scope = OperatorScope(this, "AND")
     expressionBuilder(scope)
-    sql = scope.sql
+    scope.expression
 }
 
-infix fun Expression.AND(expression: Expression): Expression = JoinedExpression(
+
+infix fun Expression<*>.AND(expression: Expression<*>): Expression<*> = JoinedExpression(
     this,
     Expression.Operators.AND,
     expression
 )
 
-infix fun Expression.OR(expression: Expression): Expression = JoinedExpression(
+infix fun Expression<*>.OR(expression: Expression<*>): Expression<*> = JoinedExpression(
     this,
     Expression.Operators.OR,
     expression
 )
 
-infix fun Expression.OR(expression: OperatorScope.() -> Unit): Expression = apply {
+infix fun Expression<*>.OR(expressionBuilder: OperatorScope.() -> Unit) = run {
     val scope = OperatorScope(this, "OR")
-    expression(scope)
-    sql = scope.sql
+    expressionBuilder(scope)
+    scope.expression
 }
 
-fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: String) = SimpleExpression<T>(name, operator, value.sqlString)
+// fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: String) = SimpleExpression<T>(name, operator, value)
 fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: Expression.Operators) =
     SimpleExpression<T>(name, operator, value.sqlString)

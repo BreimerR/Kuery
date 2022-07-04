@@ -15,4 +15,12 @@ class JoinedExpression(
     override val boundSql: String by laziest {
         "(${left.boundSql} $operator ${right.boundSql}"
     }
+    override val columnValues: List<Pair<String, String>> by laziest {
+        buildList {
+            addAll(left.columnValues)
+            addAll(right.columnValues)
+        }
+    }
+
+
 }

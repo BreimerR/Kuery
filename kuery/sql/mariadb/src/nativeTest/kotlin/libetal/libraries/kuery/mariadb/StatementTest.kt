@@ -46,7 +46,7 @@ class StatementTest {
 
     @Test
     fun testEqualsOperator() {
-        assertEquals("`name` == '$userName'", (Users.name equals userName).sql)
+        assertEquals("`name` = '$userName'", (Users.name equals userName).sql)
     }
 
     @Test
@@ -66,12 +66,12 @@ class StatementTest {
 
     @Test
     fun simpleDeleteStatementBuild() { // TODO: Investigate in some crazy situation userName was in lowerCase from deleteNewUser.toString() Trust me it happened once without lowering anywhere. I'm not crazy.
-        assertEquals("DELETE FROM `users` WHERE `name` == '$userName'", deleteNewUser.toString())
+        assertEquals("DELETE FROM `users` WHERE `name` = '$userName'", deleteNewUser.toString())
     }
 
     @Test
     fun simpleUpdateStatementBuild() {
-        assertEquals("UPDATE `users` SET `name` = 'Breimer' WHERE `name` == 'Lazie'", updateSimpleTableStatement.toString())
+        assertEquals("UPDATE `users` SET `name` = 'Breimer' WHERE `name` = 'Lazie'", updateSimpleTableStatement.toString())
     }
 
 

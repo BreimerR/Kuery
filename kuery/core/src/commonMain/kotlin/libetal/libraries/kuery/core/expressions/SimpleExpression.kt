@@ -23,6 +23,11 @@ class SimpleExpression<T> : Expression<String> {
     override val boundSql: String by laziest {
         "`$left` $operator ?"
     }
+    override val columnValues: List<Pair<String, String>> by laziest {
+        listOf(
+            left to right
+        )
+    }
 
 }
 

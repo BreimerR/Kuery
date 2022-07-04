@@ -16,7 +16,7 @@ infix fun <T, E : Entity<T>> UpdateStatementBuilder<T, E>.SET(expressionBuilder:
         expressionBuilder(entity)
     }
 
-infix fun <T, E : Entity<T>> UpdateStatementBuilder<T, E>.WHERE(whereBuilder: Expression): Update<T, E> =
+infix fun <T, E : Entity<T>> UpdateStatementBuilder<T, E>.WHERE(whereBuilder: Expression<*>): Update<T, E> =
     build("$expressionsSQL WHERE " + whereBuilder.sql)
 
 

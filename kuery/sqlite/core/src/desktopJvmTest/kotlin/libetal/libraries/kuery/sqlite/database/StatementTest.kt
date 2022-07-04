@@ -24,7 +24,7 @@ class StatementTest {
     fun createTableStatementTest() {
         assertEquals(
             """CREATE TABLE IF NOT EXISTS `users` (
-            |    user NUMERIC NOT NULL,
+            |    id NUMERIC NOT NULL,
             |    name TEXT NOT NULL,
             |    age NUMERIC NOT NULL
             |);
@@ -34,7 +34,7 @@ class StatementTest {
 
     @Test
     fun selectTest() {
-        assertEquals("SELECT `user`, `name`, `age` FROM `users` WHERE `age` = 1", selectStatement.toString())
+        assertEquals("SELECT `id`, `name`, `age` FROM `users` WHERE `age` = 1", selectStatement.toString())
     }
 
     @Test
@@ -43,7 +43,7 @@ class StatementTest {
             Users.age equivalent 1
         })
 
-        assertEquals("SELECT `id`, `name`, `age` FROM `users` WHERE (`name` = 'Breimer' AND `age` = 1)", statement.toString())
+        assertEquals("SELECT `id`, `name`, `age` FROM `users` WHERE `name` = 'Breimer' AND `age` = 1", statement.toString())
 
     }
 
@@ -53,7 +53,7 @@ class StatementTest {
             SELECT ALL Users WHERE ((Users.name equals "Lazie") AND (Users.age equals 1 OR (Users.name equals "Breimer")))
 
         assertEquals(
-            "SELECT `id`, `name`, `age` FROM `users` WHERE (`name` = 'Lazie' AND (`age` = 1 OR `name` = 'Breimer'))",
+            "SELECT `id`, `name`, `age` FROM `users` WHERE `name` = 'Lazie' AND (`age` = 1 OR `name` = 'Breimer')",
             statement.sql
         )
     }
@@ -73,7 +73,7 @@ class StatementTest {
 
     @Test
     fun insertTest() {
-        assertEquals("INSERT INTO `users` (`name`) VALUES (Breimer)", insertStatement.toString())
+        assertEquals("INSERT INTO `users` (`name`) VALUES ('Breimer')", insertStatement.toString())
     }
 
     @Test

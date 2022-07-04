@@ -14,7 +14,7 @@ class Select<T, E : Entity<T>>(sql: String, entity: E) : Statement<T, E>(sql, en
 
     val groupBy: Column<*>? = null
 
-    override val wheres: MutableMap<Column<*>, Any> by laziest {
+    override val wheres: MutableList<Pair<String, Any>> by laziest {
         mutableMapOf()
     }
 
