@@ -12,6 +12,8 @@ import libetal.libraries.kuery.core.entities.Entity
  **/
 abstract class Statement<T, E : Entity<T>>(val sql: String, val entity: E) {
 
+    abstract val boundSql: String
+
     /**
      * Watch Shaw Shank Nice preview 😅
      **/
@@ -23,6 +25,16 @@ abstract class Statement<T, E : Entity<T>>(val sql: String, val entity: E) {
 
 }
 
+
+abstract class FinalStatement {
+
+    abstract val sql: String
+
+    val columns by laziest {
+        mutableListOf<Column<*>>()
+    }
+
+}
 
 
 

@@ -101,7 +101,7 @@ class StatementTest {
         }
 
         val deleteNewUser by laziest {
-            DELETE ALL Users WHERE (Users.name equals userName)
+            DELETE FROM Users WHERE (Users.name equals userName)
         }
 
         val createSimpleTableStatement by laziest {

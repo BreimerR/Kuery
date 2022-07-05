@@ -1,5 +1,12 @@
 package libetal.libraries.kuery.core.statements
 
+import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.Entity
 
-class Update<T, E : Entity<T>>(sql: String, entity: E) : Statement<T, E>(sql, entity)
+class Update<T, E : Entity<T>>(sql: String, entity: E) : Statement<T, E>(sql, entity), WhereStatement {
+
+    override val wheres: MutableList<Pair<String, Any>> by laziest {
+        mutableListOf()
+    }
+
+}

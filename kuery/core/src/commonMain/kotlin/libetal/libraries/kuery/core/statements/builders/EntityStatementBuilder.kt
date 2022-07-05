@@ -18,6 +18,8 @@ abstract class EntityStatementBuilder<T, E : Entity<T>, S : Statement<T, E>>(
      **/
     abstract fun build(extras: String): S
 
-    fun <T, E : Entity<T>> E.buildWhere(where: String) = build("FROM `${name}` WHERE $where")
+}
 
+interface WhereStatementBuilder<T, E : Entity<T>, S : Statement<T, E>> {
+    fun E.buildWhere(where: String, boundWheres: String): S
 }

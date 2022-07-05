@@ -38,6 +38,11 @@ class StatementTest {
     }
 
     @Test
+    fun simpleBoundSelect() {
+        assertEquals("SELECT `id`, `name`, `age` FROM `users` WHERE `age` = ?", selectStatement.boundSql)
+    }
+
+    @Test
     fun simpleJoinedExpressionTest() {
         val statement = SELECT ALL Users WHERE (Users.name equals "Breimer" AND {
             Users.age equivalent 1

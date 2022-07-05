@@ -18,7 +18,17 @@ class SelectTest {
 
         TAG info statement.toString()
 
-        assertEquals("SELECT * FROM `users` WHERE `users.name` == 'Breimer'", statement.toString())
+        assertEquals("SELECT * FROM `users` WHERE `users.name` = 'Breimer'", statement.toString())
+    }
+
+    @Test
+    fun selectBoundSimple() {
+
+        val statement = SELECT * Users WHERE (Users.name equals "Breimer")
+
+        TAG info statement.toString()
+
+        assertEquals("SELECT * FROM `users` WHERE `users.name` = ?", statement.boundSql)
     }
 
     @Test
@@ -40,7 +50,7 @@ class SelectTest {
         TAG info Users.isPuppy.createSql
         TAG info Users.blobby.createSql
 
-        val statement = with(Database){
+        val statement = with(Database) {
             CREATE TABLE Users
         }
         assertEquals("CREATE TABLE `users` ( )", statement.toString())

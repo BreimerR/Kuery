@@ -10,13 +10,15 @@ class Create<Class, E : Entity<Class>>(
     val database: Kuery<*>,
     val type: Entity.Type = Entity.Type.TABLE,
     safe: Boolean = true
-) :
-    Statement<Class, E>(
-        """|CREATE $type ${if (safe) "IF NOT EXISTS " else ""}`${entity.name}` (
-           |    ${tableEntities[entity]?.joinToString(",\n    ") { it.createSql }}
-           |);
-        """.trimMargin(),
-        entity
-    )
+) : Statement<Class, E>(
+    """|CREATE $type ${if (safe) "IF NOT EXISTS " else ""}`${entity.name}` (
+       |    ${tableEntities[entity]?.joinToString(",\n    ") { it.createSql }}
+       |);
+    """.trimMargin(),
+    entity
+) {
+    override val boundSql: String
+        get() = sql
+}
 
 

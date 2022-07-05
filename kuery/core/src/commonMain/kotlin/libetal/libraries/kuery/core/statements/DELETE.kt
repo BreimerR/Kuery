@@ -9,7 +9,7 @@ import libetal.libraries.kuery.core.statements.builders.StatementFactory
 
 object DELETE : StatementFactory<Delete<*, *>>() {
     infix operator fun <T, E : Entity<T>> times(entity: E) =
-        DeleteStatementBuilder("FROM `${entity.name}`", entity).build("")
+        DeleteStatementBuilder("FROM `${entity.name}`", entity)
 
 }
 
