@@ -16,6 +16,15 @@ object SELECT : StatementFactory<Select<*, *>>() {
         *column
     )
 
+
+    /**
+     * TODO:
+     * This is something totally different from SelectPreBuilder
+     **/
+    infix fun AVG(column: Column<*>) {
+
+    }
+
     infix fun <T, E : Entity<T>> ALL(from: E) =
         SelectStatementBuilder(entity = from, columns = tableEntities[from]?.toTypedArray() ?: arrayOf())
 

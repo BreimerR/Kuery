@@ -30,9 +30,17 @@ abstract class FinalStatement {
 
     abstract val sql: String
 
+    abstract val boundSql: String
+
     val columns by laziest {
         mutableListOf<Column<*>>()
     }
+
+    val columnsSql by laziest {
+        "`${columns.joinToString("`, `") { it.name }}`"
+    }
+
+    override fun toString() = sql
 
 }
 

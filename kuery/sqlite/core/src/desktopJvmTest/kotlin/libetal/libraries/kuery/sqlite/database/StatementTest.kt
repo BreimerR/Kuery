@@ -3,6 +3,7 @@ package libetal.libraries.kuery.sqlite.database
 import libetal.kotlin.debug.info
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.extensions.equals
+import libetal.libraries.kuery.core.columns.extensions.greaterThan
 import libetal.libraries.kuery.core.expressions.extensions.AND
 import libetal.libraries.kuery.core.expressions.extensions.OR
 import libetal.libraries.kuery.core.statements.CREATE
@@ -94,6 +95,10 @@ class StatementTest {
 
         val selectStatement by laziest {
             SELECT * Users WHERE (Users.age equals 1)
+        }
+
+        val nestedSelectStatement by laziest {
+            SELECT * Users WHERE (Users.age greaterThan (SELECT AVG Users.age FROM Users WHERE true))
         }
 
         val insertStatement by laziest {

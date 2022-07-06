@@ -10,7 +10,7 @@ import libetal.libraries.kuery.core.entities.TableEntity
 val <T> Entity<T>.name
     get() = getEntityName()
 
-val <T> Entity<T>.identity
+val <T> Entity<T>.identifier
     get() = "`${getEntityName()}`"
 
 /**
