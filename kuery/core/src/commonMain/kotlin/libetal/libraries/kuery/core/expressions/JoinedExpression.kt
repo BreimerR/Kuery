@@ -3,10 +3,10 @@ package libetal.libraries.kuery.core.expressions
 import libetal.kotlin.laziest
 
 class JoinedExpression(
-    left: Expression<*>,
+    left: Expression<*, *>,
     operator: Operators,
-    right: Expression<*>
-) : Expression<Expression<*>>(left, operator.toString(), right) {
+    right: Expression<*, *>
+) : Expression<Expression<*, *>, Expression<*, *>>(left, operator.toString(), right) {
 
     override val sql: String by laziest {
         "($left $operator $right)"
@@ -15,7 +15,7 @@ class JoinedExpression(
     override val boundSql: String by laziest {
         "(${left.boundSql} $operator ${right.boundSql}"
     }
-    override val columnValues: List<Pair<String, String>> by laziest {
+    override val columnValues: List<Any> by laziest {
         buildList {
             addAll(left.columnValues)
             addAll(right.columnValues)

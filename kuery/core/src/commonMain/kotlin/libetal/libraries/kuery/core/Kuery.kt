@@ -43,7 +43,7 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
     abstract fun AbstractEntity.long(name: String = ""): Column<Long>
 
     /*Allow for primary:Boolean = false here*/
-    abstract fun AbstractEntity.int( name: String = "", size: Int? = null, primary: Boolean = false): Column<Int>
+    abstract fun AbstractEntity.int(name: String = "", size: Int? = null, primary: Boolean = false): Column<Int>
 
     abstract fun AbstractEntity.float(name: String, size: Float? = null, default: Float? = null): Column<Float>
 
@@ -55,13 +55,13 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
      * Default value consistent in most databases add here
      **/
     abstract fun AbstractEntity.string(name: String, size: Int = 55, default: String? = null): Column<String>
-     open fun AbstractEntity.nullableString(name: String, size: Int = 55, default: String? = null): Column<String?>{
-         TODO("")
-     }
+    open fun AbstractEntity.nullableString(name: String, size: Int = 55, default: String? = null): Column<String?> {
+        TODO("")
+    }
 
-    abstract fun AbstractEntity.boolean(name: String = "",default:Boolean? = null): Column<Boolean>
+    abstract fun AbstractEntity.boolean(name: String = "", default: Boolean? = null): Column<Boolean>
 
-    abstract infix fun <T, E : Entity<T>> execute(statement: Statement<T, E>)
+    abstract infix fun <T> execute(statement: Statement)
 
     /**
      * Do not remove the entity
@@ -83,7 +83,7 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
     @Suppress("FunctionName")
     infix fun <Class, E : Entity<Class>> CREATE.TABLE(entity: E) = Create(entity, this@Kuery)
 
-    companion object{
-        const val NOT_NULL ="NOT NULL"
+    companion object {
+        const val NOT_NULL = "NOT NULL"
     }
 }

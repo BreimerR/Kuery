@@ -6,18 +6,10 @@ import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 
-class Update<T, E : Entity<T>>(sql: String, entity: E) : Statement<T, E>(sql, entity), WhereStatement {
-
-    override val wheres: MutableList<Pair<String, Any>> by laziest {
-        mutableListOf()
-    }
-
-}
-
-class FinalUpdate(
+class Update(
     override val where: String,
     override val boundWhere: String
-) : FinalStatement(), FinalWhereStatement {
+) : ArgumentsStatement(), WhereStatement {
 
     var entity: Entity<*> by expected("Can't Use null entity") {
         it != null
@@ -27,12 +19,20 @@ class FinalUpdate(
         mutableListOf<Pair<Column<*>, Any>>()
     }
 
+    val boundSet by laziest {
+        mutableListOf<Pair<Column<*>, String>>()
+    }
+
     val setSql by laziest {
-        set.joinToString { (column, value) -> "${column.identifier} = $value" } // TODO Use value sql here
+        set.joinToString(", ") { (column, value) ->
+            "${column.identifier} = ${column parseToSql value}"
+        }
     }
 
     val boundSetSql by laziest {
-        set.joinToString { (column, value) -> "${column.identifier} = ?" }
+        boundSet.joinToString(", ") { (column, value) ->
+            "${column.identifier} = $value"
+        }
     }
 
     val prefixSql by laziest {

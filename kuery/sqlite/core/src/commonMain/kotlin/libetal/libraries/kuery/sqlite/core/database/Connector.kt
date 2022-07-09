@@ -11,13 +11,13 @@ interface Connector {
      * Simple sql execution from a statement
      * Might be removed in the future
      **/
-    suspend fun executeSQL(statement: Statement<*, *>)
+    suspend fun executeSQL(statement: Statement)
 
     /**
      * Handles execution of bound statements
      * Should be the final implementation
      **/
-    fun <T, E : Entity<T>, S : Statement<T, E>> execute(statement: S)
+    fun <T> execute(statement: Statement)
 
 }
 

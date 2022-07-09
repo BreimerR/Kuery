@@ -7,6 +7,8 @@ val kotlinVersion: String by project
 
 val projectVersion: String by project
 
+val jdbcVersion: String by project
+
 val androidCompileSdkVersion by project {
     it.toString().toInt()
 }
@@ -104,7 +106,11 @@ kotlin {
         val jsMain by getting
         val jsTest by getting
 
-        val desktopJvmMain by getting
+        val desktopJvmMain by getting {
+            dependencies {
+                implementation("com.oracle.database.jdbc:ojdbc11:$jdbcVersion")
+            }
+        }
         val desktopJvmTest by getting {
 
         }

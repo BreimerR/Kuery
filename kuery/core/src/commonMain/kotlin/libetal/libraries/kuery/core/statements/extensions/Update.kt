@@ -4,7 +4,6 @@ package libetal.libraries.kuery.core.statements.extensions
 
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.expressions.Expression
-import libetal.libraries.kuery.core.expressions.SimpleExpression
 import libetal.libraries.kuery.core.statements.UPDATE
 import libetal.libraries.kuery.core.statements.Update
 import libetal.libraries.kuery.core.statements.builders.UpdateStatementBuilder
@@ -16,8 +15,8 @@ infix fun <T, E : Entity<T>> UpdateStatementBuilder<T, E>.SET(expressionBuilder:
         expressionBuilder(entity)
     }
 
-infix fun <T, E : Entity<T>> UpdateStatementBuilder<T, E>.WHERE(whereBuilder: Expression<*>): Update<T, E> =
-    build("$expressionsSQL WHERE " + whereBuilder.sql)
+infix fun <T, E : Entity<T>> UpdateStatementBuilder<T, E>.WHERE(whereBuilder: Expression<*, *>): Update =
+    build(whereBuilder.sql, whereBuilder.boundSql)
 
 
 

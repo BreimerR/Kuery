@@ -6,9 +6,9 @@ import kotlinx.datetime.toLocalDateTime
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.extensions.equals
 import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.core.statements.DELETE.FROM
 import libetal.libraries.kuery.core.statements.Existence.EXISTS
 import libetal.libraries.kuery.core.statements.extensions.*
-import libetal.libraries.kuery.mariadb.database.Database
 import libetal.libraries.kuery.mariadb.database.Database.TABLE
 import libetal.libraries.kuery.mariadb.database.tables.Users
 import kotlin.test.Test
@@ -83,8 +83,8 @@ class StatementTest {
             SELECT * Users WHERE true
         }
 
-        val selectSpecificUsersColumns by laziest {
-            SELECT(Users.name) FROM Users WHERE true
+        val selectSpecificUsersColumns: Select by laziest {
+            SELECT(Users.name) FROM Users  WHERE true
         }
 
         val date by laziest {

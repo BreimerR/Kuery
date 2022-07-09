@@ -5,26 +5,17 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 
-class Delete<T, E : Entity<T>>(sql: String, entity: E, val boundWheres: String = "") : Statement<T, E>(sql, entity),
-    WhereStatement {
-
-    override val wheres: MutableList<Pair<String, Any>> by laziest {
-        mutableListOf()
-    }
-
-    override val boundSql: String
-        get() = "DELETE FROM ${entity.identifier} $boundWheres"
-
-}
-
-
-class FinalDelete(
+class Delete(
     override val where: String,
     override val boundWhere: String
-) : FinalStatement(), FinalWhereStatement {
+) : ArgumentsStatement(), WhereStatement {
 
     var entity: Entity<*> by expected("Can't Use null entity") {
         it != null
+    }
+
+    val columnValues by laziest {
+        mutableListOf<Any>()
     }
 
     override val sql by laziest {

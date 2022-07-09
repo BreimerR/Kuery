@@ -2,34 +2,30 @@ package libetal.libraries.kuery.core.expressions
 
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
-import libetal.libraries.kuery.core.statements.parseToSql
+import libetal.libraries.kuery.core.statements.Select
+import libetal.libraries.kuery.core.statements.Statement
 
-/**TODO
- * SQL Concat value to prefix and postfix
- **/
-class DecoratedExpression<T : Any> : DecoratedExpressions<Column<T>, T> {
-
+class DecoratedStatementExpression<T : Any> : DecoratedExpressions<Column<T>, Select> {
     constructor(
         left: Column<T>,
         operator: Operators,
-        right: T,
+        right: Select,
         prefix: String = "",
         postfix: String = ""
     ) : super(left, operator, right, prefix, postfix)
 
     override val sql: String by laziest {
-        "`$left` $operator ${left parseToSql right}"
+        "`$left` $operator (${right.sql})"
     }
 
     override val boundSql: String by laziest {
-        "`$left` $operator ?"
+        "`$left` $operator (${right.boundSql})"
     }
-
     override val columnValues by laziest {
-        listOf(
-            right
-        )
+        buildList {
+            addAll(
+                right.columnValues
+            )
+        }
     }
-
 }
-

@@ -9,13 +9,13 @@ import libetal.libraries.kuery.mariadb.ConnectorTest.Companion.connector
 interface TestCase {
 
     fun <T, E : libetal.libraries.kuery.core.entities.Entity<T>> query(
-        statement: Statement<T, E>,
+        statement: Statement,
         collector: (Result) -> Unit
     ) {
         (connector query statement)(collector)
     }
 
-    infix fun <T, E : libetal.libraries.kuery.core.entities.Entity<T>> Statement<T, E>.query(
+    infix fun  Statement.query(
         collector: (Result) -> Unit
     ) {
         (connector query this)(collector)

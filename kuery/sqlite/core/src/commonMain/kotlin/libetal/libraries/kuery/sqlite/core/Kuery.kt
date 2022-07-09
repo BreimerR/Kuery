@@ -249,9 +249,9 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
         }
     }
 
-    override fun <T, E : libetal.libraries.kuery.core.entities.Entity<T>> execute(statement: Statement<T, E>) {
+    override fun <T> execute(statement: Statement) {
         // Connector.INSTANCE.execute(statement)
-        connector.execute(statement)
+        connector.execute<T>(statement)
     }
 
     override fun onCreate(connector: Connector) = tableEntities.forEach { (entity, columns) ->

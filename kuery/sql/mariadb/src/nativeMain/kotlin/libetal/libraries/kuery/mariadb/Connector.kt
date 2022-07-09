@@ -40,7 +40,7 @@ actual class Connector actual constructor(
      * Don't use flows if the function isn't suspended
      * Not really usefull that way
      **/
-    actual infix fun <T, E : libetal.libraries.kuery.core.entities.Entity<T>> execute(statement: Statement<T, E>): Flow<T> =
+    actual infix fun <T> execute(statement: Statement): Flow<T> =
         TODO("Object mapping can happen here")
 
 
@@ -52,23 +52,23 @@ actual class Connector actual constructor(
      * In the case of specific columns selected a Map<TableName,Map<Column,Value>>
      * Should be utilized. But if the unspecified columns are nullable then T being return storage should be used
      **/
-    infix fun <Class, E : libetal.libraries.kuery.core.entities.Entity<Class>> query(
-        statement: Statement<Class, E>
+    infix fun  query(
+        statement: Statement
     ) = flow {
 
         if (query(statement.toString())) {
             when (statement) {
-                is Create<Class, E> -> { // CREATE doesn't have results
+                is Create<*,*> -> { // CREATE doesn't have results
                     emit(
                         CreateResult(
-                            name = statement.entity.name,
+                            name = "TODO(Definately not correct)",
                             type = statement.type,
                             null
                         )
                     )
                     return@flow
                 }
-                is Delete<Class, E> -> { // DELETE doesn't have results
+                is Delete -> { // DELETE doesn't have results
                     emit(
                         DeleteResult(
                             table = statement.entity.name,
@@ -77,7 +77,7 @@ actual class Connector actual constructor(
                     )
                     return@flow
                 }
-                is Select<Class, E> -> { // Select has results
+                is Select -> { // Select has results
                     val results = connection.useResult() ?: throw NullPointerException("Unexpected null results")
 
                     val numColumns = connection.fieldCount.toInt()
@@ -115,7 +115,7 @@ actual class Connector actual constructor(
 
                 }
 
-                is Insert<Class, E> -> {
+                is Insert -> {
                     emit(
                         InsertResult(
                             into = statement.entity.name

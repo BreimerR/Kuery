@@ -8,26 +8,26 @@ import libetal.libraries.kuery.core.expressions.Expression
 import libetal.libraries.kuery.core.expressions.JoinedExpression
 import libetal.libraries.kuery.core.expressions.OperatorScope
 
-infix fun Expression<*>.AND(expressionBuilder: OperatorScope.() -> Unit): Expression<*> = run {
+infix fun Expression<*, *>.AND(expressionBuilder: OperatorScope.() -> Unit): Expression<*, *> = run {
     val scope = OperatorScope(this, "AND")
     expressionBuilder(scope)
     scope.expression
 }
 
 
-infix fun Expression<*>.AND(expression: Expression<*>): Expression<*> = JoinedExpression(
+infix fun Expression<*, *> .AND(expression: Expression<*, *> ): Expression<*, *>  = JoinedExpression(
     this,
     Expression.Operators.AND,
     expression
 )
 
-infix fun Expression<*>.OR(expression: Expression<*>): Expression<*> = JoinedExpression(
+infix fun Expression<*, *> .OR(expression: Expression<*, *> ): Expression<*, *>  = JoinedExpression(
     this,
     Expression.Operators.OR,
     expression
 )
 
-infix fun Expression<*>.OR(expressionBuilder: OperatorScope.() -> Unit) = run {
+infix fun Expression<*, *> .OR(expressionBuilder: OperatorScope.() -> Unit) = run {
     val scope = OperatorScope(this, "OR")
     expressionBuilder(scope)
     scope.expression

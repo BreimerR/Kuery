@@ -2,22 +2,25 @@ package libetal.libraries.kuery.core.statements
 
 import libetal.kotlin.expected
 import libetal.kotlin.laziest
+import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 
-class Insert<T, E : Entity<T>>(sql: String, entity: E) : Statement<T, E>(sql, entity) {
-    override val boundSql: String
-        get() = TODO("Not yet implemented")
-}
+class Insert : ArgumentsStatement() {
 
-
-class FinalInsert() : FinalStatement() {
-
-    val values by laziest {
+    private val values by laziest {
         mutableListOf<List<Any>>()
     }
 
-    val valuesSql by laziest {
+    val columns by laziest {
+        mutableListOf<Column<*>>()
+    }
+
+    private val columnsSql by laziest {
+        "`${columns.joinToString("`, `") { it.name }}`"
+    }
+
+    private val valuesSql by laziest {
         val initial = values.joinToString("), (") { actualValues ->
             actualValues.joinToString(", ") { value -> value.toString() }
         }
@@ -25,7 +28,7 @@ class FinalInsert() : FinalStatement() {
         "($initial)"
     }
 
-    val boundValuesSql by laziest {
+    private val boundValuesSql by laziest {
         val initial = values.joinToString("), (") { actualValues ->
             actualValues.joinToString(", ") { "?" }
         }

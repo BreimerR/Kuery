@@ -8,27 +8,11 @@ import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 
-class Select<T, E : Entity<T>>(sql: String, entity: E) : Statement<T, E>(sql, entity), WhereStatement {
 
-    var limit: Long? = null
-
-    var orderBy: Column<*>? = null
-
-    var groupBy: Column<*>? = null
-
-    override val wheres: MutableList<Pair<String, Any>> by laziest {
-        mutableListOf()
-    }
-    override val boundSql: String
-        get() = TODO("Not yet implemented")
-
-}
-
-
-class FinalSelect(
+class Select(
     override val where: String,
     override val boundWhere: String
-) : FinalStatement(), FinalWhereStatement {
+) : ArgumentsStatement(), WhereStatement {
 
     var orderBy: Column<*>? = null
 
@@ -36,6 +20,18 @@ class FinalSelect(
         orderBy?.let {
             " $ORDER_BY $it"
         } ?: ""
+    }
+
+    val columns by laziest {
+        mutableListOf<Column<*>>()
+    }
+
+    val columnsSql by laziest {
+        "`${columns.joinToString("`, `") { it.name }}`"
+    }
+
+    val columnValues by laziest{
+        mutableListOf<Any>()
     }
 
     private val boundOrderBySql by laziest {
@@ -54,10 +50,6 @@ class FinalSelect(
         groupBy?.let { " $GROUP_BY ?" } ?: ""
     }
 
-    private val columnsSql by laziest {
-        "`${columns.joinToString("`,`") { it.name }}`"
-    }
-
     var entity: Entity<*> by expected("Can't Use null entity") {
         it != null
     }
@@ -69,7 +61,6 @@ class FinalSelect(
     override val boundSql by laziest {
         "SELECT $columnsSql FROM ${entity.identifier} $boundWhere$boundGroupBySql$boundOrderBySql"
     }
-
 
     companion object {
         const val GROUP_BY = "GROUP BY"

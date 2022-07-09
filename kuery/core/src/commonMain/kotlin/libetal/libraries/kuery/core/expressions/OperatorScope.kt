@@ -5,9 +5,9 @@ import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.columns.extensions.lessOrEqual as extensionLerOrEqual
 import libetal.libraries.kuery.core.columns.extensions.startsWith as extStartsWith
 
-class OperatorScope(expression: Expression<*>, val operator: String) : StatementScope {
+class OperatorScope(expression: Expression<*, *>, val operator: String) : StatementScope {
 
-    var expression: Expression<*> = expression
+    var expression: Expression<*, *> = expression
         private set
 
     val sql
@@ -33,7 +33,7 @@ class OperatorScope(expression: Expression<*>, val operator: String) : Statement
         expression + it
     }
 
-    private operator fun Expression<*>?.plus(right: Expression<*>) {
+    private operator fun Expression<*, *>?.plus(right: Expression<*, *>) {
         expression = this?.let {
             JoinedExpression(it, Expression.Operators(this@OperatorScope.operator), right)
         } ?: right

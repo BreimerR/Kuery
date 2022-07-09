@@ -10,7 +10,7 @@ import libetal.libraries.kuery.core.statements.builders.StatementFactory
 import libetal.libraries.kuery.core.tableEntities
 
 
-object SELECT : StatementFactory<Select<*, *>>() {
+object SELECT : StatementFactory<Select>() {
 
     operator fun invoke(vararg column: Column<*>) = SelectPreBuilder(
         *column

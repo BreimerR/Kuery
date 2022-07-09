@@ -160,8 +160,8 @@ abstract class Kuery(
 
     }
 
-    override fun <T, E : libetal.libraries.kuery.core.entities.Entity<T>> execute(statement: Statement<T, E>) {
-        connector.execute(statement)
+    override fun <T> execute(statement: Statement) {
+        connector.execute<T>(statement)
     }
 
 }

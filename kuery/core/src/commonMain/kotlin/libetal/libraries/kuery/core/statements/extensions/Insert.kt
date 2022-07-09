@@ -4,6 +4,7 @@ package libetal.libraries.kuery.core.statements.extensions
 
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.INSERT
+import libetal.libraries.kuery.core.statements.Insert
 import libetal.libraries.kuery.core.statements.builders.InsertStatementBuilder
 
 infix fun <T, E : Entity<T>> INSERT.INTO(entity: E) =
@@ -11,7 +12,7 @@ infix fun <T, E : Entity<T>> INSERT.INTO(entity: E) =
 
 infix fun <T, E : Entity<T>> InsertStatementBuilder<T, E>.VALUES(valueBuilder: InsertStatementBuilder<T, E>.(E) -> Unit) = let {
     it.valueBuilder(entity)
-    it.build("$columnsSQL VALUES $valuesSql")
+    it.build()
 }
 
 infix operator fun <T, E : Entity<T>> InsertStatementBuilder<T, E>.invoke(valueBuilder: InsertStatementBuilder<T, E>.(E) -> Unit) =

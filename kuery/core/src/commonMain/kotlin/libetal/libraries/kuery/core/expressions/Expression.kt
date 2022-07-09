@@ -1,12 +1,14 @@
 package libetal.libraries.kuery.core.expressions;
 
-abstract class Expression<T>(val left: T, val operator: String, val right: T) {
+abstract class Expression<L, R>(val left: L, val operator: Operators, val right: R) {
+
+    constructor(left: L, operator: String, right: R) : this(left, Operators(operator), right)
 
     abstract val sql: String
 
     abstract val boundSql: String
 
-    abstract val columnValues: List<Pair<String, String>>
+    abstract val columnValues: List<Any>
 
     enum class Operators(private val op: String) {
         EQUALS("="),
