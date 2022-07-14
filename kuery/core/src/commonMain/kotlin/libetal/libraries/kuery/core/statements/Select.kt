@@ -11,7 +11,8 @@ import libetal.libraries.kuery.core.entities.extensions.identifier
 
 class Select(
     override val where: String,
-    override val boundWhere: String
+    override val boundWhere: String,
+    val entity: Entity<*>
 ) : ArgumentsStatement(), WhereStatement {
 
     var orderBy: Column<*>? = null
@@ -25,7 +26,7 @@ class Select(
     var limit: Long? = null
         private set
 
-    val limitSql by laziest {
+    private val limitSql by laziest {
         limit?.let {
             " LIMIT $it"
         } ?: ""
@@ -63,10 +64,6 @@ class Select(
 
     var boundGroupBySql by laziest {
         groupBy?.let { " $GROUP_BY ?" } ?: ""
-    }
-
-    var entity: Entity<*> by expected("Can't Use null entity") {
-        it != null
     }
 
     override val sql by laziest {

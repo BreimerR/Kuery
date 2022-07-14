@@ -29,7 +29,7 @@ class StatementTest {
             |    name TEXT NOT NULL,
             |    age NUMERIC NOT NULL
             |);
-        """.trimMargin(), createTableStatement.toString()
+            """.trimMargin(), createTableStatement.toString()
         )
     }
 
@@ -79,12 +79,12 @@ class StatementTest {
 
     @Test
     fun insertTest() {
-        assertEquals("INSERT INTO `users` (`name`) VALUES ('Breimer')", insertStatement.toString())
+        assertEquals("INSERT INTO `users`(`name`, `age`) ('Breimer', 12), ('Breimer', 12)", insertStatement.toString())
     }
 
     @Test
     fun deleteTest() {
-        assertEquals("DELETE FROM `users`", deleteStatement.toString())
+        assertEquals("DELETE FROM `users` WHERE `name` = 'Breimer'", deleteStatement.toString())
     }
 
     companion object {
@@ -109,13 +109,13 @@ class StatementTest {
          **/
         val insertStatement by laziest {
             INSERT INTO Users(Users.name, Users.age) VALUES {
-                row("Breimer", "12")
+                row("Breimer", 12)
                 row("Breimer", 12)
             }
         }
 
         val deleteStatement by laziest {
-            DELETE FROM Users
+            DELETE FROM Users WHERE (Users.name equals "Breimer")
         }
 
         private const val TAG = "StatementTest"

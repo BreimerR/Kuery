@@ -40,14 +40,14 @@ fun <T> Column<*>.parseToSqlError(obj: T, message: String): String {
     val column = try {
         @Suppress("UNCHECKED_CAST")
         this as Column<T>
-    } catch (e: Exception) {
+    } catch (e: ClassCastException) {
         throw RuntimeException("$message: ${e.message}")
     }
 
     return with(column) {
         try {
             obj.sqlString
-        }catch (e: Exception){
+        } catch (e: ClassCastException) {
             throw RuntimeException("$column, $message: ${e.message}")
         }
     }

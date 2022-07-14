@@ -6,17 +6,11 @@ import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 
 class Delete(
+    val entity: Entity<*>,
     override val where: String,
-    override val boundWhere: String
+    override val boundWhere: String,
+    vararg val columnValues: Any
 ) : ArgumentsStatement(), WhereStatement {
-
-    var entity: Entity<*> by expected("Can't Use null entity") {
-        it != null
-    }
-
-    val columnValues by laziest {
-        mutableListOf<Any>()
-    }
 
     override val sql by laziest {
         "DELETE FROM ${entity.identifier} WHERE $where"
