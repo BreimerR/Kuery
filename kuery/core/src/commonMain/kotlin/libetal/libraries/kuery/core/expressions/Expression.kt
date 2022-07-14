@@ -8,7 +8,7 @@ abstract class Expression<L, R>(val left: L, val operator: Operators, val right:
 
     abstract val boundSql: String
 
-    abstract val columnValues: List<Any>
+    abstract val columnValues: List<*>
 
     enum class Operators(private val op: String) {
         EQUALS("="),

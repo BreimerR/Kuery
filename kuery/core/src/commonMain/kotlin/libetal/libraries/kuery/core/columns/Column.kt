@@ -1,7 +1,6 @@
 package libetal.libraries.kuery.core.columns
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.expressions.Expression
 import libetal.libraries.kuery.core.expressions.Expression.Operators.EQUALS
 import libetal.libraries.kuery.core.expressions.SimpleExpression
 
@@ -70,13 +69,12 @@ class Column<T>(
         this.default = default
     }
 
+
     // Can be a passed argument with default converter lambda
     fun T.defaultSql(): String = throw RuntimeException("Implementation pending: Column.kt 58")
 
     // TODO make abstract once all are correctly implementing
     fun parse(value: String?): T = parser(value)
-
-    override fun toString(): String = identifier
 
 }
 

@@ -25,7 +25,7 @@ class DecoratedExpression<T : Any> : DecoratedExpressions<Column<T>, T> {
         "`$left` $operator ?"
     }
 
-    override val columnValues by laziest {
+    override val columnValues: List<*> by laziest {
         listOf(
             right
         )

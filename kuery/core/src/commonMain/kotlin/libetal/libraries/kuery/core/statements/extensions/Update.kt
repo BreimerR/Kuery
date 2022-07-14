@@ -15,8 +15,4 @@ infix fun <T, E : Entity<T>> UpdateStatementBuilder<T, E>.SET(expressionBuilder:
         expressionBuilder(entity)
     }
 
-infix fun <T, E : Entity<T>> UpdateStatementBuilder<T, E>.WHERE(whereBuilder: Expression<*, *>): Update =
-    build(whereBuilder.sql, whereBuilder.boundSql)
-
-
 

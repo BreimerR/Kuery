@@ -1,5 +1,8 @@
 package libetal.libraries.kuery.core.entities
 
+import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.statements.builders.InsertStatementBuilder
+
 abstract class Entity<T> {
 
     /**
@@ -13,6 +16,10 @@ abstract class Entity<T> {
      * will reduce override conflicts
      **/
     open fun entityTableType() = Type.TABLE
+
+    operator fun invoke(vararg columns: Column<*>): InsertStatementBuilder<T, Entity<T>> =
+        InsertStatementBuilder(this, *columns)
+
 
     enum class Type(val identifier: String) {
         TABLE("TABLE"),

@@ -5,6 +5,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.extensions.equals
+import libetal.libraries.kuery.core.columns.extensions.startsWith
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.DELETE.FROM
 import libetal.libraries.kuery.core.statements.Existence.EXISTS
@@ -51,27 +52,60 @@ class StatementTest {
 
     @Test
     fun testSimpleInsertStatementBuild() {
-        assertEquals("INSERT INTO `users` (`name`, `dob`) VALUES ('Breimer', '$date')", insertNewUser.toString())
+        assertEquals("INSERT INTO `users` (`name`, `dob`) VALUES ('Breimer', '$date')", "$insertNewUser")
     }
 
     @Test
     fun simpleSelectStatement() {
-        assertEquals("SELECT `name`, `dob` FROM `users` WHERE true", selectAllUsers.toString())
+        assertEquals("SELECT `name`, `dob` FROM `users` WHERE true", "$selectAllUsers")
     }
 
     @Test
     fun simpleSelectSpecificColumnsStatement() {
-        assertEquals("SELECT `name` FROM `users` WHERE true", selectSpecificUsersColumns.toString())
+        assertEquals("SELECT `name` FROM `users` WHERE true", "$selectSpecificUsersColumns")
     }
 
     @Test
-    fun simpleDeleteStatementBuild() { // TODO: Investigate in some crazy situation userName was in lowerCase from deleteNewUser.toString() Trust me it happened once without lowering anywhere. I'm not crazy.
-        assertEquals("DELETE FROM `users` WHERE `name` = '$userName'", deleteNewUser.toString())
+    fun equalsComplexBoundTest() {
+        assertEquals(
+            "SELECT `name`, `dob` FROM `users` WHERE `name` = (SELECT `name` FROM `users` WHERE `name` = true LIMIT 1)",
+            "$selectEqualsStatement"
+        )
+    }
+
+
+    @Test
+    fun boundEqualsComplexTest() {
+        assertEquals(
+            "SELECT `name`, `dob` FROM `users` WHERE `name` = (SELECT `name` FROM `users` WHERE `name` = true LIMIT ?)",
+            selectEqualsStatement.boundSql
+        )
+    }
+
+    @Test
+    fun complexSelectStatement() {
+        assertEquals(
+            "SELECT `name` FROM `users` WHERE `name` LIKE (SELECT `name` FROM `users` WHERE `name` = true LIMIT 1)",
+            "$complexSqlStatement"
+        )
+    }
+
+    @Test
+    fun complexBoundSelectStatement() {
+        assertEquals(
+            "SELECT `name` FROM `users` WHERE `name` LIKE (SELECT `name` FROM `users` WHERE `name` = true LIMIT ?)",
+            complexSqlStatement.boundSql
+        )
+    }
+
+    @Test
+    fun simpleDeleteStatementBuild() { //// TODO: Investigate in some crazy situation userName was in lowerCase from deleteNewUser.toString() Trust me it happened once without lowering anywhere. I'm not crazy.
+        assertEquals("DELETE FROM `users` WHERE `name` = '$userName'", "$deleteNewUser")
     }
 
     @Test
     fun simpleUpdateStatementBuild() {
-        assertEquals("UPDATE `users` SET `name` = 'Breimer' WHERE `name` = 'Lazie'", updateSimpleTableStatement.toString())
+        assertEquals("UPDATE `users` SET `name` = 'Breimer' WHERE `name` = 'Lazie'", "$updateSimpleTableStatement")
     }
 
 
@@ -84,7 +118,11 @@ class StatementTest {
         }
 
         val selectSpecificUsersColumns: Select by laziest {
-            SELECT(Users.name) FROM Users  WHERE true
+            SELECT(Users.name) FROM Users WHERE true
+        }
+
+        val selectEqualsStatement by laziest {
+            SELECT * Users WHERE (Users.name equals (SELECT(Users.name) FROM Users WHERE (Users.name equals true) LIMIT 1))
         }
 
         val date by laziest {
@@ -93,8 +131,7 @@ class StatementTest {
 
         val insertNewUser by laziest {
             (INSERT INTO Users VALUES {
-                it.name set userName
-                it.dob set date
+                row(userName, date)
             }).also {
                 println("SQL: $it")
             }
@@ -116,6 +153,11 @@ class StatementTest {
 
         val dropTableIfExistsStatement by laziest {
             dropSimpleTable IF EXISTS
+        }
+
+
+        val complexSqlStatement by laziest {
+            SELECT(Users.name) FROM Users WHERE (Users.name startsWith (SELECT(Users.name) FROM Users WHERE (Users.name equals true) LIMIT 1))
         }
 
         val dropSimpleTable by laziest {

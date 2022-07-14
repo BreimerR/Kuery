@@ -35,4 +35,4 @@ infix fun Expression<*, *> .OR(expressionBuilder: OperatorScope.() -> Unit) = ru
 
 // fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: String) = SimpleExpression<T>(name, operator, value)
 fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: Expression.Operators) =
-    SimpleExpression<T>(name, operator, value.sqlString)
+    SimpleExpression(this, operator, value)

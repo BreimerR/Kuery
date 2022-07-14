@@ -25,12 +25,32 @@ abstract class ArgumentsStatement : Statement() {
     }
 }
 
+/**
+ * If it's a wrong T then it should fail
+ **/
 infix fun <T> Column<*>.parseToSql(obj: T) = try {
     @Suppress("UNCHECKED_CAST")
     this as Column<T>
     obj.sqlString
 } catch (e: Exception) {
     obj.toString()
+}
+
+fun <T> Column<*>.parseToSqlError(obj: T, message: String): String {
+    val column = try {
+        @Suppress("UNCHECKED_CAST")
+        this as Column<T>
+    } catch (e: Exception) {
+        throw RuntimeException("$message: ${e.message}")
+    }
+
+    return with(column) {
+        try {
+            obj.sqlString
+        }catch (e: Exception){
+            throw RuntimeException("$column, $message: ${e.message}")
+        }
+    }
 }
 
 

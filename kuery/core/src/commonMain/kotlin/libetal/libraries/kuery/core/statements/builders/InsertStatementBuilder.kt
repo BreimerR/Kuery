@@ -4,9 +4,12 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.name
+import libetal.libraries.kuery.core.statements.INSERT
 import libetal.libraries.kuery.core.statements.Insert
 
-class InsertStatementBuilder<T, E : Entity<T>>(val entity: E) : EntityStatementBuilder<T, E, Insert> {
+class InsertStatementBuilder<T, E : Entity<T>>(val entity: E, vararg val columns: Column<*>) :
+    EntityStatementBuilder<T, E, Insert> {
+
 
     private val map by laziest {
         mutableMapOf<String, MutableList<String>>()
@@ -26,7 +29,7 @@ class InsertStatementBuilder<T, E : Entity<T>>(val entity: E) : EntityStatementB
 
     }
 
-    fun build(): Insert = TODO("")
+    fun build() = Insert(entity, *columns)
 
     companion object {
         private const val TAG = "InsertStatementBuilder"

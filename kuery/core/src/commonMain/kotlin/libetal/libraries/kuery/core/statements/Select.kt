@@ -22,6 +22,21 @@ class Select(
         } ?: ""
     }
 
+    var limit: Long? = null
+        private set
+
+    val limitSql by laziest {
+        limit?.let {
+            " LIMIT $it"
+        } ?: ""
+    }
+
+    val boundLimitSql by laziest {
+        limit?.let {
+            " LIMIT ?"
+        } ?: ""
+    }
+
     val columns by laziest {
         mutableListOf<Column<*>>()
     }
@@ -30,7 +45,7 @@ class Select(
         "`${columns.joinToString("`, `") { it.name }}`"
     }
 
-    val columnValues by laziest{
+    val columnValues by laziest {
         mutableListOf<Any>()
     }
 
@@ -55,11 +70,16 @@ class Select(
     }
 
     override val sql by laziest {
-        "SELECT $columnsSql FROM ${entity.identifier} $where$groupBySql$orderBySql"
+        "SELECT $columnsSql FROM ${entity.identifier} WHERE $where$groupBySql$orderBySql$limitSql"
+    }
+
+    infix fun LIMIT(limit: Long): Select = this.also {
+        it.limit = limit
+        it.columnValues.add(limit)
     }
 
     override val boundSql by laziest {
-        "SELECT $columnsSql FROM ${entity.identifier} $boundWhere$boundGroupBySql$boundOrderBySql"
+        "SELECT $columnsSql FROM ${entity.identifier} WHERE $boundWhere$boundGroupBySql$boundOrderBySql$boundLimitSql"
     }
 
     companion object {

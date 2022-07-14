@@ -19,10 +19,10 @@ class Delete(
     }
 
     override val sql by laziest {
-        "DELETE FROM ${entity.identifier} $where"
+        "DELETE FROM ${entity.identifier} WHERE $where"
     }
 
     override val boundSql by laziest {
-        "DELETE FROM ${entity.identifier} $boundWhere"
+        "DELETE FROM ${entity.identifier} WHERE $boundWhere"
     }
 }

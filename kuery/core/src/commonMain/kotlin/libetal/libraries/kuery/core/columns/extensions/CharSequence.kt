@@ -3,24 +3,31 @@
 package libetal.libraries.kuery.core.columns.extensions
 
 import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.expressions.BooleanExpression
 import libetal.libraries.kuery.core.expressions.DecoratedExpression
-import libetal.libraries.kuery.core.expressions.Expression
-import libetal.libraries.kuery.core.expressions.Expression.Operators.*
-import libetal.libraries.kuery.core.expressions.SimpleExpression
+import libetal.libraries.kuery.core.expressions.DecoratedStatementExpression
+import libetal.libraries.kuery.core.expressions.Expression.Operators.EQUALS
+import libetal.libraries.kuery.core.expressions.Expression.Operators.LIKE
 import libetal.libraries.kuery.core.expressions.extensions.expressionBuilder
+import libetal.libraries.kuery.core.statements.Select
 
 infix fun <C : CharSequence, T : Column<C>> T.endsWith(end: C) =
-    DecoratedExpression(this, LIKE, end, postfix = "%")
+    LIKE(end, "", "%")
 
 infix fun <C : CharSequence, T : Column<C>> T.contains(content: C) =
-    DecoratedExpression(this, LIKE, content, "%", "%")
-
+    LIKE(content, "%", "%")
 
 infix fun <C : CharSequence, T : Column<C>> T.equals(value: C) =
     expressionBuilder(value, EQUALS)
 
-infix fun <T : CharSequence> Column<T>.LIKE(like: String) =
-    SimpleExpression<T>(name, LIKE, like)
+infix fun <C : CharSequence, T : Column<C>> T.equals(value: Boolean) =
+    BooleanExpression(this, EQUALS, value)
+
+fun <T : CharSequence> Column<T>.LIKE(like: T, prefix: String, postFix: String = "") =
+    DecoratedExpression(this, LIKE, like, prefix, postFix)
 
 infix fun <C : CharSequence> Column<C>.startsWith(like: C) =
-    DecoratedExpression(this, LIKE, like, "%")
+    LIKE(like, "%")
+
+infix fun <C : CharSequence> Column<C>.startsWith(like: Select) =
+    DecoratedStatementExpression(this, LIKE, like, "%")

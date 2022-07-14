@@ -3,7 +3,6 @@ package libetal.libraries.kuery.core.expressions
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.statements.Select
-import libetal.libraries.kuery.core.statements.Statement
 
 class DecoratedStatementExpression<T : Any> : DecoratedExpressions<Column<T>, Select> {
     constructor(
@@ -15,13 +14,13 @@ class DecoratedStatementExpression<T : Any> : DecoratedExpressions<Column<T>, Se
     ) : super(left, operator, right, prefix, postfix)
 
     override val sql: String by laziest {
-        "`$left` $operator (${right.sql})"
+        "${left.identifier} $operator (${right.sql})"
     }
 
     override val boundSql: String by laziest {
-        "`$left` $operator (${right.boundSql})"
+        "${left.identifier} $operator (${right.boundSql})"
     }
-    override val columnValues by laziest {
+    override val columnValues: List<*> by laziest {
         buildList {
             addAll(
                 right.columnValues

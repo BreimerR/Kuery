@@ -16,7 +16,7 @@ class Update(
     }
 
     val set by laziest {
-        mutableListOf<Pair<Column<*>, Any>>()
+        mutableListOf<Pair<Column<*>, *>>()
     }
 
     val boundSet by laziest {
@@ -40,11 +40,11 @@ class Update(
     }
 
     override val sql by laziest {
-        "$prefixSql $setSql $where"
+        "$prefixSql $setSql WHERE $where"
     }
 
     override val boundSql by laziest {
-        "$prefixSql $boundSetSql $boundWhere"
+        "$prefixSql $boundSetSql WHERE $boundWhere"
     }
 
 }

@@ -1,19 +1,14 @@
 package libetal.libraries.kuery.core.statements
 
-import libetal.kotlin.expected
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 
-class Insert : ArgumentsStatement() {
+class Insert(val entity: Entity<*>, vararg val columns: Column<*>) : ArgumentsStatement() {
 
     private val values by laziest {
-        mutableListOf<List<Any>>()
-    }
-
-    val columns by laziest {
-        mutableListOf<Column<*>>()
+        mutableListOf<List<Any?>>()
     }
 
     private val columnsSql by laziest {
@@ -21,11 +16,20 @@ class Insert : ArgumentsStatement() {
     }
 
     private val valuesSql by laziest {
-        val initial = values.joinToString("), (") { actualValues ->
-            actualValues.joinToString(", ") { value -> value.toString() }
+        var i = 0
+        var row = 0
+        val initialValues = values.joinToString("), (") { actualValues ->
+            val sql = actualValues.joinToString(", ") { value ->
+                val c = i
+                val column = columns[i++]
+                if (i == columns.size) i = 0
+                val sql = column.parseToSqlError(value, "Invalid value passed for row: $row  column: $c value: $value")
+                sql
+            }
+            row++
+            sql
         }
-
-        "($initial)"
+        "($initialValues)"
     }
 
     private val boundValuesSql by laziest {
@@ -34,10 +38,6 @@ class Insert : ArgumentsStatement() {
         }
 
         "($initial)"
-    }
-
-    var entity: Entity<*> by expected("Can't Use null entity") {
-        it != null
     }
 
     private val prefixInsert by laziest {
@@ -50,6 +50,16 @@ class Insert : ArgumentsStatement() {
 
     override val boundSql by laziest {
         "$prefixInsert $boundValuesSql"
+    }
+
+    fun row(vararg value: Any?) {
+        if (value.size != columns.size) throw RuntimeException("Inserted lesser values than passed columns")
+        val row = listOf(*value)
+        values.add(row)
+    }
+
+    operator fun invoke(vararg value: Any?) {
+        if (value.size != columns.size) throw RuntimeException("Inserted lesser values than passed columns")
     }
 
 }

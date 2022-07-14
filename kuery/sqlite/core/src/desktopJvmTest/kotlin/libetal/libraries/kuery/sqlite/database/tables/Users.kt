@@ -1,5 +1,7 @@
 package libetal.libraries.kuery.sqlite.database.tables
 
+import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.statements.builders.InsertStatementBuilder
 import libetal.libraries.kuery.sqlite.core.entities.IdEntity
 import libetal.libraries.kuery.sqlite.data.User
 import libetal.libraries.kuery.sqlite.database.Database.int

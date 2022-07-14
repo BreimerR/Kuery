@@ -10,25 +10,24 @@ Features
 ###### Simple Insert
 
 ```kotlin
-Users.insert(user) { user: User ->
-    // Called on insert
-    // No fail handlers provided here
+INSERT INTO Users(Users.name, Users.age) VALUES {
+    row("Breimer", 12)
+    row("Lazie", 1)
 }
 ```
 
-```kotlin
-Users.insert(user, handler) { user: User ->
-    // error handler provided here 
-}
-```
+## Limitations And Reasons
 
-###### Insert Where ```I don't think insert where is a thing should be update```
+The above syntax is best since
 
-```kotlin
-Users.insert(user) where expression { user: User ->
+1. Columns passed can not be tied directly to values passed unless maps are used
+   `Will go against SQL/Near SQL requirements of the library`
+2. It's a proper entry point from an sql starting point. 
 
-}
-```
+## Future implementations
+1. [ ] Code generation for proper mapping of columns to values per sql
+    `Assumes SQL's might be static i.e one will Insert Users.name alone.`
+2. 
 
 #### Bound Statements
 

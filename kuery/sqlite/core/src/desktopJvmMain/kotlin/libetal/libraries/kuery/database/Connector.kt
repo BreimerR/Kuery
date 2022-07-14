@@ -26,14 +26,14 @@ private constructor(override val dbName: String, val version: Int) : CoreConnect
         } ?: throw RuntimeException("Failed to open databas")
     }
 
-    override suspend fun executeSQL(statement: Statement<*, *>): Unit = withContext(Dispatchers.IO) {
-        execute(statement)
+    override suspend fun executeSQL(statement: Statement): Unit = withContext(Dispatchers.IO) {
+        // execute(statement)
     }
 
-    override fun <T, E : Entity<T>, S : Statement<T, E>> execute(statement: S) {
-        val stmnt = connection.createStatement()
-        stmnt.execute(statement.sql)
+    override fun <T> execute(statement: Statement) {
+        TODO("Not yet implemented")
     }
+
 
     companion object {
 

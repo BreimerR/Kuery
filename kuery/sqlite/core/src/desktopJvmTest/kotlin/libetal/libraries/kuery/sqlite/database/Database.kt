@@ -10,11 +10,6 @@ import libetal.libraries.kuery.sqlite.database.tables.Users
 object Database : Kuery() {
 
     override fun init(): Connector = Connector("", 1)
-
-    override fun <T, E : Entity<T>> execute(statement: Statement<T, E>) {
-        TODO("Not yet implemented")
-    }
-
     override fun onCreate() {
         CREATE TABLE Users
     }

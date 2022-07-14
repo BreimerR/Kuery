@@ -4,28 +4,23 @@ package libetal.libraries.kuery.core.expressions
 
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
-import libetal.libraries.kuery.core.statements.Select
-import libetal.libraries.kuery.core.statements.Statement
 
-class SimpleExpression<T> : Expression<String, String> {
+class SimpleExpression<T> : Expression<Column<T>, T> {
 
     constructor(
         left: Column<T>,
         operator: Operators,
         right: T
-    ) : this(left.name, operator.toString(), with(left) { right.sqlString })
+    ) : super(left, operator, right)
 
-    private constructor(column: String, operator: String, right: String) : super(column, operator, right)
-
-    constructor(column: String, operator: Operators, value: String) : this(column, operator.toString(), value)
 
     override val sql: String
-        get() = "`$left` $operator $right"
+        get() = "${left.identifier} $operator ${with(left) { right.sqlString }}"
 
     override val boundSql: String by laziest {
-        "`$left` $operator ?"
+        "${left.identifier} $operator ?"
     }
-    override val columnValues: List<Any> by laziest {
+    override val columnValues: List<*> by laziest {
         listOf(
             right
         )
@@ -33,28 +28,25 @@ class SimpleExpression<T> : Expression<String, String> {
 
 }
 
-class StatementExpression<T> : Expression<Column<T>, Select> {
+
+class BooleanExpression<T> : Expression<Column<T>, Boolean> {
 
     constructor(
         left: Column<T>,
         operator: Operators,
-        right: Select
+        right: Boolean
     ) : super(left, operator, right)
 
-    override val sql: String by laziest {
-        "${left.identifier} = ${right.sql}"
-    }
+
+    override val sql: String
+        get() = "${left.identifier} $operator $right"
 
     override val boundSql: String by laziest {
-        "${left.identifier} = ${right.boundSql}"
+        "${left.identifier} $operator $right"
     }
 
-    override val columnValues: List<Any> by laziest {
-        buildList {
-            addAll(
-                right.columnValues
-            )
-        }
+    override val columnValues: List<*> by laziest {
+        listOf<Boolean>()
     }
 
 }

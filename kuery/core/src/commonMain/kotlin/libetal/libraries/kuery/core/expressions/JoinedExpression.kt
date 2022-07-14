@@ -15,7 +15,7 @@ class JoinedExpression(
     override val boundSql: String by laziest {
         "(${left.boundSql} $operator ${right.boundSql}"
     }
-    override val columnValues: List<Any> by laziest {
+    override val columnValues: List<*> by laziest {
         buildList {
             addAll(left.columnValues)
             addAll(right.columnValues)

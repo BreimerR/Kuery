@@ -8,12 +8,12 @@ import libetal.libraries.kuery.core.expressions.extensions.AND
 import libetal.libraries.kuery.core.expressions.extensions.OR
 import libetal.libraries.kuery.core.statements.CREATE
 import libetal.libraries.kuery.core.statements.DELETE
+import libetal.libraries.kuery.core.statements.DELETE.FROM
 import libetal.libraries.kuery.core.statements.INSERT
 import libetal.libraries.kuery.core.statements.SELECT
 import libetal.libraries.kuery.core.statements.extensions.FROM
 import libetal.libraries.kuery.core.statements.extensions.INTO
 import libetal.libraries.kuery.core.statements.extensions.VALUES
-import libetal.libraries.kuery.core.statements.extensions.WHERE
 import libetal.libraries.kuery.sqlite.database.Database.TABLE
 import libetal.libraries.kuery.sqlite.database.tables.Users
 import kotlin.test.Test
@@ -101,9 +101,16 @@ class StatementTest {
             SELECT * Users WHERE (Users.age greaterThan (SELECT AVG Users.age FROM Users WHERE true))
         }
 
+        /**
+         * INSERT INTO Users(vararg column) VALUES {
+         *     add(value1, ... column.size)
+         *     add(value2, ... column.size)
+         * }
+         **/
         val insertStatement by laziest {
-            INSERT INTO Users VALUES {
-                Users.name set "Breimer"
+            INSERT INTO Users(Users.name, Users.age) VALUES {
+                row("Breimer", "12")
+                row("Breimer", 12)
             }
         }
 

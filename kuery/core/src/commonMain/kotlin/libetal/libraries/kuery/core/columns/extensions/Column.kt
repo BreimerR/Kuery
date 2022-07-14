@@ -14,6 +14,9 @@ infix fun <T> Column<T>.lessThan(value: T) =
 infix fun <T> Column<T>.greaterThan(value: T) =
     SimpleExpression(this, GREATER, value)
 
+infix fun <T> Column<T>.greaterThan(value: Select) =
+    StatementExpression(this, GREATER, value)
+
 infix fun <T> Column<T>.lessOrEqual(value: T) =
     SimpleExpression(this, LESS_OR_EQUALS, value)
 
