@@ -1,6 +1,5 @@
 package libetal.libraries.kuery.sqlite.database
 
-import libetal.kotlin.debug.info
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.extensions.equals
 import libetal.libraries.kuery.core.columns.extensions.greaterThan
@@ -79,12 +78,27 @@ class StatementTest {
 
     @Test
     fun insertTest() {
-        assertEquals("INSERT INTO `users`(`name`, `age`) ('Breimer', 12), ('Breimer', 12)", insertStatement.toString())
+        assertEquals("INSERT INTO `users`(`name`, `age`) VALUES ('Breimer', 12), ('Breimer', 12)", insertStatement.toString())
+    }
+
+    @Test
+    fun nestedSelectStatementTest(){
+        assertEquals("SELECT `id`, `name`, `age` FROM `users` WHERE `age` = (SELECT AVG(`age`) FROM `users` WHERE true)",nestedSelectStatement.sql)
+    }
+
+    @Test
+    fun boundInsertTest() {
+        assertEquals("INSERT INTO `users`(`name`, `age`) VALUES (?, ?), (?, ?)", insertStatement.boundSql)
     }
 
     @Test
     fun deleteTest() {
         assertEquals("DELETE FROM `users` WHERE `name` = 'Breimer'", deleteStatement.toString())
+    }
+
+    @Test
+    fun boundDeleteTest() {
+        assertEquals("DELETE FROM `users` WHERE `name` = ?", deleteStatement.boundSql)
     }
 
     companion object {

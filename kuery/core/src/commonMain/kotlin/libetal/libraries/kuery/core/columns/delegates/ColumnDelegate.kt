@@ -1,11 +1,11 @@
 package libetal.libraries.kuery.core.columns.delegates
 
 import libetal.libraries.kuery.core.Kuery
-import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.entities.Entity
 import kotlin.reflect.KProperty
 
-class ColumnDelegate<ColumnType, C : Column<ColumnType>, AbstractEntity : Entity<*>>(
+class ColumnDelegate<ColumnType, C : EntityColumn<ColumnType>, AbstractEntity : Entity<*>>(
     val database: Kuery<AbstractEntity>,
     val name: String,
     val initialize: AbstractEntity.(columnName: String) -> C

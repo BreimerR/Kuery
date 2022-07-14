@@ -2,7 +2,7 @@ package libetal.libraries.kuery.sqlite.core
 
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.Kuery as CoreKuery
@@ -31,7 +31,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     fun Entity<*, *, *>.text(name: String = "", default: String? = null) =
         registerColumn(name) {
             val defaultSql = default?.let { " DEFAULT '$default'" } ?: ""
-            Column(it, "$it TEXT $NOT_NULL$defaultSql", primary = false, nullable = false, {value ->
+            EntityColumn(it, "$it TEXT $NOT_NULL$defaultSql", primary = false, nullable = false, { value ->
                 "'$value'"
             }) { result ->
                 result ?: throw MalformedStoredData(this, it)
@@ -46,7 +46,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     ) =
         registerColumn(name) { columnName ->
             val sizeSql = size?.let { "($size)" } ?: ""
-            Column(
+            EntityColumn(
                 columnName,
                 "$columnName NUMERIC$sizeSql $NOT_NULL",
                 primary,
@@ -59,7 +59,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
         }
 
     fun Entity<*, *, *>.real(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
-        Column(
+        EntityColumn(
             columnName,
             "`$name` REAL",
             primary,
@@ -86,7 +86,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     }
 
     fun Entity<*, *, *>.blob(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
-        Column(
+        EntityColumn(
             columnName,
             "`$columnName` BLOB",
             primary,
@@ -145,7 +145,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     fun Entity<*, *, *>.char(name: String, default: Char?) =
         registerColumn(name) { columnName ->
-            Column(
+            EntityColumn(
                 columnName,
                 "`$columnName` TEXT",
                 primary = false,
@@ -160,7 +160,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     override fun Entity<*, *, *>.date(name: String) =
         registerColumn(name) { columnName ->
-            Column(
+            EntityColumn(
                 columnName,
                 "`$columnName` TEXT",
                 false,
@@ -187,7 +187,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     fun Entity<*, *, *>.date(name: String, default: LocalDate? = null, format: String? = null) =
         registerColumn(name) { columnName ->
             val defaultSql = default?.let { " DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))" } ?: ""
-            Column(
+            EntityColumn(
                 columnName,
                 "`$columnName` TEXT$defaultSql $NOT_NULL",
                 false,
@@ -208,7 +208,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     override fun Entity<*, *, *>.string(name: String, size: Int, default: String?) =
         registerColumn(name) { columnName ->
-            Column(
+            EntityColumn(
                 columnName,
                 "`$columnName` TEXT",
                 primary = false,
@@ -229,7 +229,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     override fun Entity<*, *, *>.boolean(name: String, default: Boolean?) = registerColumn(name) { columnName ->
         val defaultSql = default?.let { " DEFAULT ${if (it) "1" else "0"}" } ?: ""
 
-        Column(
+        EntityColumn(
             columnName,
             "`$columnName` NUMBER$defaultSql $NOT_NULL",
             primary = false,

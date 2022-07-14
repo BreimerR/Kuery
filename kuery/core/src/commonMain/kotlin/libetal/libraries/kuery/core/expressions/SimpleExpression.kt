@@ -3,12 +3,12 @@
 package libetal.libraries.kuery.core.expressions
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.EntityColumn
 
-class SimpleExpression<T> : Expression<Column<T>, T> {
+class SimpleExpression<T> : Expression<EntityColumn<T>, T> {
 
     constructor(
-        left: Column<T>,
+        left: EntityColumn<T>,
         operator: Operators,
         right: T
     ) : super(left, operator, right)
@@ -29,10 +29,10 @@ class SimpleExpression<T> : Expression<Column<T>, T> {
 }
 
 
-class BooleanExpression<T> : Expression<Column<T>, Boolean> {
+class BooleanExpression<T> : Expression<EntityColumn<T>, Boolean> {
 
     constructor(
-        left: Column<T>,
+        left: EntityColumn<T>,
         operator: Operators,
         right: Boolean
     ) : super(left, operator, right)

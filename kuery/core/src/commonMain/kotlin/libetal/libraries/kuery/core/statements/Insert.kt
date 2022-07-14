@@ -1,11 +1,11 @@
 package libetal.libraries.kuery.core.statements
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 
-class Insert(val entity: Entity<*>, vararg val columns: Column<*>) : ArgumentsStatement() {
+class Insert(val entity: Entity<*>, vararg val columns: EntityColumn<*>) : ArgumentsStatement() {
 
     private val values by laziest {
         mutableListOf<List<Any?>>()
@@ -45,11 +45,11 @@ class Insert(val entity: Entity<*>, vararg val columns: Column<*>) : ArgumentsSt
     }
 
     override val sql by laziest {
-        "$prefixInsert $valuesSql"
+        "$prefixInsert VALUES $valuesSql"
     }
 
     override val boundSql by laziest {
-        "$prefixInsert $boundValuesSql"
+        "$prefixInsert VALUES $boundValuesSql"
     }
 
     fun row(vararg value: Any?) {

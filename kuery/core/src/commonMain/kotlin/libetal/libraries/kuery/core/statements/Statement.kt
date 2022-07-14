@@ -3,7 +3,7 @@
 package libetal.libraries.kuery.core.statements
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.EntityColumn
 
 /**
  * Need to map results to the statement
@@ -28,18 +28,18 @@ abstract class ArgumentsStatement : Statement() {
 /**
  * If it's a wrong T then it should fail
  **/
-infix fun <T> Column<*>.parseToSql(obj: T) = try {
+infix fun <T> EntityColumn<*>.parseToSql(obj: T) = try {
     @Suppress("UNCHECKED_CAST")
-    this as Column<T>
+    this as EntityColumn<T>
     obj.sqlString
 } catch (e: Exception) {
     obj.toString()
 }
 
-fun <T> Column<*>.parseToSqlError(obj: T, message: String): String {
+fun <T> EntityColumn<*>.parseToSqlError(obj: T, message: String): String {
     val column = try {
         @Suppress("UNCHECKED_CAST")
-        this as Column<T>
+        this as EntityColumn<T>
     } catch (e: ClassCastException) {
         throw RuntimeException("$message: ${e.message}")
     }

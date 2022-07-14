@@ -52,7 +52,7 @@ class StatementTest {
 
     @Test
     fun testSimpleInsertStatementBuild() {
-        assertEquals("INSERT INTO `users` (`name`, `dob`) VALUES ('Breimer', '$date')", "$insertNewUser")
+        assertEquals("INSERT INTO `users`(`name`, `dob`) VALUES ('Breimer', '$date')", "$insertNewUser")
     }
 
     @Test
@@ -130,10 +130,8 @@ class StatementTest {
         }
 
         val insertNewUser by laziest {
-            (INSERT INTO Users VALUES {
+            INSERT INTO Users VALUES {
                 row(userName, date)
-            }).also {
-                println("SQL: $it")
             }
         }
 

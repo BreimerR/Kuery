@@ -2,20 +2,22 @@
 
 package libetal.libraries.kuery.core.statements
 
-import libetal.kotlin.expected
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 
 
 class Select(
+    val entity: Entity<*>,
     override val where: String,
     override val boundWhere: String,
-    val entity: Entity<*>
+    val columnValues: MutableList<Any>,
+    vararg val columns: Column<*>
 ) : ArgumentsStatement(), WhereStatement {
 
-    var orderBy: Column<*>? = null
+    var orderBy: EntityColumn<*>? = null
 
     private val orderBySql by laziest {
         orderBy?.let {
@@ -38,16 +40,19 @@ class Select(
         } ?: ""
     }
 
-    val columns by laziest {
-        mutableListOf<Column<*>>()
-    }
-
     val columnsSql by laziest {
-        "`${columns.joinToString("`, `") { it.name }}`"
-    }
-
-    val columnValues by laziest {
-        mutableListOf<Any>()
+        var i = 0
+        buildString {
+            for (column in columns) {
+                val identifier = column.identifier
+                append(
+                    if (i == 0) {
+                        identifier
+                    } else ", $identifier"
+                )
+                i++
+            }
+        }
     }
 
     private val boundOrderBySql by laziest {
@@ -56,7 +61,7 @@ class Select(
         } ?: ""
     }
 
-    var groupBy: Column<*>? = null
+    var groupBy: EntityColumn<*>? = null
 
     var groupBySql by laziest {
         groupBy?.let { " $GROUP_BY $it" } ?: ""
