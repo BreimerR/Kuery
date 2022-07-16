@@ -40,7 +40,6 @@ actual class Connector actual constructor(
     actual infix fun <R : Result> execute(statement: Statement<R>): Flow<R> =
         TODO("Object mapping can happen here")
 
-
     /**
      * The query runs on a single thread
      * and until the results are completely
@@ -49,8 +48,6 @@ actual class Connector actual constructor(
      * In the case of specific columns selected a Map<TableName,Map<Column,Value>>
      * Should be utilized. But if the unspecified columns are nullable then T being return storage should be used
      **/
-
-
     infix fun query(statement: Create<*, *>) = flow {
         query(statement.toString())
         @Suppress("UNCHECKED_CAST")
@@ -61,11 +58,10 @@ actual class Connector actual constructor(
                 null
             )
         )
-        return@flow
+
     }
 
-
-    infix fun query(statement: Select) = flow {
+    override infix fun query(statement: Select) = flow {
         query(statement.toString())
 
         val results = connection.useResult() ?: throw NullPointerException("Unexpected null results")
@@ -111,7 +107,7 @@ actual class Connector actual constructor(
 
     }
 
-    infix fun query(statement: Delete) = flow {
+    override infix fun query(statement: Delete) = flow {
         query(statement.toString())
         @Suppress("UNCHECKED_CAST")
         emit(
@@ -122,7 +118,7 @@ actual class Connector actual constructor(
         )
     }
 
-    infix fun query(statement: Insert) = flow {
+    override infix fun query(statement: Insert) = flow {
         query(statement.toString())
         @Suppress("UNCHECKED_CAST")
         emit(
@@ -132,7 +128,7 @@ actual class Connector actual constructor(
         )
     }
 
-    infix fun query(statement: Drop) = flow {
+    override infix fun query(statement: Drop) = flow {
         query(statement.toString())
         @Suppress("UNCHECKED_CAST")
         emit(
@@ -143,7 +139,7 @@ actual class Connector actual constructor(
         )
     }
 
-    infix fun query(statement: Update) = flow {
+    override infix fun query(statement: Update) = flow {
         query(statement.toString())
         @Suppress("UNCHECKED_CAST")
         emit(
@@ -153,7 +149,6 @@ actual class Connector actual constructor(
             )
         )
     }
-
 
     @Suppress("unused")
     actual fun close() {

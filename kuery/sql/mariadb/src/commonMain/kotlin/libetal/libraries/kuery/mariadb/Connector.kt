@@ -1,7 +1,10 @@
 package libetal.libraries.kuery.mariadb
 
 import kotlinx.coroutines.flow.Flow
-import libetal.libraries.kuery.core.statements.results.Result
+import kotlinx.coroutines.flow.flow
+import libetal.libraries.kuery.core.entities.extensions.name
+import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.core.statements.results.*
 
 expect class Connector(
     database: String = "test",

@@ -3,8 +3,8 @@ package libetal.libraries.kuery.mariadb
 import kotlinx.coroutines.flow.Flow
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.Entity
-import libetal.libraries.kuery.core.statements.Statement
-import libetal.libraries.kuery.core.statements.results.Result
+import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.core.statements.results.*
 import java.sql.DriverManager
 
 actual class Connector actual constructor(
@@ -35,6 +35,26 @@ actual class Connector actual constructor(
         val executed = statement.execute(sqlStatement)
 
         return executed
+    }
+
+    override fun query(statement: Select): Flow<SelectResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun query(statement: Delete): Flow<DeleteResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun query(statement: Insert): Flow<InsertResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun query(statement: Drop): Flow<DropResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun query(statement: Update): Flow<UpdateResult> {
+        TODO("Not yet implemented")
     }
 
 

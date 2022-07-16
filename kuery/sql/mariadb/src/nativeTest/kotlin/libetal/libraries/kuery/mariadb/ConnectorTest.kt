@@ -5,6 +5,7 @@ import libetal.libraries.kuery.core.statements.results.CreateResult
 import libetal.libraries.kuery.core.statements.results.SelectResult
 import libetal.libraries.kuery.mariadb.StatementTest.Companion.selectAllUsers
 import libetal.libraries.kuery.mariadb.database.Database
+import libetal.libraries.kuery.mariadb.database.Database.query
 import libetal.libraries.kuery.mariadb.database.tables.User
 import libetal.libraries.kuery.mariadb.database.tables.Users
 import kotlin.test.*
@@ -45,15 +46,7 @@ class ConnectorTest : TestCase {
 
 
     companion object {
-        val connector by laziest {
-            Connector(
-                Database.database,
-                Database.user,
-                Database.password,
-                Database.host,
-                Database.port
-            )
-        }
+
     }
 
 

@@ -1,14 +1,13 @@
 package libetal.libraries.kuery.core
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.columns.delegates.ColumnDelegate
 import libetal.libraries.kuery.core.entities.Entity
-import libetal.libraries.kuery.core.statements.CREATE
-import libetal.libraries.kuery.core.statements.Create
-import libetal.libraries.kuery.core.statements.Statement
-import libetal.libraries.kuery.core.statements.results.Result
+import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.core.statements.results.*
 
 /**
  * Objects are frozen in kotlin/native
@@ -78,6 +77,30 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
             columns.add(column)
         }
     } as C
+
+    abstract infix fun Create<*, *>.query(
+        collector: CreateResult.() -> Unit
+    ): Unit
+
+    abstract infix fun Select.query(
+        collector: SelectResult.() -> Unit
+    ): Unit
+
+    abstract infix fun Insert.query(
+        collector: InsertResult.() -> Unit
+    ): Unit
+
+    abstract infix fun Delete.query(
+        collector: DeleteResult.() -> Unit
+    ): Unit
+
+    abstract infix fun Drop.query(
+        collector: DropResult.() -> Unit
+    ): Unit
+
+    abstract infix fun Update.query(
+        collector: UpdateResult.() -> Unit
+    ): Unit
 
     abstract fun onCreate()
 

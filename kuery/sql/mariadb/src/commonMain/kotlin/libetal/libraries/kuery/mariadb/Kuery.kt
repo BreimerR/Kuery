@@ -1,13 +1,15 @@
 package libetal.libraries.kuery.mariadb
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.Kuery
 import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
-import libetal.libraries.kuery.core.statements.Statement
-import libetal.libraries.kuery.core.statements.results.Result
+import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.mariadb.entities.TableEntity
 
 abstract class Kuery(
@@ -159,6 +161,36 @@ abstract class Kuery(
             result.toBooleanStrictOrNull() ?: throw MalformedStoredData(this, columnName)
         }
 
+    }
+
+    override infix fun Create<*, *>.query(
+        collector: CreateResult.() -> Unit
+    ) = connector.query(this)(collector)
+
+    override infix fun Select.query(
+        collector: SelectResult.() -> Unit
+    ) = connector.query(this)(collector)
+
+    override infix fun Insert.query(
+        collector: InsertResult.() -> Unit
+    ) = connector.query(this)(collector)
+
+    override infix fun Delete.query(
+        collector: DeleteResult.() -> Unit
+    ) = connector.query(this)(collector)
+
+    override infix fun Drop.query(
+        collector: DropResult.() -> Unit
+    ) = connector.query(this)(collector)
+
+    override infix fun Update.query(
+        collector: UpdateResult.() -> Unit
+    ) = connector.query(this)(collector)
+
+    operator fun <T> Flow<T>.invoke(collector: (T) -> Unit) = runBlocking {
+        this@invoke.collect { value ->
+            collector(value)
+        }
     }
 
     override fun <T : Result> execute(statement: Statement<T>) {

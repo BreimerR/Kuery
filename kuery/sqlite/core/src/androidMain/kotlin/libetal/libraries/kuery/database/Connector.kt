@@ -10,10 +10,13 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.sqlite.core.database.extensions.listeners
 import libetal.libraries.kuery.sqlite.core.database.Connector as CoreConnector
 
@@ -65,89 +68,68 @@ class Connector : SQLiteOpenHelper, CoreConnector {
         }
     }
 
-
-    override suspend fun executeSQL(statement: Statement<*>) = withContext(Dispatchers.IO) {
-        when (statement) {
-            is Select -> {
-
-            }
-            is Insert -> {
-
-            }
-            is Update -> {
-
-            }
-            else -> writableDatabase.execSQL(statement.sql)
-        }
+    override fun <R : Result> execute(statement: Statement<R>) {
+        writableDatabase.execSQL(statement.sql)
     }
 
-    override fun <T, E : Entity<T>, S : Statement<T, E>> execute(statement: S) {
-        when (statement) {
-            is Select<*, *> -> {
-                val whereArgs: Array<String>
-                val where = buildString {
-                    val whereScope = this
+    override fun query(sqlStatement: String): Boolean {
+        TODO("Not yet implemented")
+    }
 
-                    whereArgs = buildList {
-                        val whereArgsScope = this
+    override fun query(statement: Select): Flow<SelectResult> = flow {
 
-                        var i = 0
-                        for ((column, value) in statement.wheres) {
-                            val coma = if (i == 0) "" else ","
-                            whereScope.append("$coma`${column.name}` = ?")
-                            whereArgsScope.add(value.toString())
-                            i++
-                        }
+        val where = statement.boundWhere
 
-                    }.toTypedArray()
-                }
+        val cursor = writableDatabase.query(
+            statement.entity.name,
+            statement.columns.map { it.name }.toTypedArray(),
+            where,
+            statement.columnValues.map { it.toString() }.toTypedArray(),
+            statement.groupBy?.name,
+            null, // TODO: String Argument relevance not clear yet
+            statement.orderBy?.name,
+            statement.limit?.toString()
+        )
 
-                val cursor = writableDatabase.query(
-                    statement.entity.name,
-                    statement.columns.map { it.name }.toTypedArray(),
-                    where,
-                    whereArgs,
-                    statement.groupBy?.name,
-                    null, // TODO: String Argument relevance not clear yet
-                    statement.orderBy?.name,
-                    statement.limit?.toString()
-                )
+        cursor.use {
 
-                cursor.use {
-
-                }
-            }
-            is Insert<*, *> -> {
-                val values = ContentValues().apply {
-                }
-
-                /**
-                 * Null column hack not considered here.
-                 * Not sure if the feature is well-used / how to
-                 * solve for its use case in this project yet.
-                 **/
-                writableDatabase.insert(statement.entity.name, null, values)
-            }
-            is Update<*, *> -> {
-
-            }
-
-            is Delete<*, *> -> {
-                val whereClause = ""
-
-                val whereArgs = buildList<String> {
-
-                }.toTypedArray()
-
-                writableDatabase.delete(
-                    statement.entity.name,
-                    whereClause,
-                    whereArgs
-                )
-
-            }
-            else -> writableDatabase.execSQL(statement.sql)
         }
+
+    }
+
+    override fun query(statement: Delete): Flow<DeleteResult> = flow {
+        val whereClause = ""
+
+        val whereArgs = buildList<String> {
+
+        }.toTypedArray()
+
+        writableDatabase.delete(
+            statement.entity.name,
+            whereClause,
+            whereArgs
+        )
+
+    }
+
+    override fun query(statement: Insert): Flow<InsertResult> = flow {
+        val values = ContentValues().apply {
+        }
+
+        /**
+         * Null column hack not considered here.
+         * Not sure if the feature is well-used / how to
+         * solve for its use case in this project yet.
+         **/
+        writableDatabase.insert(statement.entity.name, null, values)
+    }
+
+    override fun query(statement: Drop): Flow<DropResult> = flow {
+
+    }
+
+    override fun query(statement: Update): Flow<UpdateResult> {
+        TODO("Not yet implemented")
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {

@@ -5,10 +5,9 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
+import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.core.Kuery as CoreKuery
-import libetal.libraries.kuery.core.statements.INSERT
-import libetal.libraries.kuery.core.statements.Statement
-import libetal.libraries.kuery.core.statements.results.Result
 import libetal.libraries.kuery.sqlite.core.database.extensions.addListener
 import libetal.libraries.kuery.sqlite.core.database.listeners.ConnectorListener
 import libetal.libraries.kuery.sqlite.core.entities.Entity
@@ -253,6 +252,30 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     override fun <R : Result> execute(statement: Statement<R>) {
         // Connector.INSTANCE.execute(statement)
         connector.execute<R>(statement)
+    }
+
+    override fun Create<*, *>.query(collector: CreateResult.() -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun Select.query(collector: SelectResult.() -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun Insert.query(collector: InsertResult.() -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun Delete.query(collector: DeleteResult.() -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun Drop.query(collector: DropResult.() -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun Update.query(collector: UpdateResult.() -> Unit) {
+        TODO("Not yet implemented")
     }
 
     override fun onCreate(connector: Connector) = tableEntities.forEach { (entity, columns) ->

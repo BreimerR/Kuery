@@ -58,11 +58,7 @@ class Connector : SQLiteOpenHelper, CoreConnector {
     override suspend fun executeSQL(statement: Statement<*>) = withContext(Dispatchers.IO) {
         writableDatabase.execSQL(statement.toString())
     }
-
-    override fun <T> execute(statement: Statement) {
-        TODO("Not yet implemented")
-    }
-
+    
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         TODO("Not yet implemented")
     }
