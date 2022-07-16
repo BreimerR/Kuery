@@ -6,7 +6,6 @@ import libetal.interop.sqlite3.connect
 import libetal.interop.sqlite3.sqlite3_close
 import libetal.kotlin.debug.info
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.Statement
 import libetal.libraries.kuery.sqlite.core.database.Connector as CoreConnector
 
@@ -24,11 +23,11 @@ class Connector(override val dbName: String, val version: Int/*TODO: Store value
         })
     }
 
-    override suspend fun executeSQL(statement: Statement<*, *>) {
+    override suspend fun executeSQL(statement: Statement<*>) {
         connection.query(statement.toString())
     }
 
-    override fun <T, E : Entity<T>, S : Statement<T, E>> execute(statement: S) {
+    override fun <T> execute(statement: Statement) {
         connection.query(statement.toString())
     }
 

@@ -2,28 +2,42 @@ package libetal.libraries.kuery.mariadb
 
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.statements.results.CreateResult
+import libetal.libraries.kuery.core.statements.results.SelectResult
 import libetal.libraries.kuery.mariadb.StatementTest.Companion.selectAllUsers
 import libetal.libraries.kuery.mariadb.database.Database
-import kotlin.test.Test
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import libetal.libraries.kuery.mariadb.database.tables.User
+import libetal.libraries.kuery.mariadb.database.tables.Users
+import kotlin.test.*
 
 class ConnectorTest : TestCase {
+
+    @BeforeTest
+    fun simpleCreateTable() = StatementTest.createSimpleTableStatement query {
+        assertNull(error, "Failed to create database")
+    }
+
+    @AfterTest
+    fun simpleDropTable() = StatementTest.dropTableIfExistsStatement query {
+
+    }
 
     @Test
     fun connection() {
 
     }
 
-    fun simpleCreateTable() = StatementTest.createSimpleTableStatement query { result ->
-        assertTrue(result is CreateResult)
-        assertNull(result.error, "Failed to create database")
-    }
-
     @Test
     fun executeSimpleSelect() = selectAllUsers query {
+        val user = User(
+            name = get(Users to Users.name),
+            dateOfBirth = get(Users to Users.dob)
+        )
+
+        assertEquals(StatementTest.userName, user.name)
+        assertEquals(StatementTest.date, user.dateOfBirth)
 
     }
+
 
     val results by laziest {
         mutableMapOf<String, String>()

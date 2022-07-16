@@ -8,6 +8,7 @@ import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.Kuery as CoreKuery
 import libetal.libraries.kuery.core.statements.INSERT
 import libetal.libraries.kuery.core.statements.Statement
+import libetal.libraries.kuery.core.statements.results.Result
 import libetal.libraries.kuery.sqlite.core.database.extensions.addListener
 import libetal.libraries.kuery.sqlite.core.database.listeners.ConnectorListener
 import libetal.libraries.kuery.sqlite.core.entities.Entity
@@ -249,9 +250,9 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
         }
     }
 
-    override fun <T> execute(statement: Statement) {
+    override fun <R : Result> execute(statement: Statement<R>) {
         // Connector.INSTANCE.execute(statement)
-        connector.execute<T>(statement)
+        connector.execute<R>(statement)
     }
 
     override fun onCreate(connector: Connector) = tableEntities.forEach { (entity, columns) ->

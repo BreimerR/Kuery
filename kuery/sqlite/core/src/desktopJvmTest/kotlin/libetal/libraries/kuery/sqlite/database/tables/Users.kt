@@ -11,4 +11,7 @@ object Users : IdEntity<User>() {
     val name = text("name")
     val age = int("age")
     override fun getEntityName(): String = "users"
+
+    override fun toString(): String = "users"
+
 }

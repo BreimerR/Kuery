@@ -8,6 +8,7 @@ import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.CREATE
 import libetal.libraries.kuery.core.statements.Create
 import libetal.libraries.kuery.core.statements.Statement
+import libetal.libraries.kuery.core.statements.results.Result
 
 /**
  * Objects are frozen in kotlin/native
@@ -61,7 +62,7 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
 
     abstract fun AbstractEntity.boolean(name: String = "", default: Boolean? = null): EntityColumn<Boolean>
 
-    abstract infix fun <T> execute(statement: Statement)
+    abstract infix fun <T : Result> execute(statement: Statement<T>)
 
     /**
      * Do not remove the entity

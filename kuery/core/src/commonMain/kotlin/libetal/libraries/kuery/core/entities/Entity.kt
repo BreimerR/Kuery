@@ -28,6 +28,8 @@ abstract class Entity<T> {
         override fun toString(): String = identifier
     }
 
+    abstract override fun toString(): String
+
 }
 
 

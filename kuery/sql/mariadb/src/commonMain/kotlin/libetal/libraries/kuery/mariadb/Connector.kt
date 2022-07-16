@@ -1,6 +1,7 @@
 package libetal.libraries.kuery.mariadb
 
 import kotlinx.coroutines.flow.Flow
+import libetal.libraries.kuery.core.statements.results.Result
 
 expect class Connector(
     database: String = "test",
@@ -15,7 +16,7 @@ expect class Connector(
     val database: String
     val port: UInt
 
-    infix fun <T> execute(statement: libetal.libraries.kuery.core.statements.Statement): Flow<T>
+    infix fun <R : Result> execute(statement: libetal.libraries.kuery.core.statements.Statement<R>): Flow<R>
 
     fun close()
 

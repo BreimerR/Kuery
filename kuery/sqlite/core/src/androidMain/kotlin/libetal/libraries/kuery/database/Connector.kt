@@ -66,7 +66,7 @@ class Connector : SQLiteOpenHelper, CoreConnector {
     }
 
 
-    override suspend fun executeSQL(statement: Statement<*, *>) = withContext(Dispatchers.IO) {
+    override suspend fun executeSQL(statement: Statement<*>) = withContext(Dispatchers.IO) {
         when (statement) {
             is Select -> {
 

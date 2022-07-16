@@ -11,7 +11,6 @@ import androidx.annotation.RequiresApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.Statement
 import libetal.libraries.kuery.sqlite.core.database.extensions.listeners
 import libetal.libraries.kuery.sqlite.core.database.Connector as CoreConnector
@@ -56,7 +55,7 @@ class Connector : SQLiteOpenHelper, CoreConnector {
         }
     }
 
-    override suspend fun executeSQL(statement: Statement) = withContext(Dispatchers.IO) {
+    override suspend fun executeSQL(statement: Statement<*>) = withContext(Dispatchers.IO) {
         writableDatabase.execSQL(statement.toString())
     }
 

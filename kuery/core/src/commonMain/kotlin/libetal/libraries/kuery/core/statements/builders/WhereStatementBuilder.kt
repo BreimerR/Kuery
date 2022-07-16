@@ -6,7 +6,7 @@ import libetal.libraries.kuery.core.expressions.Expression
 import libetal.libraries.kuery.core.expressions.WhereScope
 import libetal.libraries.kuery.core.statements.Statement
 
-abstract class WhereStatementBuilder<T, E : Entity<T>, S : Statement> : EntityStatementBuilder<T, E, S> {
+abstract class WhereStatementBuilder<T, E : Entity<T>, S : Statement<*>> : EntityStatementBuilder<T, E, S> {
 
     val columnValues by laziest {
         mutableListOf<Any>()

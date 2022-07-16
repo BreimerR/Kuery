@@ -7,7 +7,7 @@ import libetal.libraries.kuery.core.statements.Statement
 
 class Connector(override val dbName:String) : libetal.libraries.kuery.sqlite.core.database.Connector {
 
-    override suspend fun executeSQL(statement: Statement<*, *>): Unit = withContext(Dispatchers.Default) {
+    override suspend fun executeSQL(statement: Statement<*>): Unit = withContext(Dispatchers.Default) {
         TODO("")
     }
 

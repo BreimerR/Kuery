@@ -25,4 +25,6 @@ object Users : IdEntity<User>() {
 
     override fun getEntityName(): String = "users"
 
+    override fun toString(): String  = "users"
+
 }

@@ -3,11 +3,8 @@ package libetal.libraries.kuery.database
 import libetal.libraries.kuery.sqlite.core.database.Connector as CoreConnector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import libetal.kotlin.expected
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.Statement
-import java.sql.Connection
 import java.sql.DriverManager
 
 class Connector
@@ -26,7 +23,7 @@ private constructor(override val dbName: String, val version: Int) : CoreConnect
         } ?: throw RuntimeException("Failed to open databas")
     }
 
-    override suspend fun executeSQL(statement: Statement): Unit = withContext(Dispatchers.IO) {
+    override suspend fun executeSQL(statement: Statement<*>): Unit = withContext(Dispatchers.IO) {
         // execute(statement)
     }
 

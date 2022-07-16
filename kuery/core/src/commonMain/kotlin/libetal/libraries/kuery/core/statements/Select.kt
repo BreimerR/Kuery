@@ -7,6 +7,7 @@ import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
+import libetal.libraries.kuery.core.statements.results.SelectResult
 
 
 class Select(
@@ -15,7 +16,7 @@ class Select(
     override val boundWhere: String,
     val columnValues: MutableList<Any>,
     vararg val columns: Column<*>
-) : ArgumentsStatement(), WhereStatement {
+) : ArgumentsStatement<SelectResult>(), WhereStatement {
 
     var orderBy: EntityColumn<*>? = null
 

@@ -5,11 +5,12 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
+import libetal.libraries.kuery.core.statements.results.UpdateResult
 
 class Update(
     override val where: String,
     override val boundWhere: String
-) : ArgumentsStatement(), WhereStatement {
+) : ArgumentsStatement<UpdateResult>(), WhereStatement {
 
     var entity: Entity<*> by expected("Can't Use null entity") {
         it != null

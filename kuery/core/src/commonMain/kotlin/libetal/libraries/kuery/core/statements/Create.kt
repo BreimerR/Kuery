@@ -4,6 +4,7 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.Kuery
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.name
+import libetal.libraries.kuery.core.statements.results.CreateResult
 import libetal.libraries.kuery.core.tableEntities
 
 class Create<Class, E : Entity<Class>>(
@@ -11,7 +12,7 @@ class Create<Class, E : Entity<Class>>(
     val database: Kuery<*>,
     val type: Entity.Type = Entity.Type.TABLE,
     safe: Boolean = true
-) : Statement() {
+) : Statement<CreateResult>() {
 
     override val sql: String by laziest {
         """|CREATE $type ${if (safe) "IF NOT EXISTS " else ""}`${entity.name}` (

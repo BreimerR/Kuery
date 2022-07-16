@@ -9,10 +9,7 @@ import kuery.interop.mariadb.mysql_free_result
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.statements.*
-import libetal.libraries.kuery.core.statements.results.CreateResult
-import libetal.libraries.kuery.core.statements.results.DeleteResult
-import libetal.libraries.kuery.core.statements.results.InsertResult
-import libetal.libraries.kuery.core.statements.results.SelectResult
+import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.mariadb.exceptions.MariaDbException
 import libetal.libraries.kuery.mariadb.interop.*
 
@@ -40,7 +37,7 @@ actual class Connector actual constructor(
      * Don't use flows if the function isn't suspended
      * Not really usefull that way
      **/
-    actual infix fun <T> execute(statement: Statement): Flow<T> =
+    actual infix fun <R : Result> execute(statement: Statement<R>): Flow<R> =
         TODO("Object mapping can happen here")
 
 
@@ -52,81 +49,109 @@ actual class Connector actual constructor(
      * In the case of specific columns selected a Map<TableName,Map<Column,Value>>
      * Should be utilized. But if the unspecified columns are nullable then T being return storage should be used
      **/
-    infix fun  query(
-        statement: Statement
-    ) = flow {
 
-        if (query(statement.toString())) {
-            when (statement) {
-                is Create<*,*> -> { // CREATE doesn't have results
-                    emit(
-                        CreateResult(
-                            name = "TODO(Definately not correct)",
-                            type = statement.type,
-                            null
-                        )
-                    )
-                    return@flow
-                }
-                is Delete -> { // DELETE doesn't have results
-                    emit(
-                        DeleteResult(
-                            table = statement.entity.name,
-                            null
-                        )
-                    )
-                    return@flow
-                }
-                is Select -> { // Select has results
-                    val results = connection.useResult() ?: throw NullPointerException("Unexpected null results")
 
-                    val numColumns = connection.fieldCount.toInt()
+    infix fun query(statement: Create<*, *>) = flow {
+        query(statement.toString())
+        @Suppress("UNCHECKED_CAST")
+        emit(
+            CreateResult(
+                name = "TODO(Definately not correct)",
+                type = statement.type,
+                null
+            )
+        )
+        return@flow
+    }
 
-                    while (true) {
-                        val row = results.row ?: break
-                        var i = 0
-                        while (i < numColumns) {
-                            val column = (results fetchFieldDirect i.toUInt())?.pointed ?: break
-                            val statementColumn = statement.columns[i]
-                            val value = row[i]?.toKString()
-                            val statementValue = value?.let {
-                                statementColumn.parse(it)
-                            } ?: if (statementColumn.nullable)
-                                null
-                            else
-                                throw RuntimeException("Null Received for non null column `${statement.entity.name}`.${statementColumn.name}")
 
-                            emit(
-                                SelectResult(
-                                    table = column.table?.toKString() ?: throw NullPointerException("Failed to read table"),
-                                    columnName = column.name?.toKString()
-                                        ?: throw NullPointerException("Unexpected null result"),
-                                    value = value
-                                )
-                            )
-                            i++
-                        }
+    infix fun query(statement: Select) = flow {
+        query(statement.toString())
 
-                        // emit the whole row instead
+        val results = connection.useResult() ?: throw NullPointerException("Unexpected null results")
 
-                    }
+        val numColumns = connection.fieldCount.toInt()
 
-                    mysql_free_result(results)
+        val emission = mutableMapOf<String, MutableMap<String, Any?>>()
 
+        while (true) {
+            val row = results.row ?: break
+            var i = 0
+            while (i < numColumns) {
+                val column = (results fetchFieldDirect i.toUInt())?.pointed ?: break
+                val statementColumn = statement.columns[i]
+                val value = row[i]?.toKString()
+                val statementValue = value?.let {
+                    statementColumn.parse(it)
+                } ?: if (statementColumn.nullable)
+                    null
+                else
+                    throw RuntimeException("Null Received for non null column `${statement.entity.name}`.${statementColumn.name}")
+
+
+                val tableName = column.table?.toKString() ?: throw NullPointerException("Failed to read table")
+                val table = emission[tableName] ?: mutableMapOf<String, Any?>().also {
+                    emission[tableName] = it
                 }
 
-                is Insert -> {
-                    emit(
-                        InsertResult(
-                            into = statement.entity.name
-                        )
-                    )
-                }
-
+                val columnName = column.name?.toKString() ?: throw NullPointerException("Failed to read column name")
+                table[columnName] = statementValue
+                i++
             }
 
-        } else throw MariaDbException(connection.errorCode, connection.errorMessage)
+            @Suppress("UNCHECKED_CAST")
+            emit(
+                SelectResult(
+                    row = emission
+                )
+            )
+        }
 
+        mysql_free_result(results)
+
+    }
+
+    infix fun query(statement: Delete) = flow {
+        query(statement.toString())
+        @Suppress("UNCHECKED_CAST")
+        emit(
+            DeleteResult(
+                table = statement.entity.name,
+                null
+            )
+        )
+    }
+
+    infix fun query(statement: Insert) = flow {
+        query(statement.toString())
+        @Suppress("UNCHECKED_CAST")
+        emit(
+            InsertResult(
+                into = statement.entity.name
+            )
+        )
+    }
+
+    infix fun query(statement: Drop) = flow {
+        query(statement.toString())
+        @Suppress("UNCHECKED_CAST")
+        emit(
+            DropResult(
+                table = statement.entity.name,
+                null
+            )
+        )
+    }
+
+    infix fun query(statement: Update) = flow {
+        query(statement.toString())
+        @Suppress("UNCHECKED_CAST")
+        emit(
+            UpdateResult(
+                table = statement.entity.name,
+                null
+            )
+        )
     }
 
 

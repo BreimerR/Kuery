@@ -4,12 +4,13 @@ package libetal.libraries.kuery.core.statements
 
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.statements.results.Result
 
 /**
  * Need to map results to the statement
  * This could have multiple entities.
  **/
-abstract class Statement {
+abstract class Statement<R : Result> {
 
     abstract val sql: String
 
@@ -19,7 +20,7 @@ abstract class Statement {
 
 }
 
-abstract class ArgumentsStatement : Statement() {
+abstract class ArgumentsStatement<T : Result> : Statement<T>() {
     val arguments by laziest {
         mutableListOf<Any>()
     }

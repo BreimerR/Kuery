@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.Statement
+import libetal.libraries.kuery.core.statements.results.Result
 import java.sql.DriverManager
 
 actual class Connector actual constructor(
@@ -19,7 +20,7 @@ actual class Connector actual constructor(
             ?: throw RuntimeException("Failed to establish connection to database")
     }
 
-    actual infix fun <T, E : Entity<T>> execute(statement: Statement<T, E>): Flow<T> {
+    actual infix fun <R : Result> execute(statement: Statement<R>): Flow<R> {
         val execute = query(statement.sql)
         TODO("Not yet implemented")
     }

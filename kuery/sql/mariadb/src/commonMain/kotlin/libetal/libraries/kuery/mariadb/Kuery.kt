@@ -7,6 +7,7 @@ import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.statements.Statement
+import libetal.libraries.kuery.core.statements.results.Result
 import libetal.libraries.kuery.mariadb.entities.TableEntity
 
 abstract class Kuery(
@@ -160,7 +161,7 @@ abstract class Kuery(
 
     }
 
-    override fun <T> execute(statement: Statement) {
+    override fun <T : Result> execute(statement: Statement<T>) {
         connector.execute<T>(statement)
     }
 

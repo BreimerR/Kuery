@@ -4,7 +4,7 @@ import libetal.kotlin.laziest
 
 class FunctionColumn<T, R>(
     private val func: String,
-    val column: EntityColumn<T>,
+    private val column: EntityColumn<T>,
     override val parser: (String?) -> R,
     private val alias: String? = null
 ) : Column<R> {

@@ -17,6 +17,8 @@ object Users : TableEntity<User>() {
 
     val dob = date("dob")
 
-    override fun getEntityName(): String = "users"
+    override fun getEntityName(): String = "users" // use to string
+
+    override fun toString(): String = "users"
 
 }
