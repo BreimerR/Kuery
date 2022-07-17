@@ -5,15 +5,11 @@ import libetal.libraries.kuery.core.columns.extensions.equals
 import libetal.libraries.kuery.core.columns.extensions.greaterThan
 import libetal.libraries.kuery.core.expressions.extensions.AND
 import libetal.libraries.kuery.core.expressions.extensions.OR
-import libetal.libraries.kuery.core.statements.CREATE
-import libetal.libraries.kuery.core.statements.DELETE
+import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.DELETE.FROM
-import libetal.libraries.kuery.core.statements.INSERT
-import libetal.libraries.kuery.core.statements.SELECT
 import libetal.libraries.kuery.core.statements.extensions.FROM
 import libetal.libraries.kuery.core.statements.extensions.INTO
 import libetal.libraries.kuery.core.statements.extensions.VALUES
-import libetal.libraries.kuery.sqlite.database.Database.TABLE
 import libetal.libraries.kuery.sqlite.database.tables.Users
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -82,8 +78,11 @@ class StatementTest {
     }
 
     @Test
-    fun nestedSelectStatementTest(){
-        assertEquals("SELECT `id`, `name`, `age` FROM `users` WHERE `age` = (SELECT AVG(`age`) FROM `users` WHERE true)",nestedSelectStatement.sql)
+    fun nestedSelectStatementTest() {
+        assertEquals(
+            "SELECT `id`, `name`, `age` FROM `users` WHERE `age` = (SELECT AVG(`age`) FROM `users` WHERE true)",
+            nestedSelectStatement.sql
+        )
     }
 
     @Test
@@ -93,12 +92,12 @@ class StatementTest {
 
     @Test
     fun deleteTest() {
-        assertEquals("DELETE FROM `users` WHERE `name` = 'Breimer'", deleteStatement.toString())
+        assertEquals("DELETE FROM `users` WHERE `name` = 'Breimer'", deleteUserStatement.toString())
     }
 
     @Test
     fun boundDeleteTest() {
-        assertEquals("DELETE FROM `users` WHERE `name` = ?", deleteStatement.boundSql)
+        assertEquals("DELETE FROM `users` WHERE `name` = ?", deleteUserStatement.boundSql)
     }
 
     companion object {
@@ -128,11 +127,16 @@ class StatementTest {
             }
         }
 
-        val deleteStatement by laziest {
+        val deleteUserStatement by laziest {
             DELETE FROM Users WHERE (Users.name equals "Breimer")
         }
 
+        val dropTableStatement by laziest {
+            DROP TABLE Users IF Existence.EXISTS
+        }
+
         private const val TAG = "StatementTest"
+
     }
 
 }

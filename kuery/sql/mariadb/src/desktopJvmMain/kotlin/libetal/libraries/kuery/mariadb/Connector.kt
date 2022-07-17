@@ -37,6 +37,10 @@ actual class Connector actual constructor(
         return executed
     }
 
+    override fun query(statement: Create<*, *>): Flow<CreateResult> {
+        TODO("Not yet implemented")
+    }
+
     override fun query(statement: Select): Flow<SelectResult> {
         TODO("Not yet implemented")
     }

@@ -7,6 +7,8 @@ import libetal.libraries.kuery.mariadb.database.tables.Users
 
 object DatabaseConfig {
 
+    // this can be loaded from a file or something as long as it's a lazy
+    // Specifically for native platforms
     private val configSource by laziest {
         mapOf<String, Any>(
             "database" to "test",

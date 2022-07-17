@@ -1,12 +1,11 @@
 package libetal.libraries.kuery.sqlite.database
 
 import libetal.kotlin.debug.info
+import libetal.libraries.kuery.core.columns.extensions.equals
 import libetal.libraries.kuery.core.expressions.extensions.AND
 import libetal.libraries.kuery.core.expressions.extensions.OR
 import libetal.libraries.kuery.core.statements.CREATE
 import libetal.libraries.kuery.core.statements.SELECT
-import libetal.libraries.kuery.core.statements.extensions.WHERE
-import libetal.libraries.kuery.core.columns.extensions.equals
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

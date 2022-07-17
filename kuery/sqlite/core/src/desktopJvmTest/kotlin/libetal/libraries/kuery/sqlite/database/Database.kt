@@ -9,7 +9,8 @@ import libetal.libraries.kuery.sqlite.database.tables.Users
 
 object Database : Kuery() {
 
-    override fun init(): Connector = Connector("", 1)
+    override fun init(): Connector = Connector("src/desktopJvmTest/resources/desktop", 1)
+
     override fun onCreate() {
         CREATE TABLE Users
     }

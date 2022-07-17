@@ -8,6 +8,7 @@ import libetal.libraries.kuery.core.columns.delegates.ColumnDelegate
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
+import kotlin.native.concurrent.ThreadLocal
 
 /**
  * Objects are frozen in kotlin/native
@@ -17,6 +18,7 @@ import libetal.libraries.kuery.core.statements.results.*
  *
  * Affects JS
  **/
+@ThreadLocal // This is mainly for concurrency in kotlin
 val tableEntities by laziest {
     mutableMapOf<Entity<*>, MutableList<EntityColumn<*>>>()
 }
@@ -104,8 +106,8 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
 
     abstract fun onCreate()
 
-    @Suppress("FunctionName")
-    infix fun <Class, E : Entity<Class>> CREATE.TABLE(entity: E) = Create(entity, this@Kuery)
+    suspend operator fun <T> Flow<T>.invoke(collector: (T) -> Unit) =
+        collect(collector)
 
     companion object {
         const val NOT_NULL = "NOT NULL"

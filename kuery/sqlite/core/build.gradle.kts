@@ -13,7 +13,6 @@ val androidCompileSdkVersion by project {
     it.toString().toInt()
 }
 
-
 val minSdkVersion by project {
     it.toString().toInt()
 }
@@ -108,7 +107,8 @@ kotlin {
 
         val desktopJvmMain by getting {
             dependencies {
-                implementation("com.oracle.database.jdbc:ojdbc11:$jdbcVersion")
+                implementation("org.xerial:sqlite-jdbc:3.36.0.3")
+                // implementation("com.oracle.database.jdbc:ojdbc11:$jdbcVersion")
             }
         }
         val desktopJvmTest by getting {

@@ -165,33 +165,27 @@ abstract class Kuery(
 
     override infix fun Create<*, *>.query(
         collector: CreateResult.() -> Unit
-    ) = connector.query(this)(collector)
+    ) = runBlocking { connector.query(this@query)(collector) }
 
     override infix fun Select.query(
         collector: SelectResult.() -> Unit
-    ) = connector.query(this)(collector)
+    ) = runBlocking { connector.query(this@query)(collector) }
 
     override infix fun Insert.query(
         collector: InsertResult.() -> Unit
-    ) = connector.query(this)(collector)
+    ) = runBlocking { connector.query(this@query)(collector) }
 
     override infix fun Delete.query(
         collector: DeleteResult.() -> Unit
-    ) = connector.query(this)(collector)
+    ) = runBlocking { connector.query(this@query)(collector) }
 
     override infix fun Drop.query(
         collector: DropResult.() -> Unit
-    ) = connector.query(this)(collector)
+    ) = runBlocking { connector.query(this@query)(collector) }
 
     override infix fun Update.query(
         collector: UpdateResult.() -> Unit
-    ) = connector.query(this)(collector)
-
-    operator fun <T> Flow<T>.invoke(collector: (T) -> Unit) = runBlocking {
-        this@invoke.collect { value ->
-            collector(value)
-        }
-    }
+    ) = runBlocking { connector.query(this@query)(collector) }
 
     override fun <T : Result> execute(statement: Statement<T>) {
         connector.execute<T>(statement)

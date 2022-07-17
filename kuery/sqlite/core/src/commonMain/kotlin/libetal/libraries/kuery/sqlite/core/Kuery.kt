@@ -1,5 +1,6 @@
 package libetal.libraries.kuery.sqlite.core
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.EntityColumn
@@ -99,26 +100,6 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
         }
 
     }
-
-    /*@Suppress("UNCHECKED_CAST")
-    fun Entity<*, *, *>.boolean(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
-        FinalColumn(
-            columnName,
-            "`$columnName` BLOB",
-            primary,
-            nullable = false,
-            { it: Any ->
-                it.toString()
-            }
-        ) { result ->
-            result ?: throw UnexpectedNull(this, columnName)
-            when (result) {
-                "1" -> true
-                "0" -> false
-                else -> throw MalformedStoredData(this, columnName)
-            }
-        }
-    }*/
 
     @Suppress("UNCHECKED_CAST")
     override fun Entity<*, *, *>.long(name: String) = numeric(name) { columnName, result ->
@@ -250,32 +231,43 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     }
 
     override fun <R : Result> execute(statement: Statement<R>) {
-        // Connector.INSTANCE.execute(statement)
-        connector.execute<R>(statement)
+        connector.execute(statement)
     }
 
     override fun Create<*, *>.query(collector: CreateResult.() -> Unit) {
-        TODO("Not yet implemented")
+        runBlocking {
+            connector.query(this@query).invoke(collector)
+        }
     }
 
     override fun Select.query(collector: SelectResult.() -> Unit) {
-        TODO("Not yet implemented")
+        runBlocking {
+            connector.query(this@query).invoke(collector)
+        }
     }
 
     override fun Insert.query(collector: InsertResult.() -> Unit) {
-        TODO("Not yet implemented")
+        runBlocking {
+            connector.query(this@query).invoke(collector)
+        }
     }
 
     override fun Delete.query(collector: DeleteResult.() -> Unit) {
-        TODO("Not yet implemented")
+        runBlocking {
+            connector.query(this@query).invoke(collector)
+        }
     }
 
     override fun Drop.query(collector: DropResult.() -> Unit) {
-        TODO("Not yet implemented")
+        runBlocking {
+            connector.query(this@query).invoke(collector)
+        }
     }
 
     override fun Update.query(collector: UpdateResult.() -> Unit) {
-        TODO("Not yet implemented")
+        runBlocking {
+            connector.query(this@query).invoke(collector)
+        }
     }
 
     override fun onCreate(connector: Connector) = tableEntities.forEach { (entity, columns) ->
@@ -284,4 +276,4 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
 }
 
-
+expect fun <T> runBlocking(block: suspend CoroutineScope.() -> T): T

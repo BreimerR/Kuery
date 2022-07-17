@@ -10,7 +10,6 @@ import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.DELETE.FROM
 import libetal.libraries.kuery.core.statements.Existence.EXISTS
 import libetal.libraries.kuery.core.statements.extensions.*
-import libetal.libraries.kuery.mariadb.database.Database.TABLE
 import libetal.libraries.kuery.mariadb.database.tables.Users
 import kotlin.test.Test
 import kotlin.test.assertEquals

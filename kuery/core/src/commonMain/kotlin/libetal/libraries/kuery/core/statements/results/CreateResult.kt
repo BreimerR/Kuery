@@ -6,5 +6,5 @@ class CreateResult(
     val name: String,
     val type: Entity.Type,
     // val columns: List<Int>
-    error: RuntimeException? = null
+    error: Exception? = null
 ) : Result(error)

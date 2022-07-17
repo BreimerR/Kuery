@@ -48,7 +48,7 @@ actual class Connector actual constructor(
      * In the case of specific columns selected a Map<TableName,Map<Column,Value>>
      * Should be utilized. But if the unspecified columns are nullable then T being return storage should be used
      **/
-    infix fun query(statement: Create<*, *>) = flow {
+    override infix fun query(statement: Create<*, *>) = flow {
         query(statement.toString())
         @Suppress("UNCHECKED_CAST")
         emit(

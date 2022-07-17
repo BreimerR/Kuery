@@ -76,6 +76,10 @@ class Connector : SQLiteOpenHelper, CoreConnector {
         TODO("Not yet implemented")
     }
 
+    override fun query(statement: Create<*, *>): Flow<CreateResult> {
+        TODO("Not yet implemented")
+    }
+
     override fun query(statement: Select): Flow<SelectResult> = flow {
 
         val where = statement.boundWhere

@@ -8,8 +8,7 @@ import libetal.libraries.kuery.core.statements.results.CreateResult
 import libetal.libraries.kuery.core.tableEntities
 
 class Create<Class, E : Entity<Class>>(
-    entity: E,
-    val database: Kuery<*>,
+    val entity: E,
     val type: Entity.Type = Entity.Type.TABLE,
     safe: Boolean = true
 ) : Statement<CreateResult>() {
