@@ -1,11 +1,11 @@
 package libetal.libraries.kuery.core.statements.builders
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.Insert
 
-class InsertStatementBuilder<T, E : Entity<T>>(val entity: E, vararg val columns: EntityColumn<*>) :
+class InsertStatementBuilder<T, E : Entity<T>>(val entity: E, vararg val columns: BaseColumn<*>) :
     EntityStatementBuilder<T, E, Insert> {
 
 
@@ -17,7 +17,7 @@ class InsertStatementBuilder<T, E : Entity<T>>(val entity: E, vararg val columns
         """(`${map.keys.joinToString("`, `")}`)"""
     }
 
-    infix fun <C> EntityColumn<C>.set(value: C) {
+    infix fun <C> BaseColumn<C>.set(value: C) {
 
         val values = map[name] ?: mutableListOf<String>().also {
             map[name] = it

@@ -1,12 +1,12 @@
 package libetal.libraries.kuery.core.expressions
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.statements.Select
 
-class DecoratedStatementExpression<T : Any> : DecoratedExpressions<EntityColumn<T>, Select> {
+class DecoratedStatementExpression<T : Any> : DecoratedExpressions<BaseColumn<T>, Select> {
     constructor(
-        left: EntityColumn<T>,
+        left: BaseColumn<T>,
         operator: Operators,
         right: Select,
         prefix: String = "",

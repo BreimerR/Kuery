@@ -68,15 +68,17 @@ actual class Connector actual constructor(
 
         val numColumns = connection.fieldCount.toInt()
 
-        val emission = mutableMapOf<String, MutableMap<String, Any?>>()
+
 
         while (true) {
             val row = results.row ?: break
+            val emission = mutableListOf<Any?>()
             var i = 0
             while (i < numColumns) {
                 val column = (results fetchFieldDirect i.toUInt())?.pointed ?: break
                 val statementColumn = statement.columns[i]
                 val value = row[i]?.toKString()
+
                 val statementValue = value?.let {
                     statementColumn.parse(it)
                 } ?: if (statementColumn.nullable)
@@ -84,14 +86,7 @@ actual class Connector actual constructor(
                 else
                     throw RuntimeException("Null Received for non null column `${statement.entity.name}`.${statementColumn.name}")
 
-
-                val tableName = column.table?.toKString() ?: throw NullPointerException("Failed to read table")
-                val table = emission[tableName] ?: mutableMapOf<String, Any?>().also {
-                    emission[tableName] = it
-                }
-
-                val columnName = column.name?.toKString() ?: throw NullPointerException("Failed to read column name")
-                table[columnName] = statementValue
+                emission += statementValue
                 i++
             }
 

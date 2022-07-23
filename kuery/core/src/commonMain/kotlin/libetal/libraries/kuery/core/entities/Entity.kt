@@ -1,6 +1,6 @@
 package libetal.libraries.kuery.core.entities
 
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.statements.builders.InsertStatementBuilder
 
 abstract class Entity<T> {
@@ -17,7 +17,7 @@ abstract class Entity<T> {
      **/
     open fun entityTableType() = Type.TABLE
 
-    operator fun invoke(vararg columns: EntityColumn<*>): InsertStatementBuilder<T, Entity<T>> =
+    operator fun invoke(vararg columns: BaseColumn<*>): InsertStatementBuilder<T, Entity<T>> =
         InsertStatementBuilder(this, *columns)
 
 

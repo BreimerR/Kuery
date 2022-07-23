@@ -1,7 +1,6 @@
 package libetal.libraries.kuery.core.statements.builders
 
 import libetal.libraries.kuery.core.columns.Column
-import libetal.libraries.kuery.core.columns.EntityColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.Select
 

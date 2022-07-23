@@ -1,25 +1,36 @@
 package libetal.libraries.kuery.core.statements.results
 
 import libetal.libraries.kuery.core.columns.Column
-import libetal.libraries.kuery.core.entities.Entity
 
 class SelectResult(
-    val row: MutableMap<String, MutableMap<String, Any?>>, // null if row is nullable
-    error: RuntimeException? = null
+    val row: List<Any?>,
+    error: Exception? = null,
+    vararg columns: Column<*>
 ) : Result(error) {
-    fun <T> get(tableName: String, columnName: String): T {
-        val table = row[tableName] ?: throw RuntimeException("Requesting for a table that wasn't queried")
+
+    val columns by lazy {
+        buildMap {
+            columns.forEachIndexed { i, col ->
+                this += col.name to i
+            }
+        }
+    }
+
+    val <T> Column<T>.value: T
+        get() = this@SelectResult[this]
+
+    operator fun <T> get(column: Column<*>) = get<T>(columns[column.name] ?: throw UnQueriedColumnResultRequest(column))
+
+    operator fun <T> get(id: Int): T {
+        val value = row[id]
 
         @Suppress("UNCHECKED_CAST")
         return try {
-            table[columnName] as T
+            value as T
         } catch (e: ClassCastException) {
             throw RuntimeException("Invalid value the column requested isn't of the requested type")
         }
-
     }
-
-    operator fun <T> get(column: Pair<Entity<*>, Column<*>>): T = get(column.first.toString(), column.second.name)
 
 }
 

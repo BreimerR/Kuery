@@ -1,11 +1,12 @@
 package libetal.libraries.kuery.mariadb
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.Kuery
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.GenericColumn
+import libetal.libraries.kuery.core.columns.NumberColumn
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.statements.*
@@ -30,20 +31,33 @@ abstract class Kuery(
         )
     }
 
-    override fun TableEntity<*>.long(name: String) = long(name, false)
-
-    fun TableEntity<*>.long(name: String, primary: Boolean) = registerColumn(name) { columnName ->
-        EntityColumn(columnName, "$columnName INT ", primary, false) { result ->
-            result ?: throw UnexpectedNull(this, columnName)
-            result.toLongOrNull() ?: throw MalformedStoredData(this, columnName)
-        }
+    override fun TableEntity<*>.long(
+        name: String,
+        size: Long?,
+        default: Long?,
+        primary: Boolean
+    ) = numeric("LONG", name, size, primary, autoIncrement = false, default) {
+        it.toLongOrNull() ?: throw MalformedStoredData(this, name)
     }
 
-    override fun TableEntity<*>.int(name: String, size: Int?, primary: Boolean) = registerColumn(name) { columnName ->
-        EntityColumn(columnName, "$columnName INT ", primary, false) { result ->
-            result ?: throw UnexpectedNull(this, columnName)
-            result.toIntOrNull() ?: throw MalformedStoredData(this, columnName)
-        }
+    fun TableEntity<*>.long(
+        name: String,
+        size: Long?,
+        default: Long?,
+        primary: Boolean,
+        autoIncrement: Boolean = false
+    ) = numeric("LONG", name, size, primary, autoIncrement, default) {
+        it.toLongOrNull() ?: throw MalformedStoredData(this, name)
+    }
+
+    override fun TableEntity<*>.int(
+        name: String,
+        size: Int?,
+        primary: Boolean,
+        autoIncrement: Boolean,
+        default: Int?
+    ) = numeric("INT", name, size, false, autoIncrement = false, default) {
+        it.toIntOrNull() ?: throw MalformedStoredData(this, name)
     }
 
     /**TODO
@@ -51,92 +65,110 @@ abstract class Kuery(
      * OR:KILL CHAIN
      **/
     override fun TableEntity<*>.float(name: String, size: Float?, default: Float?) =
-        registerColumn(name) { columnName ->
-            val defaultSql = default?.let { " DEFAULT $default" } ?: ""
-            val maxSql = size?.let { "($size) " } ?: ""
-            EntityColumn(columnName, "$columnName FLOAT$maxSql$defaultSql", false, false) { result ->
-                result ?: throw UnexpectedNull(this, columnName)
-                result.toFloatOrNull() ?: throw MalformedStoredData(this, columnName)
-            }
+        numeric("FLOAT", name, size, false, autoIncrement = false, default) {
+            it.toFloatOrNull() ?: throw MalformedStoredData(this, name)
         }
 
-    override fun TableEntity<*>.char(name: String) =
-        char(name, null)
-
-    fun TableEntity<*>.char(name: String, default: Char?) = registerColumn(name) { columnName ->
-        val defaultSql = default?.let { " DEFAULT '$it'" } ?: ""
-        EntityColumn(
-            columnName,
-            sql = "`$columnName` CHAR$defaultSql",
-            primary = false,
-            nullable = false
-        ) {
-            it?.toCharArray()?.getOrNull(0) ?: throw UnexpectedNull(this, columnName)
+    fun <N> TableEntity<*>.numeric(
+        type: String,
+        name: String,
+        size: N? = null,
+        primary: Boolean = false,
+        autoIncrement: Boolean = primary,
+        default: N? = null,
+        parser: (String) -> N
+    ) = registerColumn(name) {
+        NumberColumn(
+            name = name,
+            typeName = type,
+            default = default,
+            primary = primary,
+            autoIncrement = autoIncrement,
+            size = size,
+            nullable = false,
+            alias = null,
+        ) { result ->
+            result ?: throw UnexpectedNull(this, name)
+            parser(result)
         }
     }
 
-    override fun TableEntity<*>.date(name: String) = registerColumn(name) { columnName ->
-        EntityColumn(
-            columnName,
-            "`$columnName` DATE $NOT_NULL",
-            primary = false,
+    override fun TableEntity<*>.char(name: String): Column<Char> =
+        char(name, null)
+
+    fun TableEntity<*>.char(name: String, default: Char?) = registerColumn(name) {
+
+        GenericColumn(
+            name = name,
+            baseSql = "$name CHAR",
             nullable = false,
-            {
+            default = default,
+            toSqlString = {
+                "'$it'"
+            }
+        ) {
+            it?.toCharArray()?.getOrNull(0) ?: throw UnexpectedNull(this, name)
+        }
+    }
+
+    override fun TableEntity<*>.date(name: String) = registerColumn(name) {
+        GenericColumn(
+            name,
+            "`$name` DATE",
+            nullable = false,
+            toSqlString = {
                 "'$it'"
             }
         ) { result ->
-            result ?: throw UnexpectedNull(this, columnName)
+            result ?: throw UnexpectedNull(this, name)
             LocalDate.parse(result)
         }
     }
 
-    fun TableEntity<*>.date(
+    fun TableEntity<*>.date( /*TODO Create converted columns for this*/
         name: String,
         default: LocalDate,
         format: String
-    ) = registerColumn(name) { columnName ->
+    ) = registerColumn(name) {
         val defaultSql = " DEFAULT STR_TO_DATE('$default','$format')"
-        EntityColumn(
-            columnName,
-            "`$columnName` DATE$defaultSql $NOT_NULL",
-            primary = false,
+        GenericColumn(
+            name,
+            "`$name` DATE",
             nullable = false,
-            {
+            toSqlString = {
                 "'$it'"
             }
         ) { result ->
-            result ?: throw UnexpectedNull(this, columnName)
+            result ?: throw UnexpectedNull(this, name)
             LocalDate.parse(result)
         }
     }
 
-    override fun TableEntity<*>.string(name: String, size: Int, default: String?): EntityColumn<String> =
-        registerColumn(name) { columnName ->
+    override fun TableEntity<*>.string(name: String, size: Int, default: String?): Column<String> =
+        registerColumn(name) {
             val defaultSql = default?.let { " DEFAULT $default" } ?: ""
             val maxSql = "($size)"
-            EntityColumn(
-                columnName,
-                "`$columnName` VARCHAR$maxSql$defaultSql $NOT_NULL",
-                primary = false,
+            GenericColumn(
+                name,
+                "`$name` VARCHAR$maxSql$defaultSql",
                 nullable = false,
-                {
+                toSqlString = {
                     "'$it'"
                 }
             ) { result ->
-                result ?: throw UnexpectedNull(this, columnName)
+                result ?: throw UnexpectedNull(this, name)
             }
         }
 
-    override fun TableEntity<*>.nullableString(name: String, size: Int, default: String?): EntityColumn<String?> =
-        registerColumn(name) { columnName ->
+    override fun TableEntity<*>.nullableString(name: String, size: Int, default: String?): GenericColumn<String?> =
+        registerColumn(name) {
             val maxSql = "($size)"
             val defaultSql = default?.let { " DEFAULT '$it'" } ?: ""
-            EntityColumn(
-                columnName,
-                "`$columnName` VARCHAR$maxSql$defaultSql",
-                primary = false,
+            GenericColumn(
+                name,
+                "`$name` VARCHAR$maxSql$defaultSql",
                 nullable = false,
-                {
+                toSqlString = {
                     it?.let {
                         "'$it'"
                     } ?: ""
@@ -146,19 +178,18 @@ abstract class Kuery(
             }
         }
 
-    override fun TableEntity<*>.boolean(name: String, default: Boolean?) = registerColumn(name) { columnName ->
+    override fun TableEntity<*>.boolean(name: String, default: Boolean?) = registerColumn(name) {
         val defaultSql = default?.let { " DEFAULT ${if (it) "true" else "false"}" } ?: ""
 
-        EntityColumn(columnName,
-            "$columnName BOOLEAN$defaultSql",
-            primary = false,
+        GenericColumn(name,
+            "$name BOOLEAN$defaultSql",
             nullable = false,
-            {
+            toSqlString = {
                 if (it) "true" else "false"
             }
         ) { result ->
-            result ?: throw UnexpectedNull(this, columnName)
-            result.toBooleanStrictOrNull() ?: throw MalformedStoredData(this, columnName)
+            result ?: throw UnexpectedNull(this, name)
+            result.toBooleanStrictOrNull() ?: throw MalformedStoredData(this, name)
         }
 
     }

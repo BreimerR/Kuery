@@ -45,9 +45,9 @@ class SelectTest {
     fun createSimple() {
 
 
-        TAG info Users.name.createSql
-        TAG info Users.isPuppy.createSql
-        TAG info Users.blobby.createSql
+        TAG info Users.name.sql
+        TAG info Users.isPuppy.sql
+        TAG info Users.blobby.sql
 
         val statement = with(Database) {
             CREATE TABLE Users

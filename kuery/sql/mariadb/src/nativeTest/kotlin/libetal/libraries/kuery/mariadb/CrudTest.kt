@@ -31,8 +31,8 @@ class CrudTest : TestCase {
     fun simpleInsert() = insertNewUser query {
         selectAllUsers query {
             val user = User(
-                name = get(Users to Users.name),
-                dateOfBirth = get(Users to Users.dob),
+                name = get(0),
+                dateOfBirth = get(1),
             )
 
             assertEquals(StatementTest.userName, user.name)

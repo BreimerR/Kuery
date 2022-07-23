@@ -2,7 +2,8 @@
 
 package libetal.libraries.kuery.core.expressions.extensions
 
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.BaseColumn
+import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.expressions.SimpleExpression
 import libetal.libraries.kuery.core.expressions.Expression
 import libetal.libraries.kuery.core.expressions.JoinedExpression
@@ -34,5 +35,5 @@ infix fun Expression<*, *> .OR(expressionBuilder: OperatorScope.() -> Unit) = ru
 }
 
 // fun <T, C : Column<T>> C.expressionBuilder(value: T, operator: String) = SimpleExpression<T>(name, operator, value)
-fun <T, C : EntityColumn<T>> C.expressionBuilder(value: T, operator: Expression.Operators) =
+fun <T, C : BaseColumn<T>> C.expressionBuilder(value: T, operator: Expression.Operators) =
     SimpleExpression(this, operator, value)

@@ -2,28 +2,34 @@ package libetal.libraries.kuery.core.columns
 
 import libetal.kotlin.laziest
 
-/*open class NumberColumn<N : Number> : SizedColumn<N, N> {
-    constructor(
-        name: String,
-        defaultSql: String,
-        size: N? = null,
-        primary: Boolean = false,
-        nullable: Boolean = !primary,
-        parser: (String?) -> N,
-    ) : super(name, defaultSql, size, primary, nullable, parser)
+class NumberColumn<T>(
+    name: String,
+    typeName: String = "",
+    default: T? = null,
+    override val size: T? = null,
+    override val primary: Boolean = false,
+    private val autoIncrement: Boolean = false,
+    nullable: Boolean = primary,
+    alias: String? = null,
+    parser: (String?) -> T
+) : BaseColumn<T>(
+    name,
+    typeName,
+    default,
+    primary || nullable,
+    { it.toString() },
+    alias,
+    parser
+), PrimaryColumn, SizedColumn<T> {
 
-    constructor(
-        name: String,
-        defaultSql: String,
-        size: N? = null,
-        default: N? = null,
-        parser: (String?) -> N,
-    ) : super(name, defaultSql, default, size, parser)
-
-    override val createSql: String by laziest {
-        super.createSql + primarySql + defaultSql
+    override val sql by laziest {
+        "$identifier $typeName$sizedSql$primarySql$autoIncrementSql$nullableSql$defaultSql"
     }
 
-    override fun N.defaultSql(): String = toString()
+    private val autoIncrementSql
+        get() = if (autoIncrement) " AUTOINCREMENT" else ""
 
-}*/
+    override fun <C : Column<T>> copy(alias: String): C {
+        TODO("Not yet implemented")
+    }
+}

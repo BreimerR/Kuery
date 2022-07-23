@@ -3,7 +3,7 @@ package libetal.libraries.kuery.sqlite.core
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.*
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.statements.*
@@ -19,7 +19,7 @@ import libetal.libraries.kuery.sqlite.core.database.Connector
  * [SQLITE DataTypes](https:sqlite.org/datatypes3.html)
  * [SQLITE SPECS](https://www.sqlite.org/lang.html)
  **/
-abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
+abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
 
     val connector: Connector by laziest {
         init().also {
@@ -29,72 +29,69 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
 
     abstract fun init(): Connector
 
-    fun Entity<*, *, *>.text(name: String = "", default: String? = null) =
+    fun Entity<*, *>.text(name: String = "", default: String? = null, size: Int? = null, nullable: Boolean = false) =
         registerColumn(name) {
-            val defaultSql = default?.let { " DEFAULT '$default'" } ?: ""
-            EntityColumn(it, "$it TEXT $NOT_NULL$defaultSql", primary = false, nullable = false, { value ->
-                "'$value'"
-            }) { result ->
-                result ?: throw MalformedStoredData(this, it)
+            CharSequenceColumn(name, "TEXT", default, size, nullable = nullable) { result ->
+                result ?: throw MalformedStoredData(this, name)
             }
         }
 
-    fun <N : Number> Entity<*, *, *>.numeric(
-        name: String = "",
+    fun <N : Number> Entity<*, *>.numeric(
+        name: String,
+        typeName: String,
+        default: N? = null,
         size: N? = null,
         primary: Boolean = false,
-        parser: (String, String?) -> N
-    ) =
-        registerColumn(name) { columnName ->
-            val sizeSql = size?.let { "($size)" } ?: ""
-            EntityColumn(
-                columnName,
-                "$columnName NUMERIC$sizeSql $NOT_NULL",
-                primary,
-                nullable = false, {
-                    it.toString()
-                }
-            ) {
-                parser(columnName, it)
-            }
-        }
-
-    fun Entity<*, *, *>.real(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
-        EntityColumn(
-            columnName,
-            "`$name` REAL",
+        autoIncrement: Boolean = primary,
+        nullable: Boolean = false,
+        alias: String? = null,
+        parser: (String) -> N
+    ) = registerColumn(name) {
+        NumberColumn(
+            name,
+            typeName,
+            default,
+            size,
             primary,
-            false,
-            {
-                "$it"
-            }
+            autoIncrement,
+            nullable,
+            alias
         ) {
-            it ?: throw UnexpectedNull(this, columnName)
-            val actions = listOf(String::toDouble, String::toFloat, String::toLong, String::toInt)
+            it ?: throw UnexpectedNull(this, name)
+            parser(it)
+        }
+    }
+
+    fun Entity<*, *>.real(name: String = "") = registerColumn(name) {
+        GenericColumn(
+            name,
+            "REAL",
+            default = false,
+            nullable = false,
+            alias = null,
+            toSqlString = {
+                "'$it'"
+            }
+        ) { dbResult ->
+            dbResult ?: throw UnexpectedNull(this, name)
+            val actions = listOf(String::toDoubleOrNull, String::toFloatOrNull, String::toLongOrNull, String::toIntOrNull)
 
             var result: Number? = null
 
             for (action in actions) {
-                result = try {
-                    action(it)
-                } catch (e: Exception) {
-                    null
-                }
+                result = action(dbResult)
             }
 
-            result ?: throw MalformedStoredData(this, columnName)
+            result ?: dbResult
+
         }
     }
 
-    fun Entity<*, *, *>.blob(name: String = "", primary: Boolean = false) = registerColumn(name) { columnName ->
-        EntityColumn(
-            columnName,
-            "`$columnName` BLOB",
-            primary,
-            nullable = false,
-            { it: Any ->
-                it.toString()
-            }
+    fun Entity<*, *>.blob(name: String = "", primary: Boolean = false) = registerColumn(name) {
+        GenericColumn(
+            name,
+            "`$name` BLOB",
+            nullable = false
         ) {
             throw RuntimeException("Not sure of the representation for this one")
         }
@@ -102,59 +99,63 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun Entity<*, *, *>.long(name: String) = numeric(name) { columnName, result ->
-        result ?: throw UnexpectedNull(this, columnName)
-        result.toLongOrNull() ?: throw MalformedStoredData(this, columnName)
+    override fun Entity<*, *>.long(
+        name: String,
+        size: Long?,
+        default: Long?,
+        primary: Boolean
+    ) = numeric(name, "NUMERIC", default, size, primary, false, false, null) {
+        it.toLongOrNull() ?: throw MalformedStoredData(this, name)
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun Entity<*, *, *>.int(name: String, size: Int?, primary: Boolean) =
-        numeric(name, size) { columnName, result ->
-            result ?: throw UnexpectedNull(this, columnName)
-            result.toIntOrNull() ?: throw MalformedStoredData(this, columnName)
-        }
+    override fun Entity<*, *>.int(
+        name: String,
+        size: Int?,
+        primary: Boolean,
+        autoIncrement: Boolean,
+        default: Int?
+    ) = numeric(name, "INTEGER", default, size, primary, autoIncrement, false, null) {
+        it.toIntOrNull() ?: throw MalformedStoredData(this, name)
+    }
 
     @Suppress("UNCHECKED_CAST")
-    override fun Entity<*, *, *>.float(name: String, size: Float?, default: Float?) =
-        numeric(name, size) { columnName, result ->
-            result ?: throw UnexpectedNull(this, columnName)
-            result.toFloatOrNull() ?: throw MalformedStoredData(this, columnName)
+    override fun Entity<*, *>.float(name: String, size: Float?, default: Float?) =
+        numeric(name, "", default, size, false, false, false, null) {
+            it.toFloatOrNull() ?: throw MalformedStoredData(this, name)
         }
 
-    override fun Entity<*, *, *>.char(name: String) =
-        char(name, null)
+    override fun Entity<*, *>.char(name: String): Column<Char> = char(name, null)
 
-    fun Entity<*, *, *>.char(name: String, default: Char?) =
-        registerColumn(name) { columnName ->
-            EntityColumn(
-                columnName,
-                "`$columnName` TEXT",
-                primary = false,
-                nullable = false,
-                {
-                    "'$it'"
-                }
-            ) {
-                it?.toCharArray()?.getOrNull(0) ?: throw UnexpectedNull(this, columnName)
-            }
+    fun Entity<*, *>.char(name: String, default: Char?) = registerColumn(name) {
+        CharSequenceColumn(
+            name,
+            "TEXT",
+            default = default,
+            size = null,
+            nullable = false,
+        ) {
+            it?.toCharArray()?.getOrNull(0) ?: throw UnexpectedNull(this, name)
         }
+    }
 
-    override fun Entity<*, *, *>.date(name: String) =
-        registerColumn(name) { columnName ->
-            EntityColumn(
-                columnName,
-                "`$columnName` TEXT",
-                false,
+    override fun Entity<*, *>.date(name: String) =
+        registerColumn(name) {
+            GenericColumn(
+                name = name,
+                typeName = "TEXT",
+                default = null,
                 nullable = false,
-                {
-                    "'$it'"
-                }
+                toSqlString = {
+                    "'$it'"/*TODO DATE_CONVERTER('$it')*/
+                },
+                alias = null
             ) { result ->
-                result ?: throw UnexpectedNull(this, columnName)
+                result ?: throw UnexpectedNull(this, name)
                 try {
                     LocalDate.parse(result)
                 } catch (e: Exception) {
-                    throw MalformedStoredData(this, columnName)
+                    throw MalformedStoredData(this, name)
                 }
             }
         }
@@ -165,68 +166,67 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
      * but can easily be changed once solved
      * "DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))"
      **/
-    fun Entity<*, *, *>.date(name: String, default: LocalDate? = null, format: String? = null) =
-        registerColumn(name) { columnName ->
+    fun Entity<*, *>.date(name: String, default: LocalDate? = null, format: String? = null) =
+        registerColumn(name) {
             val defaultSql = default?.let { " DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))" } ?: ""
-            EntityColumn(
-                columnName,
-                "`$columnName` TEXT$defaultSql $NOT_NULL",
-                false,
+            GenericColumn(
+                name = name,
+                typeName = "TEXT",
+                default = null,
                 nullable = false,
-                {
-                    "'$it'"
-                }
+                toSqlString = {
+                    "'$it'"/*TODO DATE_CONVERTER('$it')*/
+                },
+                alias = null
             ) { result ->
-                result ?: throw UnexpectedNull(this, columnName)
+                result ?: throw UnexpectedNull(this, name)
                 try {
                     LocalDate.parse(result)
                 } catch (e: Exception) {
-                    throw MalformedStoredData(this, columnName)
+                    throw MalformedStoredData(this, name)
                 }
             }
         }
 
 
-    override fun Entity<*, *, *>.string(name: String, size: Int, default: String?) =
-        registerColumn(name) { columnName ->
-            EntityColumn(
-                columnName,
-                "`$columnName` TEXT",
-                primary = false,
-                nullable = false,
-                {
-                    "'$it'"
-                }
-            ) {
-                it ?: throw UnexpectedNull(this, columnName)
-            }
+    override fun Entity<*, *>.string(name: String, size: Int, default: String?): Column<String> = registerColumn(name) {
+        CharSequenceColumn(
+            name,
+            "TEXT",
+            primary = false,
+            nullable = false,
+            default = default,
+            size = size,
+            alias = null
+        ) {
+            it ?: throw UnexpectedNull(this, name)
         }
+    }
 
     /**
      * SQLite doesn't support booleans
      * thus need to store this value as an integer and
      * retrieve as int and convert to boolean
      **/
-    override fun Entity<*, *, *>.boolean(name: String, default: Boolean?) = registerColumn(name) { columnName ->
-        val defaultSql = default?.let { " DEFAULT ${if (it) "1" else "0"}" } ?: ""
+    override fun Entity<*, *>.boolean(name: String, default: Boolean?) = registerColumn(name) {
 
-        EntityColumn(
-            columnName,
-            "`$columnName` NUMBER$defaultSql $NOT_NULL",
-            primary = false,
+        GenericColumn(
+            name = name,
+            typeName = "NUMERIC",
             nullable = false,
-            {
+            default = default,
+            toSqlString = {
                 if (it) "1" else "0"
             }
         ) { result ->
-            result ?: throw UnexpectedNull(this, columnName)
+            result ?: throw UnexpectedNull(this, name)
             result.toIntOrNull()?.let {
                 when (it) {
                     1 -> true
                     0 -> false
                     else -> null
                 }
-            } ?: throw MalformedStoredData(this, columnName)
+            } ?: throw MalformedStoredData(this, name)
         }
     }
 
@@ -271,7 +271,7 @@ abstract class Kuery : CoreKuery<Entity<*, *, *>>(), ConnectorListener {
     }
 
     override fun onCreate(connector: Connector) = tableEntities.forEach { (entity, columns) ->
-        val sql = INSERT
+
     }
 
 }

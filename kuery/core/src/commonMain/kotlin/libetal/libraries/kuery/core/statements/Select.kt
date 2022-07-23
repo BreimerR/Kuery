@@ -4,7 +4,7 @@ package libetal.libraries.kuery.core.statements
 
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.Column
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 import libetal.libraries.kuery.core.statements.results.SelectResult
@@ -18,7 +18,7 @@ class Select(
     vararg val columns: Column<*>
 ) : ArgumentsStatement<SelectResult>(), WhereStatement {
 
-    var orderBy: EntityColumn<*>? = null
+    var orderBy: GenericColumn<*>? = null
 
     private val orderBySql by laziest {
         orderBy?.let {
@@ -62,7 +62,7 @@ class Select(
         } ?: ""
     }
 
-    var groupBy: EntityColumn<*>? = null
+    var groupBy: GenericColumn<*>? = null
 
     var groupBySql by laziest {
         groupBy?.let { " $GROUP_BY $it" } ?: ""

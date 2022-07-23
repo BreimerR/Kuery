@@ -3,7 +3,8 @@
 package libetal.libraries.kuery.core.statements
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.BaseColumn
+import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.statements.results.Result
 
 /**
@@ -29,18 +30,18 @@ abstract class ArgumentsStatement<T : Result> : Statement<T>() {
 /**
  * If it's a wrong T then it should fail
  **/
-infix fun <T> EntityColumn<*>.parseToSql(obj: T) = try {
+infix fun <T> BaseColumn<*>.parseToSql(obj: T) = try {
     @Suppress("UNCHECKED_CAST")
-    this as EntityColumn<T>
+    this as BaseColumn<T>
     obj.sqlString
 } catch (e: Exception) {
     obj.toString()
 }
 
-fun <T> EntityColumn<*>.parseToSqlError(obj: T, message: String): String {
+fun <T> BaseColumn<*>.parseToSqlError(obj: T, message: String): String {
     val column = try {
         @Suppress("UNCHECKED_CAST")
-        this as EntityColumn<T>
+        this as BaseColumn<T>
     } catch (e: ClassCastException) {
         throw RuntimeException("$message: ${e.message}")
     }
@@ -54,5 +55,4 @@ fun <T> EntityColumn<*>.parseToSqlError(obj: T, message: String): String {
     }
 }
 
-
-
+infix fun <R : Column<*>> R.AS(alias: String): R = copy(alias)

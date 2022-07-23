@@ -10,15 +10,17 @@ import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.core.statements.results.Result
 import java.sql.DriverManager
+import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.SQLTimeoutException
+import java.sql.Statement as JvmStatement
 
 class Connector
 private constructor(override val dbName: String, val version: Int) : CoreConnector {
 
     var exception: Exception? = null
 
-    val connection by laziest {
+    private val connection by laziest {
         val connection = try {
             Class.forName("org.sqlite.JDBC")
             val fileName = when (dbName.substringAfterLast(".")) {
@@ -44,19 +46,32 @@ private constructor(override val dbName: String, val version: Int) : CoreConnect
         TODO("Not yet implemented")
     }
 
-
     val connectionStatement
         get() = connection.createStatement() ?: throw RuntimeException("Failed to create statement!!")
 
+    fun <R : Result> executeUpdate(statement: Statement<R>) = try {
+        connectionStatement.executeUpdate(statement.sql)
+        null
+    } catch (e: SQLException) {
+        e
+    } catch (e: SQLTimeoutException) {
+        e
+    }
+
+    /**
+     * Feels a bit confusing to utilize
+     **/
+    private infix fun <R : Result> Statement<R>.executeQuery(then: (ResultSet) -> Unit) = try {
+        then(connectionStatement.executeQuery(sql))
+        null
+    } catch (e: SQLException) {
+        e
+    } catch (e: SQLTimeoutException) {
+        e
+    }
+
     override fun query(statement: Create<*, *>): Flow<CreateResult> = flow {
-        val error = try {
-            connectionStatement.executeUpdate(statement.sql)
-            null
-        } catch (e: SQLException) {
-            e
-        } catch (e: SQLTimeoutException) {
-            e
-        }
+        val error = executeUpdate(statement)
 
         emit(
             CreateResult(
@@ -68,16 +83,62 @@ private constructor(override val dbName: String, val version: Int) : CoreConnect
 
     }
 
-    override fun query(statement: Select): Flow<SelectResult> {
-        TODO("Not yet implemented")
+    override fun query(statement: Select): Flow<SelectResult> = flow {
+        var resultSet: ResultSet? = null
+
+        val error = statement executeQuery {
+            resultSet = it
+        }
+
+        resultSet?.let { set ->
+
+            try {
+                val columns = statement.columns
+                val columnsSize = columns.size
+                var r = 0
+
+                while (set.next()) {
+                    val row = buildList {
+                        var i = 0
+                        while (i < columnsSize) {
+                            val column = columns[i]
+                            this += column parse set.getString(column.name)
+                            i++
+                        }
+                        r++
+                    }
+
+                    emit(
+                        SelectResult(
+                            row,
+                            error,
+                            *columns
+                        )
+                    )
+
+                }
+
+            } catch (e: SQLException) {
+                throw RuntimeException(e)
+            }
+
+        }
+
     }
 
     override fun query(statement: Delete): Flow<DeleteResult> {
         TODO("Not yet implemented")
     }
 
-    override fun query(statement: Insert): Flow<InsertResult> {
-        TODO("Not yet implemented")
+    override fun query(statement: Insert): Flow<InsertResult> = flow {
+        val error = executeUpdate(statement)
+
+        emit(
+            InsertResult(
+                into = statement.entity.name,
+                error = error
+            )
+        )
     }
 
     override fun query(statement: Drop): Flow<DropResult> = flow {

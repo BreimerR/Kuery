@@ -1,16 +1,17 @@
 package libetal.libraries.kuery.core.expressions
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.BaseColumn
+import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.statements.parseToSql
 
 /**TODO
  * SQL Concat value to prefix and postfix
  **/
-class DecoratedExpression<T : Any> : DecoratedExpressions<EntityColumn<T>, T> {
+class DecoratedExpression<T : Any> : DecoratedExpressions<BaseColumn<T>, T> {
 
     constructor(
-        left: EntityColumn<T>,
+        left: BaseColumn<T>,
         operator: Operators,
         right: T,
         prefix: String = "",

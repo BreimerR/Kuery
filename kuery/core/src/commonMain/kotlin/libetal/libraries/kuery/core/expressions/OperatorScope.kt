@@ -1,6 +1,6 @@
 package libetal.libraries.kuery.core.expressions
 
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.columns.extensions.lessOrEqual as extensionLerOrEqual
 import libetal.libraries.kuery.core.columns.extensions.startsWith as extStartsWith
 
@@ -13,22 +13,22 @@ class OperatorScope(expression: Expression<*, *>, val operator: String) : Statem
         get() = expression.toString()
 
     @Suppress("CovariantEquals") // TODO: This isn't the best due to operator problems
-    infix fun <T> EntityColumn<T>.equals(value: T) = equivalent(value)
+    infix fun <T> BaseColumn<T>.equals(value: T) = equivalent(value)
 
     /**
      * TODO:
      * This might be best for the api and should be the
      * recommended use case
      **/
-    infix fun <T> EntityColumn<T>.equivalent(value: T) {
+    infix fun <T> BaseColumn<T>.equivalent(value: T) {
         expression + value.equalsExpression
     }
 
-    infix fun <T> EntityColumn<T>.lessOrEqual(value: T) = extensionLerOrEqual(value).also {
+    infix fun <T> BaseColumn<T>.lessOrEqual(value: T) = extensionLerOrEqual(value).also {
         expression + it
     }
 
-    infix fun <C : CharSequence> EntityColumn<C>.startsWith(value: C) = extStartsWith(value).also {
+    infix fun <C : CharSequence> BaseColumn<C>.startsWith(value: C) = extStartsWith(value).also {
         expression + it
     }
 

@@ -2,7 +2,7 @@ package libetal.libraries.kuery.core.statements
 
 import libetal.kotlin.expected
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 import libetal.libraries.kuery.core.statements.results.UpdateResult
@@ -17,11 +17,11 @@ class Update(
     }
 
     val set by laziest {
-        mutableListOf<Pair<EntityColumn<*>, *>>()
+        mutableListOf<Pair<GenericColumn<*>, *>>()
     }
 
     val boundSet by laziest {
-        mutableListOf<Pair<EntityColumn<*>, String>>()
+        mutableListOf<Pair<GenericColumn<*>, String>>()
     }
 
     val setSql by laziest {

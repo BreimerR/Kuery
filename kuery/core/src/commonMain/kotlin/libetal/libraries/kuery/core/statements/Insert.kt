@@ -1,12 +1,12 @@
 package libetal.libraries.kuery.core.statements
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.EntityColumn
+import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.identifier
 import libetal.libraries.kuery.core.statements.results.InsertResult
 
-class Insert(val entity: Entity<*>, vararg val columns: EntityColumn<*>) : ArgumentsStatement<InsertResult>() {
+class Insert(val entity: Entity<*>, vararg val columns: BaseColumn<*>) : ArgumentsStatement<InsertResult>() {
 
     private val values by laziest {
         mutableListOf<List<Any?>>()

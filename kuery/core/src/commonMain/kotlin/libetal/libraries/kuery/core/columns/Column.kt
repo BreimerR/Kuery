@@ -5,6 +5,10 @@ interface Column<T> {
     val name: String
     val parser: (String?) -> T
     val nullable: Boolean
-    fun parse(value: String?): T = parser(value)
+    val sql: String
+    val alias: String?
+    infix fun parse(value: String?): T = parser(value)
+
+    infix fun <C : Column<T>> copy(alias: String): C
 
 }

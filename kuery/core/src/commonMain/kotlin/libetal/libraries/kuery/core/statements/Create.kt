@@ -15,7 +15,7 @@ class Create<Class, E : Entity<Class>>(
 
     override val sql: String by laziest {
         """|CREATE $type ${if (safe) "IF NOT EXISTS " else ""}`${entity.name}` (
-           |    ${tableEntities[entity]?.joinToString(",\n    ") { it.createSql }}
+           |    ${tableEntities[entity]?.joinToString(",\n    ") { it.sql }}
            |);
         """.trimMargin()
     }
