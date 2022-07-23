@@ -14,7 +14,7 @@ import libetal.libraries.kuery.core.statements.results.Result
 import libetal.libraries.kuery.sqlite.core.database.Connector as CoreConnector
 
 fun CValue<SqliteConn>.query(sql: String) {
-
+    TODO("Integration not complete on building sqlite for C platforms")
 }
 
 class Connector(override val dbName: String, val version: Int/*TODO: Store value in the database*/) : CoreConnector {

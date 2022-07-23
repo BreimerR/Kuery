@@ -1,4 +1,4 @@
-package libetal.libraries.kuery.sqlite.core
+package libetal.libraries.kuery.sqlite.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 

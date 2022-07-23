@@ -1,10 +1,6 @@
 package libetal.libraries.kuery.sqlite.database
 
 import libetal.kotlin.debug.info
-import libetal.libraries.kuery.core.statements.results.CreateResult
-import libetal.libraries.kuery.core.statements.results.InsertResult
-import libetal.libraries.kuery.core.statements.results.SelectResult
-import libetal.libraries.kuery.sqlite.core.runBlocking
 import libetal.libraries.kuery.sqlite.data.User
 import libetal.libraries.kuery.sqlite.database.Database.query
 import libetal.libraries.kuery.sqlite.database.StatementTest.Companion.createTableStatement
@@ -12,12 +8,32 @@ import libetal.libraries.kuery.sqlite.database.StatementTest.Companion.dropTable
 import libetal.libraries.kuery.sqlite.database.StatementTest.Companion.insertStatement
 import libetal.libraries.kuery.sqlite.database.StatementTest.Companion.selectStatement
 import libetal.libraries.kuery.sqlite.database.tables.Users
+import kotlin.reflect.KFunction0
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertNull
 
 class CrudTests {
+
+    @Test
+    fun selectUsersTest() = ::insertUsers then ::selectUsers
+
+    @Test
+    fun insertUsersTest() = insertUsers()
+
+    private fun insertUsers() = insertStatement query {
+        assertNull(error, "Failed to insert due to : ${error?.message}")
+        TAG info "Inserted: $insertStatement"
+    }
+
+    private fun selectUsers() = selectStatement query {
+        val user = User(
+            Users.name.value,
+            Users.age.value
+        )
+        println("$user")
+    }
 
     @BeforeTest
     fun createTableTests() = createTableStatement query {
@@ -38,31 +54,11 @@ class CrudTests {
                |Due to ${error?.let { " ${it::class.qualifiedName} " }}:${error?.message ?: ""}
             """.trimMargin()
         )
+        TAG info "Executed: $dropTableStatement"
     }
 
-    @Test
-    fun selectUsers() = select {
-        val user = User(
-            Users.name.value,
-            Users.age.value
-        )
-        println("$user")
-    }
-
-    @Test
-    fun insertUser() = insertStatement query {
-        assertNull(error, "Failed to insert due to : ${error?.message}")
-        TAG info "Inserted $insertStatement"
-    }
-
-    fun select(then: SelectResult.() -> Unit) = selectStatement query {
-        assertNull(
-            actual = error,
-            message =
-            """Failed to execute $selectStatement.
-               |Due to ${error?.let { it::class.simpleName ?: "Exception" }}: ${error?.message ?: ""}
-            """.trimMargin()
-        )
+    private infix fun KFunction0<Unit>.then(then: KFunction0<Unit>) {
+        this()
         then()
     }
 

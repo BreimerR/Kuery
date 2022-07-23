@@ -1,19 +1,22 @@
 package libetal.libraries.kuery.sqlite.core
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.*
+import libetal.libraries.kuery.core.columns.CharSequenceColumn
+import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.GenericColumn
+import libetal.libraries.kuery.core.columns.NumberColumn
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
-import libetal.libraries.kuery.core.Kuery as CoreKuery
+import libetal.libraries.kuery.core.tableEntities
+import libetal.libraries.kuery.sqlite.core.database.Connector
 import libetal.libraries.kuery.sqlite.core.database.extensions.addListener
 import libetal.libraries.kuery.sqlite.core.database.listeners.ConnectorListener
 import libetal.libraries.kuery.sqlite.core.entities.Entity
-import libetal.libraries.kuery.core.tableEntities
-import libetal.libraries.kuery.sqlite.core.database.Connector
+import libetal.libraries.kuery.sqlite.coroutines.runBlocking
+import libetal.libraries.kuery.core.Kuery as CoreKuery
 
 /**
  * [SQLITE DataTypes](https:sqlite.org/datatypes3.html)
@@ -276,4 +279,4 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
 
 }
 
-expect fun <T> runBlocking(block: suspend CoroutineScope.() -> T): T
+
