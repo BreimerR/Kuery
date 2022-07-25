@@ -20,8 +20,8 @@ class StatementTest {
     fun createTableStatementTest() {
         assertEquals(
             """CREATE TABLE IF NOT EXISTS `users` (
-            |    `id` NUMERIC PRIMARY KEY AUTOINCREMENT,
-            |    `name` TEXT NOT NULL,
+            |    `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+            |    `name` TEXT(55) NOT NULL,
             |    `age` INTEGER NOT NULL
             |);
             """.trimMargin(), createTableStatement.toString()
@@ -35,7 +35,7 @@ class StatementTest {
 
     @Test
     fun simpleBoundSelect() {
-        assertEquals("SELECT `id`, `name`, `age` FROM `users` WHERE `age` = ?", selectStatement.boundSql)
+        assertEquals("SELECT `id`, `name`, `age` FROM `users` WHERE `age` = ?", boundSelectStatement.boundSql)
     }
 
     @Test
@@ -108,6 +108,10 @@ class StatementTest {
 
         val selectStatement by laziest {
             SELECT * Users WHERE true
+        }
+
+        val boundSelectStatement by laziest {
+            SELECT * Users WHERE (Users.age equals 12)
         }
 
         val nestedSelectStatement by laziest {

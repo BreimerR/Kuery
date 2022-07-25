@@ -14,7 +14,7 @@ import libetal.libraries.kuery.mariadb.exceptions.MariaDbException
 import libetal.libraries.kuery.mariadb.interop.*
 
 actual class Connector actual constructor(
-    actual val database: String,
+    actual override val database: String,
     actual val user: String,
     actual val password: String,
     actual val host: String,

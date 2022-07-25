@@ -1,18 +1,17 @@
 @file:Suppress("UnstableApiUsage")
 
 import libetal.libraries.commonTargets
-import libetal.libraries.invoke
 
 val kotlinVersion: String by extra
 val projectVersion: String by project
-val projectGroup: String by project
+val kueryProjectGroup: String by project
 
 plugins {
     kotlin("multiplatform")
     `maven-publish`
 }
 
-group = "$projectGroup.annotations"
+group = "$kueryProjectGroup.annotations"
 version = projectVersion
 
 kotlin {

@@ -1,11 +1,15 @@
 package libetal.libraries.kuery.sqlite.core
 
 import kotlinx.datetime.LocalDate
+import libetal.kotlin.debug.info
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.CharSequenceColumn
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.columns.NumberColumn
+import libetal.libraries.kuery.core.entities.TableEntity
+import libetal.libraries.kuery.core.entities.ViewEntity
+import libetal.libraries.kuery.core.entities.extensions.type
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.statements.*
@@ -17,6 +21,7 @@ import libetal.libraries.kuery.sqlite.core.database.listeners.ConnectorListener
 import libetal.libraries.kuery.sqlite.core.entities.Entity
 import libetal.libraries.kuery.sqlite.coroutines.runBlocking
 import libetal.libraries.kuery.core.Kuery as CoreKuery
+import libetal.libraries.kuery.core.Connector as CoreConnector
 
 /**
  * [SQLITE DataTypes](https:sqlite.org/datatypes3.html)
@@ -24,20 +29,45 @@ import libetal.libraries.kuery.core.Kuery as CoreKuery
  **/
 abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
 
-    val connector: Connector by laziest {
-        init().also {
+    val connector: CoreConnector by laziest {
+        Connector().also {
             it.addListener(this)
         }
     }
 
-    abstract fun init(): Connector
-
-    fun Entity<*, *>.text(name: String = "", default: String? = null, size: Int? = null, nullable: Boolean = false) =
-        registerColumn(name) {
-            CharSequenceColumn(name, "TEXT", default, size, nullable = nullable) { result ->
-                result ?: throw MalformedStoredData(this, name)
-            }
+    fun Entity<*, *>.text(
+        name: String,
+        size: Int = 55,
+        default: String? = null,
+        primary: Boolean = false,
+        nullable: Boolean = false
+    ) = registerColumn(name) {
+        CharSequenceColumn<CharSequence, Int>(
+            name,
+            "TEXT",
+            primary = false,
+            nullable = nullable,
+            default = default,
+            size = size,
+            alias = null
+        ) { result ->
+            result ?: throw MalformedStoredData(this, name)
         }
+    }
+
+    override fun Entity<*, *>.string(
+        name: String,
+        size: Int,
+        default: String?,
+        primary: Boolean,
+        nullable: Boolean
+    ) = text(
+        name,
+        size,
+        default,
+        primary,
+        nullable
+    )
 
     fun <N : Number> Entity<*, *>.numeric(
         name: String,
@@ -77,7 +107,8 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
             }
         ) { dbResult ->
             dbResult ?: throw UnexpectedNull(this, name)
-            val actions = listOf(String::toDoubleOrNull, String::toFloatOrNull, String::toLongOrNull, String::toIntOrNull)
+            val actions =
+                listOf(String::toDoubleOrNull, String::toFloatOrNull, String::toLongOrNull, String::toIntOrNull)
 
             var result: Number? = null
 
@@ -142,36 +173,14 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         }
     }
 
-    override fun Entity<*, *>.date(name: String) =
-        registerColumn(name) {
-            GenericColumn(
-                name = name,
-                typeName = "TEXT",
-                default = null,
-                nullable = false,
-                toSqlString = {
-                    "'$it'"/*TODO DATE_CONVERTER('$it')*/
-                },
-                alias = null
-            ) { result ->
-                result ?: throw UnexpectedNull(this, name)
-                try {
-                    LocalDate.parse(result)
-                } catch (e: Exception) {
-                    throw MalformedStoredData(this, name)
-                }
-            }
-        }
-
     /** TODO
      * Not sure about the implementation of default
      * here yet
      * but can easily be changed once solved
      * "DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))"
      **/
-    fun Entity<*, *>.date(name: String, default: LocalDate? = null, format: String? = null) =
+    override fun Entity<*, *>.date(name: String, default: LocalDate?, format: String?) =
         registerColumn(name) {
-            val defaultSql = default?.let { " DEFAULT(strftime('%Y-%m-%dT%H:%M:%fZ', '$it'))" } ?: ""
             GenericColumn(
                 name = name,
                 typeName = "TEXT",
@@ -190,21 +199,6 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
                 }
             }
         }
-
-
-    override fun Entity<*, *>.string(name: String, size: Int, default: String?): Column<String> = registerColumn(name) {
-        CharSequenceColumn(
-            name,
-            "TEXT",
-            primary = false,
-            nullable = false,
-            default = default,
-            size = size,
-            alias = null
-        ) {
-            it ?: throw UnexpectedNull(this, name)
-        }
-    }
 
     /**
      * SQLite doesn't support booleans
@@ -234,7 +228,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
     }
 
     override fun <R : Result> execute(statement: Statement<R>) {
-        connector.execute(statement)
+        connector.query("$statement")
     }
 
     override fun Create<*, *>.query(collector: CreateResult.() -> Unit) {
@@ -273,8 +267,31 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         }
     }
 
-    override fun onCreate(connector: Connector) = tableEntities.forEach { (entity, columns) ->
+    override fun onCreate(connector: Connector) {
 
+        tableEntities.forEach { (entity, _) ->
+            TAG info "Creating table $entity"
+
+            val statement = when (entity.type) {
+                libetal.libraries.kuery.core.entities.Entity.Type.TABLE -> CREATE TABLE entity as TableEntity
+                libetal.libraries.kuery.core.entities.Entity.Type.VIEW -> CREATE VIEW entity as ViewEntity
+            }
+
+            statement query {
+                if (error != null) {
+                    throw RuntimeException(error)
+                } else TAG info "Created Table $entity"
+            }
+
+        }
+
+        onCreate()
+
+    }
+
+
+    companion object {
+        const val TAG = "KuerySqlite"
     }
 
 }

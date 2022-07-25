@@ -8,7 +8,7 @@ import libetal.libraries.kuery.core.statements.results.InsertResult
 
 class Insert(val entity: Entity<*>, vararg val columns: BaseColumn<*>) : ArgumentsStatement<InsertResult>() {
 
-    private val values by laziest {
+    val values by laziest {
         mutableListOf<List<Any?>>()
     }
 

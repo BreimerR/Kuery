@@ -20,11 +20,11 @@ buildscript {
 
 
 allprojects {
-    val projectGroup: String by project
+    val kueryProjectGroup: String by project
     val projectVersion: String by project
 
-    val mysqlProjectGroup by extra("$projectGroup.mysql")
-    val sqliteProjectGroup by extra("$projectGroup.sqlite")
+    val mysqlProjectGroup by extra("$kueryProjectGroup.mysql")
+    val sqliteProjectGroup by extra("$kueryProjectGroup.sqlite")
 
     version = projectVersion
 

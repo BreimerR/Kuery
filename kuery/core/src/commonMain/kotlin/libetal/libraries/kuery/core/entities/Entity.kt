@@ -9,13 +9,7 @@ abstract class Entity<T> {
      * Implementation of this property as a function
      * will reduce override conflicts
      **/
-    abstract fun getEntityName(): String
-
-    /**
-     * Implementation of this property as a function
-     * will reduce override conflicts
-     **/
-    open fun entityTableType() = Type.TABLE
+     open fun getEntityName(): String = ""
 
     operator fun invoke(vararg columns: BaseColumn<*>): InsertStatementBuilder<T, Entity<T>> =
         InsertStatementBuilder(this, *columns)
@@ -33,6 +27,3 @@ abstract class Entity<T> {
 }
 
 
-abstract class TableEntity<T> : Entity<T>()
-
-abstract class ViewEntity<T> : Entity<T>()

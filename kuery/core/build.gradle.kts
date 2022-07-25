@@ -3,10 +3,8 @@
 
 import libetal.libraries.*
 import android.annotation.SuppressLint
-import libetal.libraries.commonTargets
 import libetal.libraries.invoke
 import libetal.libraries.isMac
-import libetal.libraries.mobileTargets
 
 val kotlinVersion: String by project
 
@@ -24,7 +22,7 @@ val targetSdkVersion by project {
     it.toString().toInt()
 }
 
-val projectGroup: String by project
+val kueryProjectGroup: String by project
 
 repositories {
     mavenLocal()
@@ -37,7 +35,7 @@ plugins {
     `maven-publish`
 }
 
-group = projectGroup
+group = kueryProjectGroup
 version = projectVersion
 
 kotlin {
@@ -61,8 +59,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":kuery:library"))
-                api(project(":kuery:logging"))
+                api(project(":kotlin:library"))
+                api(project(":kotlin:logging"))
 
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")

@@ -5,6 +5,8 @@ import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 
 interface Connector {
+
+    val database: String
     fun query(sqlStatement: String): Boolean
 
     infix fun query(statement: Create<*, *>): Flow<CreateResult>

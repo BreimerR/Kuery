@@ -59,8 +59,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":kuery:core"))
-                implementation(project(":kuery:library"))
-                implementation(project(":kuery:logging"))
+                implementation(project(":kotlin:library"))
+                implementation(project(":kotlin:logging"))
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
             }
         }

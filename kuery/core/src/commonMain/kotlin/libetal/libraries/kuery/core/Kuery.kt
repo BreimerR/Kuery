@@ -3,10 +3,7 @@ package libetal.libraries.kuery.core
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.BaseColumn
-import libetal.libraries.kuery.core.columns.Column
-import libetal.libraries.kuery.core.columns.GenericColumn
-import libetal.libraries.kuery.core.columns.NumberColumn
+import libetal.libraries.kuery.core.columns.*
 import libetal.libraries.kuery.core.columns.delegates.ColumnDelegate
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.*
@@ -70,13 +67,28 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
 
     abstract fun AbstractEntity.char(name: String): Column<Char>
 
-    abstract fun AbstractEntity.date(name: String): GenericColumn<LocalDate>
+    abstract fun AbstractEntity.date(
+        name: String,
+        default: LocalDate? = null,
+        format: String? = null
+    ): GenericColumn<LocalDate>
 
     /**TODO
      * Default value consistent in most databases add here
      **/
-    abstract fun AbstractEntity.string(name: String, size: Int = 55, default: String? = null): Column<String>
-    open fun AbstractEntity.nullableString(name: String, size: Int = 55, default: String? = null): GenericColumn<String?> {
+    abstract fun AbstractEntity.string(
+        name: String,
+        size: Int = 55,
+        default: String? = null,
+        primary: Boolean = false,
+        nullable: Boolean = false
+    ): Column<CharSequence>
+
+    open fun AbstractEntity.nullableString(
+        name: String,
+        size: Int = 55,
+        default: String? = null
+    ): Column<CharSequence?> {
         TODO("")
     }
 

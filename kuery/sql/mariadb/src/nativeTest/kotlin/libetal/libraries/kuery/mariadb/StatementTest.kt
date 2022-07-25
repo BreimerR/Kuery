@@ -144,7 +144,7 @@ class StatementTest {
 
         val updateSimpleTableStatement by laziest {
             UPDATE TABLE Users SET {
-                Users.name to "Breimer"
+                Users.name set "Breimer"
             } WHERE (Users.name equals "Lazie")
         }
 

@@ -20,7 +20,7 @@ val targetSdkVersion by project {
     it.toString().toInt()
 }
 
-val projectGroup: String by project
+val kueryProjectGroup: String by project
 
 plugins {
     kotlin("multiplatform")
@@ -28,7 +28,7 @@ plugins {
     `maven-publish`
 }
 
-group = "$projectGroup.annotations"
+group = "$kueryProjectGroup.annotations"
 version = projectVersion
 
 kotlin {
@@ -54,11 +54,7 @@ kotlin {
         val jsTest by getting
         val nativeMain by getting
         val nativeTest by getting
-        val androidMain by getting {
-            dependencies {
-                implementation("com.google.android.material:material:1.5.0")
-            }
-        }
+        val androidMain by getting
         val androidTest by getting {
             dependencies {
                 implementation("junit:junit:4.13.2")

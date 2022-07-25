@@ -1,20 +1,18 @@
 package libetal.libraries.kuery.core.statements.builders
 
-import libetal.libraries.kuery.core.columns.GenericColumn
+import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.Update
-import kotlin.to as kotlinTo
 
 class UpdateStatementBuilder<T, E : Entity<T>>(val entity: E) : WhereStatementBuilder<T, E, Update>() {
 
     private val expressions by lazy {
-        mutableListOf<Pair<GenericColumn<*>, *>>()
+        mutableListOf<Pair<BaseColumn<*>, *>>()
     }
 
-    infix fun <T> GenericColumn<T>.to(value: T) {
-        expressions.add(this kotlinTo value)
+    infix fun <T> BaseColumn<T>.set(value: T) {
+        expressions.add(this to value)
     }
-
 
     override fun build(where: String, boundWhere: String) = Update(where, boundWhere).also { statement ->
         statement.entity = entity

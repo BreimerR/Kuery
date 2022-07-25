@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.Kuery
+import libetal.libraries.kuery.core.columns.CharSequenceColumn
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.columns.NumberColumn
@@ -97,24 +98,20 @@ abstract class Kuery(
         char(name, null)
 
     fun TableEntity<*>.char(name: String, default: Char?) = registerColumn(name) {
-
-        GenericColumn(
+        CharSequenceColumn<Char, Int>(
             name = name,
-            baseSql = "$name CHAR",
+            typeName = "CHAR",
             nullable = false,
-            default = default,
-            toSqlString = {
-                "'$it'"
-            }
+            default = default
         ) {
             it?.toCharArray()?.getOrNull(0) ?: throw UnexpectedNull(this, name)
         }
     }
 
-    override fun TableEntity<*>.date(name: String) = registerColumn(name) {
+    override fun TableEntity<*>.date(name: String, default: LocalDate?, format: String?) = registerColumn(name) {
         GenericColumn(
             name,
-            "`$name` DATE",
+            "DATE",
             nullable = false,
             toSqlString = {
                 "'$it'"
@@ -125,64 +122,46 @@ abstract class Kuery(
         }
     }
 
-    fun TableEntity<*>.date( /*TODO Create converted columns for this*/
+    override fun TableEntity<*>.string(
         name: String,
-        default: LocalDate,
-        format: String
-    ) = registerColumn(name) {
-        val defaultSql = " DEFAULT STR_TO_DATE('$default','$format')"
-        GenericColumn(
-            name,
-            "`$name` DATE",
-            nullable = false,
-            toSqlString = {
-                "'$it'"
-            }
-        ) { result ->
-            result ?: throw UnexpectedNull(this, name)
-            LocalDate.parse(result)
-        }
-    }
-
-    override fun TableEntity<*>.string(name: String, size: Int, default: String?): Column<String> =
+        size: Int,
+        default: String?,
+        primary: Boolean,
+        nullable: Boolean
+    ) =
         registerColumn(name) {
-            val defaultSql = default?.let { " DEFAULT $default" } ?: ""
-            val maxSql = "($size)"
-            GenericColumn(
-                name,
-                "`$name` VARCHAR$maxSql$defaultSql",
+            CharSequenceColumn<CharSequence, Int>(
+                name = name,
+                typeName = "VARCHAR",
                 nullable = false,
-                toSqlString = {
-                    "'$it'"
-                }
+                default = default,
+                size = size,
+                primary = primary,
+                alias = null
             ) { result ->
                 result ?: throw UnexpectedNull(this, name)
             }
         }
 
-    override fun TableEntity<*>.nullableString(name: String, size: Int, default: String?): GenericColumn<String?> =
-        registerColumn(name) {
-            val maxSql = "($size)"
-            val defaultSql = default?.let { " DEFAULT '$it'" } ?: ""
-            GenericColumn(
-                name,
-                "`$name` VARCHAR$maxSql$defaultSql",
-                nullable = false,
-                toSqlString = {
-                    it?.let {
-                        "'$it'"
-                    } ?: ""
-                }
-            ) { result ->
-                result
-            }
+    override fun TableEntity<*>.nullableString(name: String, size: Int, default: String?) = registerColumn(name) {
+        CharSequenceColumn<CharSequence?, Int>(
+            name = name,
+            typeName = "VARCHAR",
+            nullable = false,
+            default = default,
+            size = size,
+            primary = false,
+            alias = null
+        ) { result ->
+            result
         }
+    }
 
     override fun TableEntity<*>.boolean(name: String, default: Boolean?) = registerColumn(name) {
         val defaultSql = default?.let { " DEFAULT ${if (it) "true" else "false"}" } ?: ""
 
         GenericColumn(name,
-            "$name BOOLEAN$defaultSql",
+            "BOOLEAN",
             nullable = false,
             toSqlString = {
                 if (it) "true" else "false"

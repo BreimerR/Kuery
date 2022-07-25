@@ -1,13 +1,13 @@
 rootProject.name = "Kuery"
 
-include(":kuery:logging")
-project(":kuery:logging").projectDir = File(rootProject.projectDir, "../../Libraries/master/kotlin/log")
+include(":kotlin:logging")
+project(":kotlin:logging").projectDir = File(rootProject.projectDir, "../../Libraries/master/kotlin/log")
 
-include(":kuery:library")
-project(":kuery:library").projectDir = File(rootProject.projectDir, "../../Libraries/master/kotlin/library")
+include(":kotlin:library")
+project(":kotlin:library").projectDir = File(rootProject.projectDir, "../../Libraries/master/kotlin/library")
 
-include(":kuery:coroutines")
-project(":kuery:coroutines").projectDir = File(rootProject.projectDir, "../../Libraries/master/kotlin/coroutines")
+include(":kotlin:coroutines")
+project(":kotlin:coroutines").projectDir = File(rootProject.projectDir, "../../Libraries/master/kotlin/coroutines")
 
 include(
     ":annotations:common",
@@ -32,6 +32,17 @@ include(
     ":kuery:sql:mariadb",
     ":kuery:sql:postgresql"
 )
+
+
+include(
+    ":examples:sqlite:android"
+)
+
+include(":kotlin:lang")
+project(":kotlin:lang").projectDir = File("/opt/Projects/Kotlin/Libraries/master/kotlin/lang")
+
+include(":kotlin:io")
+project(":kotlin:io").projectDir = File("/opt/Projects/Kotlin/Libraries/master/kotlin/io")
 
 /*
 include(

@@ -1,17 +1,18 @@
 package libetal.libraries.kuery.sqlite.core.database
 
-import libetal.libraries.kuery.core.statements.Statement
-import libetal.libraries.kuery.core.statements.results.Result
+expect class Connector : libetal.libraries.kuery.core.Connector {
 
-interface Connector : libetal.libraries.kuery.core.Connector {
+    override val database: String
 
-    val dbName: String
-
-    /**
+/*    *//**
      * Handles execution of bound statements
      * Should be the final implementation
-     **/
-    fun <R : Result> execute(statement: Statement<R>)
+     **//*
+    fun <R : Result> execute(statement: Statement<R>)*/
+
+    companion object {
+        operator fun invoke(): libetal.libraries.kuery.core.Connector
+    }
 
 }
 

@@ -85,8 +85,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                api(project(":kotlin:io"))
                 api(project(":kuery:core"))
-                api(project(":kuery:library"))
+                api(project(":kotlin:library"))
             }
         }
 
