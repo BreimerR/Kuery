@@ -270,7 +270,8 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
                 libetal.libraries.kuery.core.entities.Entity.Type.VIEW -> CREATE VIEW entity as ViewEntity
             }
 
-           /* runBlocking {
+            runBlocking {
+
                 statement query {
                     if (error != null) {
                         throw RuntimeException(error)
@@ -280,7 +281,6 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
                 entity.onCreate()
 
             }
-*/
         }
 
     }

@@ -2,7 +2,6 @@ package libetal.libraries.kuery.core.expressions
 
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.BaseColumn
-import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.statements.parseToSql
 
 /**TODO

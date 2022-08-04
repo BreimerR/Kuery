@@ -3,7 +3,6 @@
 package libetal.libraries.kuery.core.expressions
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.columns.BaseColumn
 
 class SimpleExpression<T> : Expression<BaseColumn<T>, T> {
@@ -43,11 +42,11 @@ class BooleanExpression<T> : Expression<BaseColumn<T>, Boolean> {
         get() = "${left.identifier} $operator $right"
 
     override val boundSql: String by laziest {
-        "${left.identifier} $operator $right"
+        "${left.identifier} $operator ?"
     }
 
     override val columnValues: List<*> by laziest {
-        listOf<Boolean>()
+        listOf(right)
     }
 
 }

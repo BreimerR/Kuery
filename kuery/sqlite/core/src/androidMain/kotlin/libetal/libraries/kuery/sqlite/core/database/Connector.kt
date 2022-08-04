@@ -102,24 +102,6 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
         )
     }
 
-    suspend fun createTable(sql: String, onComplete: CreateResult.() -> Unit) {
-        val error = try {
-            connection.execSQL(sql)
-            null
-        } catch (e: Exception) {
-            e
-        }
-
-        onComplete(
-            CreateResult(
-                sql,
-                Entity.Type.TABLE,
-                error
-            )
-        )
-
-    }
-
     override fun query(statement: Select): Flow<SelectResult> = flow {
         val columns = statement.columns
         val boundWhere = statement.boundWhere
@@ -173,8 +155,7 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
 
                     while (i < columns.size) {
                         columns[i].apply {
-                            TAG info "AT: $name"
-                            val value = getString(getColumnIndexOrThrow(name)) ?: null
+                            val value = getString(i) ?: null
                             row += parse(value)
                         }
                         i++
