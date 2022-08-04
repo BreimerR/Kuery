@@ -24,7 +24,7 @@ abstract class WhereStatementBuilder<T, E : Entity<T>, S : Statement<*>> : Entit
             } else sql
         },
         expression.boundSql,
-        expression.columnValues as List<Any>
+        *(expression.columnValues as List<Any>).toTypedArray()
     )
 
 
