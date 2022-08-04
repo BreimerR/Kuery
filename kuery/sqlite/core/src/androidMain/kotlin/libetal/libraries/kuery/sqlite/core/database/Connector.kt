@@ -110,7 +110,7 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
 
             val selectionColumns = columns.map { it.name }.toTypedArray()
             val selectionArgs = statement.columnValues.map { it.toString() }.toTypedArray()
-            val selectionGroup =  statement.groupBy?.name
+            val selectionGroup = statement.groupBy?.name
 
             TAG info "BoundWhere = $boundWhere"
             TAG info "Entity: ${statement.entity}"
@@ -119,15 +119,9 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
             TAG info "SelectionArgs: ${selectionArgs.joinToString(", ")}"
 
             with(readableDatabase) {
-                query(
-                    statement.entity.name,
-                    selectionColumns,
-                    boundWhere,
-                    selectionArgs,
-                   selectionGroup,
-                    null, // TODO: String Argument relevance not clear yet
-                    statement.orderBy?.name,
-                    statement.limit?.toString()
+                rawQuery(
+                    statement.boundSql,
+                    selectionArgs
                 ) ?: throw RuntimeException("Java based exception. Not sure why it's null yet.")
             }
 

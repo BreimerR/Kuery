@@ -6,7 +6,7 @@ import libetal.libraries.kuery.core.statements.Select
 
 class SelectStatementBuilder<T, E : Entity<T>>(val entity: E, vararg val columns: Column<*>) :
     WhereStatementBuilder<T, E, Select>() {
-    override fun build(where: String, boundWhere: String) = Select(entity, where, boundWhere, columnValues, *columns)
+    override fun build(where: String, boundWhere: String, vararg columnValues: Any) = Select(entity, where, boundWhere, columnValues = columnValues, columns = columns)
 
 }
 

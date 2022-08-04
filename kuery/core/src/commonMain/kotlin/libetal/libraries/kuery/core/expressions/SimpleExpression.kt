@@ -20,11 +20,6 @@ class SimpleExpression<T> : Expression<BaseColumn<T>, T> {
     override val boundSql: String by laziest {
         "${left.identifier} $operator ?"
     }
-    override val columnValues: List<*> by laziest {
-        listOf(
-            right
-        )
-    }
 
 }
 
@@ -43,10 +38,6 @@ class BooleanExpression<T> : Expression<BaseColumn<T>, Boolean> {
 
     override val boundSql: String by laziest {
         "${left.identifier} $operator ?"
-    }
-
-    override val columnValues: List<*> by laziest {
-        listOf(right)
     }
 
 }

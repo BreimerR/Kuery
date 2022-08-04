@@ -12,7 +12,7 @@ import libetal.libraries.kuery.core.expressions.extensions.expressionBuilder
 import libetal.libraries.kuery.core.statements.Select
 
 infix fun <C : CharSequence, T : BaseColumn<C>> T.endsWith(end: C) =
-    LIKE(end, "", "%")
+    LIKE(end, "%", "")
 
 infix fun <C : CharSequence, T : BaseColumn<C>> T.contains(content: C) =
     LIKE(content, "%", "%")
@@ -27,7 +27,7 @@ fun <T : CharSequence> BaseColumn<T>.LIKE(like: T, prefix: String, postFix: Stri
     DecoratedExpression(this, LIKE, like, prefix, postFix)
 
 infix fun <C : CharSequence> BaseColumn<C>.startsWith(like: C) =
-    LIKE(like, "%")
+    LIKE(like, "", "%")
 
 infix fun <C : CharSequence> BaseColumn<C>.startsWith(like: Select) =
-    DecoratedStatementExpression(this, LIKE, like, "%")
+    DecoratedStatementExpression(this, LIKE, like, "", "%")

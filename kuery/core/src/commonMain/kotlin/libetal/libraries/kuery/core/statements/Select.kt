@@ -14,9 +14,15 @@ class Select(
     val entity: Entity<*>,
     override val where: String,
     override val boundWhere: String,
-    val columnValues: MutableList<Any>,
+    columnValues: Array<out Any>,
     vararg val columns: Column<*>
 ) : ArgumentsStatement<SelectResult>(), WhereStatement {
+
+    val columnValues by laziest {
+        mutableListOf<Any>().apply {
+            addAll(columnValues)
+        }
+    }
 
     var orderBy: GenericColumn<*>? = null
 

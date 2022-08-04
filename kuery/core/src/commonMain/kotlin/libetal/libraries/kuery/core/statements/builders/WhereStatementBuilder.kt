@@ -12,23 +12,23 @@ abstract class WhereStatementBuilder<T, E : Entity<T>, S : Statement<*>> : Entit
         mutableListOf<Any>()
     }
 
-    abstract fun build(where: String, boundWhere: String): S
+    abstract fun build(where: String, boundWhere: String, vararg columnValues: Any): S
 
     infix fun WHERE(expressionBuilder: WhereScope.() -> Expression<*, *>): S =
         WHERE(expressionBuilder(WhereScope()))
 
-    open infix fun WHERE(expression: Expression<*, *>): S {
-        columnValues.addAll(expression.columnValues as List<Any>)
-        return build(
-            expression.sql.let { sql ->
-                if (sql[0] == '(' && sql.last() == ')') {
-                    sql.substring(1, sql.length - 1)
-                } else sql
-            }, expression.boundSql
-        )
-    }
+    open infix fun WHERE(expression: Expression<*, *>): S = build(
+        expression.sql.let { sql ->
+            if (sql[0] == '(' && sql.last() == ')') {
+                sql.substring(1, sql.length - 1)
+            } else sql
+        },
+        expression.boundSql,
+        expression.columnValues as List<Any>
+    )
+
 
     infix fun WHERE(boolean: Boolean): S =
-        build("$boolean", "$boolean")
+        build("$boolean", "?", boolean)
 
 }

@@ -5,6 +5,8 @@ abstract class DecoratedExpressions<L, R> : Expression<L, R> {
     private val prefix: String
     private val postfix: String
 
+    val rightValue: R
+
     constructor(
         left: L,
         operator: Operators,
@@ -14,6 +16,7 @@ abstract class DecoratedExpressions<L, R> : Expression<L, R> {
     ) : super(left, operator, right) {
         this.prefix = prefix
         this.postfix = postfix
+        rightValue = right
     }
 
 

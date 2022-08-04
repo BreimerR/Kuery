@@ -14,7 +14,11 @@ class UpdateStatementBuilder<T, E : Entity<T>>(val entity: E) : WhereStatementBu
         expressions.add(this to value)
     }
 
-    override fun build(where: String, boundWhere: String) = Update(where, boundWhere).also { statement ->
+    override fun build(
+        where: String,
+        boundWhere: String,
+        vararg columnValues: Any
+    ) = Update(where, boundWhere, *columnValues).also { statement ->
         statement.entity = entity
         statement.set.addAll(expressions)
     }

@@ -1,5 +1,7 @@
 package libetal.libraries.kuery.core.expressions;
 
+import libetal.kotlin.laziest
+
 abstract class Expression<L, R>(val left: L, val operator: Operators, val right: R) {
 
     constructor(left: L, operator: String, right: R) : this(left, Operators(operator), right)
@@ -8,7 +10,11 @@ abstract class Expression<L, R>(val left: L, val operator: Operators, val right:
 
     abstract val boundSql: String
 
-    abstract val columnValues: List<*>
+    open val columnValues: List<*> by laziest {
+        listOf(
+            right
+        )
+    }
 
     enum class Operators(private val op: String) {
         EQUALS("="),
