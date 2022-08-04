@@ -40,7 +40,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         size: Int = 55,
         default: String? = null,
         primary: Boolean = false,
-        nullable: Boolean = false
+        nullable: Boolean = true
     ) = registerColumn(name) {
         CharSequenceColumn<CharSequence, Int>(
             name,
@@ -81,7 +81,17 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         parser: (String) -> N
     ) = registerColumn(name) {
         NumberColumn(
-            name,
+            if (primary) {
+                when (name) {
+                    "id", "ID", "Id", "iD", "_id" -> "_id"
+                    /**
+                     * TODO
+                     * This is bad I know.
+                     * Solution to be rethought
+                     **/
+                    else -> throw RuntimeException("Android Doesn't support having id as id has to be _id")
+                }
+            } else name,
             typeName,
             default,
             size,
@@ -119,6 +129,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
             result ?: dbResult
 
         }
+
     }
 
     fun Entity<*, *>.blob(name: String = "", primary: Boolean = false) = registerColumn(name) {
@@ -231,41 +242,23 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         connector.query("$statement")
     }
 
-    override fun Create<*, *>.query(collector: CreateResult.() -> Unit) {
-        runBlocking {
-            connector.query(this@query).invoke(collector)
-        }
-    }
+    override infix fun query(statement: Create<*, *>) =
+        connector.query(statement)
 
-    override fun Select.query(collector: SelectResult.() -> Unit) {
-        runBlocking {
-            connector.query(this@query).invoke(collector)
-        }
-    }
+    override infix fun query(statement: Select) =
+        connector.query(statement)
 
-    override fun Insert.query(collector: InsertResult.() -> Unit) {
-        runBlocking {
-            connector.query(this@query).invoke(collector)
-        }
-    }
+    override infix fun query(statement: Insert) =
+        connector.query(statement)
 
-    override fun Delete.query(collector: DeleteResult.() -> Unit) {
-        runBlocking {
-            connector.query(this@query).invoke(collector)
-        }
-    }
+    override infix fun query(statement: Delete) =
+        connector.query(statement)
 
-    override fun Drop.query(collector: DropResult.() -> Unit) {
-        runBlocking {
-            connector.query(this@query).invoke(collector)
-        }
-    }
+    override infix fun query(statement: Drop) =
+        connector.query(statement)
 
-    override fun Update.query(collector: UpdateResult.() -> Unit) {
-        runBlocking {
-            connector.query(this@query).invoke(collector)
-        }
-    }
+    override infix fun query(statement: Update) =
+        connector.query(statement)
 
     override fun onCreate(connector: Connector) {
 
@@ -277,18 +270,20 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
                 libetal.libraries.kuery.core.entities.Entity.Type.VIEW -> CREATE VIEW entity as ViewEntity
             }
 
-            statement query {
-                if (error != null) {
-                    throw RuntimeException(error)
-                } else TAG info "Created Table $entity"
-            }
+           /* runBlocking {
+                statement query {
+                    if (error != null) {
+                        throw RuntimeException(error)
+                    } else TAG info "Created Table $entity"
+                }
 
+                entity.onCreate()
+
+            }
+*/
         }
 
-        onCreate()
-
     }
-
 
     companion object {
         const val TAG = "KuerySqlite"

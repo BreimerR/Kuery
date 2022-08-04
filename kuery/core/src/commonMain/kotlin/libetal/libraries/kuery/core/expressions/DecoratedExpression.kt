@@ -19,11 +19,11 @@ class DecoratedExpression<T : Any> : DecoratedExpressions<BaseColumn<T>, T> {
     ) : super(left, operator, right, prefix, postfix)
 
     override val sql: String by laziest {
-        "`$left` $operator ${left parseToSql right}"
+        "`${left.name}` $operator ${left parseToSql right}"
     }
 
     override val boundSql: String by laziest {
-        "`$left` $operator ?"
+        "`${left.name}` $operator ?"
     }
 
     override val columnValues: List<*> by laziest {

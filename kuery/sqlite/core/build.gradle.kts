@@ -1,7 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
 import libetal.libraries.*
-import org.jetbrains.kotlin.konan.library.konanPlatformLibraryPath
 
 val kotlinVersion: String by project
 
@@ -13,11 +12,11 @@ val androidCompileSdkVersion by project {
     it.toString().toInt()
 }
 
-val minSdkVersion by project {
+val androidMinSdkVersion by project {
     it.toString().toInt()
 }
 
-val targetSdkVersion by project {
+val androidTargetSdkVersion by project {
     it.toString().toInt()
 }
 
@@ -32,11 +31,11 @@ plugins {
 }
 
 group = sqliteProjectGroup
-version = "$projectVersion-3" // this should represent the version of sqlite i.e 1.0.0-3
+version = "$projectVersion" // this should represent the version of sqlite i.e 1.0.0-3
 
 kotlin {
     android {
-
+        publishLibraryVariants("release", "debug")
     }
     jsTarget()
     desktopJvm()
@@ -85,9 +84,10 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":kotlin:io"))
                 api(project(":kuery:core"))
-                api(project(":kotlin:library"))
+                api("libetal.libraries.kotlin:log:1.0.2")
+                api("libetal.libraries.kotlin:io:1.0.2")
+                api("libetal.libraries.kotlin:library:1.0.2")
             }
         }
 
@@ -99,7 +99,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("androidx.annotation:annotation:1.4.0")
+                implementation("androidx.annotation:annotation:1.4.0")
             }
         }
 
@@ -138,8 +138,8 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
     defaultConfig {
-        minSdk = minSdkVersion
-        targetSdk = targetSdkVersion
+        minSdk = androidMinSdkVersion
+        targetSdk = androidTargetSdkVersion
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

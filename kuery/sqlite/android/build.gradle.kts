@@ -10,11 +10,11 @@ val androidCompileSdkVersion by project {
     it.toString().toInt()
 }
 
-val minSdkVersion by project {
+val androidMinSdkVersion by project {
     it.toString().toInt()
 }
 
-val targetSdkVersion by project {
+val androidTargetSdkVersion by project {
     it.toString().toInt()
 }
 
@@ -36,7 +36,9 @@ group = sqliteProjectGroup
 
 kotlin {
 
-    android()
+    android {
+        publishLibraryVariants("release", "debug")
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -69,8 +71,8 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
     defaultConfig {
-        minSdk = minSdkVersion
-        targetSdk = targetSdkVersion
+        minSdk = androidMinSdkVersion
+        targetSdk = androidTargetSdkVersion
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

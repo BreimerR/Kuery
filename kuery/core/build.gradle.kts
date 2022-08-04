@@ -14,11 +14,11 @@ val androidCompileSdkVersion by project {
     it.toString().toInt()
 }
 
-val minSdkVersion by project {
+val androidMinSdkVersion by project {
     it.toString().toInt()
 }
 
-val targetSdkVersion by project {
+val androidTargetSdkVersion by project {
     it.toString().toInt()
 }
 
@@ -48,7 +48,9 @@ kotlin {
         iosArm64()
     }
 
-    android()
+    android {
+        publishLibraryVariants("release", "debug")
+    }
 
     // TODO: Affects build system for kmm android()
     // TODO: androidNativeArm64("androidArm64")
@@ -59,9 +61,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":kotlin:library"))
-                api(project(":kotlin:logging"))
-
+                api("libetal.libraries.kotlin:log:1.0.2")
+                api("libetal.libraries.kotlin:library:1.0.2")
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
                 // TODO implementation ("org.jetbrains.kotlinx:atomicfu:0.17.1")
@@ -104,8 +105,8 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
     defaultConfig {
-        minSdk = minSdkVersion
-        targetSdk = targetSdkVersion
+        minSdk = androidMinSdkVersion
+        targetSdk = androidTargetSdkVersion
     }
 
     compileOptions {

@@ -1,5 +1,6 @@
 package libetal.libraries.kuery.mariadb
 
+import kotlinx.coroutines.runBlocking
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.statements.results.CreateResult
 import libetal.libraries.kuery.core.statements.results.SelectResult
@@ -13,13 +14,17 @@ import kotlin.test.*
 class ConnectorTest : TestCase {
 
     @BeforeTest
-    fun simpleCreateTable() = StatementTest.createSimpleTableStatement query {
-        assertNull(error, "Failed to create database")
+    fun simpleCreateTable() = runBlocking {
+        StatementTest.createSimpleTableStatement query {
+            assertNull(error, "Failed to create database")
+        }
     }
 
     @AfterTest
-    fun simpleDropTable() = StatementTest.dropTableIfExistsStatement query {
+    fun simpleDropTable() = runBlocking {
+        StatementTest.dropTableIfExistsStatement query {
 
+        }
     }
 
     @Test
@@ -28,26 +33,22 @@ class ConnectorTest : TestCase {
     }
 
     @Test
-    fun executeSimpleSelect() = selectAllUsers query {
-        val user = User(
-            name = get(0),
-            dateOfBirth = get(1)
-        )
+    fun executeSimpleSelect() = runBlocking {
+        selectAllUsers query {
+            val user = User(
+                name = get(0),
+                dateOfBirth = get(1)
+            )
 
-        assertEquals(StatementTest.userName, user.name)
-        assertEquals(StatementTest.date, user.dateOfBirth)
+            assertEquals(StatementTest.userName, user.name)
+            assertEquals(StatementTest.date, user.dateOfBirth)
 
+        }
     }
 
 
     val results by laziest {
         mutableMapOf<String, String>()
     }
-
-
-    companion object {
-
-    }
-
 
 }

@@ -1,6 +1,5 @@
 package libetal.libraries.kuery.core.statements
 
-import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.statements.results.DropResult

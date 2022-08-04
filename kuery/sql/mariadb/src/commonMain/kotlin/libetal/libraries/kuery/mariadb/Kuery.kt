@@ -1,9 +1,9 @@
 package libetal.libraries.kuery.mariadb
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.Kuery
+import libetal.libraries.kuery.core.Kuery as CoreKuery
 import libetal.libraries.kuery.core.columns.CharSequenceColumn
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.columns.GenericColumn
@@ -20,7 +20,7 @@ abstract class Kuery(
     private val password: String = "",
     private val host: String = "localhost",
     private val port: UInt = 3306u
-) : Kuery<TableEntity<*>>() {
+) : CoreKuery<TableEntity<*>>() {
 
     val connector: Connector by laziest {
         Connector(
@@ -173,32 +173,26 @@ abstract class Kuery(
 
     }
 
-    override infix fun Create<*, *>.query(
-        collector: CreateResult.() -> Unit
-    ) = runBlocking { connector.query(this@query)(collector) }
+    override fun query(statement: Create<*, *>) =
+        connector.query(statement)
 
-    override infix fun Select.query(
-        collector: SelectResult.() -> Unit
-    ) = runBlocking { connector.query(this@query)(collector) }
+    override infix fun query(statement: Select) =
+        connector.query(statement)
 
-    override infix fun Insert.query(
-        collector: InsertResult.() -> Unit
-    ) = runBlocking { connector.query(this@query)(collector) }
+    override infix fun query(statement: Insert) =
+        connector.query(statement)
 
-    override infix fun Delete.query(
-        collector: DeleteResult.() -> Unit
-    ) = runBlocking { connector.query(this@query)(collector) }
+    override infix fun query(statement: Delete) =
+        connector.query(statement)
 
-    override infix fun Drop.query(
-        collector: DropResult.() -> Unit
-    ) = runBlocking { connector.query(this@query)(collector) }
+    override infix fun query(statement: Drop) =
+        connector.query(statement)
 
-    override infix fun Update.query(
-        collector: UpdateResult.() -> Unit
-    ) = runBlocking { connector.query(this@query)(collector) }
+    override infix fun query(statement: Update) =
+        connector.query(statement)
 
     override fun <T : Result> execute(statement: Statement<T>) {
-        connector.execute<T>(statement)
+        connector.execute(statement)
     }
 
 }

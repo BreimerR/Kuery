@@ -22,9 +22,6 @@ object Users : IdEntity<User, Long>() {
     val keepingItReal = real("id")
 
     val isPuppy = boolean("id")
-
-    override fun getEntityName(): String = "users"
-
     override fun toString(): String = "users"
 
 }

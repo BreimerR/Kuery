@@ -11,22 +11,6 @@ import libetal.libraries.kuery.test.models.Users
 
 object Database : Kuery() {
 
-    override fun onCreate() {
-        Log.d(TAG, "Inserting users")
-        insertDefaultUserStatement query {
-            assert(error == null) {
-                "Failed to execute $ $error"
-            }
-        }
-        Log.d(TAG, "Inserted users")
-    }
-
     const val TAG = "Database"
-
-    val insertDefaultUserStatement by laziest {
-        INSERT INTO Users(Users.name, Users.age) VALUES {
-            row("Breimer", 12)
-        }
-    }
 
 }

@@ -1,15 +1,10 @@
 package libetal.libraries.kuery.core.entities
 
+import libetal.kotlin.debug.info
 import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.statements.builders.InsertStatementBuilder
 
 abstract class Entity<T> {
-
-    /**
-     * Implementation of this property as a function
-     * will reduce override conflicts
-     **/
-     open fun getEntityName(): String = ""
 
     operator fun invoke(vararg columns: BaseColumn<*>): InsertStatementBuilder<T, Entity<T>> =
         InsertStatementBuilder(this, *columns)
@@ -23,6 +18,14 @@ abstract class Entity<T> {
     }
 
     abstract override fun toString(): String
+
+    open suspend fun onCreate() {
+        TAG info "override this method if you need custom prefilled data for the table"
+    }
+
+    companion object {
+        const val TAG = "libetal.libraries.kuery.core.entities.Entity"
+    }
 
 }
 

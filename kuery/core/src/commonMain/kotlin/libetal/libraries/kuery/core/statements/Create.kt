@@ -10,14 +10,21 @@ import libetal.libraries.kuery.core.tableEntities
 class Create<Class, E : Entity<Class>>(
     val entity: E,
     val type: Entity.Type = Entity.Type.TABLE,
-    safe: Boolean = true
+    var safe: Boolean = false
 ) : Statement<CreateResult>() {
 
-    override val sql: String by laziest {
-        """|CREATE $type ${if (safe) "IF NOT EXISTS " else ""}`${entity.name}` (
-           |    ${tableEntities[entity]?.joinToString(",\n    ") { it.sql }}
-           |);
-        """.trimMargin()
+    val entitiesString by laziest {
+        tableEntities[entity]?.joinToString(",\n    ") { it.sql }
+    }
+
+    override val sql: String
+        get() = """|CREATE $type ${if (safe) "IF NOT EXISTS " else ""}${entity.name} (
+                   |    $entitiesString
+                   |);
+                """.trimMargin()
+
+    infix fun IF(existence: Existence) = this.apply {
+        safe = existence.state
     }
 
     override val boundSql: String

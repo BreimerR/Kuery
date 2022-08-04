@@ -44,15 +44,17 @@ class MainActivity : ComponentActivity() {
     }
 
     fun selectUser() {
-        SELECT * Users WHERE true query {
-            val user = User(
-                Users.name.value,
-                Users.age.value
+        MainScope().launch(Dispatchers.IO) {
+            SELECT * Users WHERE true query {
+                val user = User(
+                    Users.name.value.toString(),
+                    Users.age.value
 
-            )
+                )
 
-            Log.d(TAG, "Selected $user Error = $error")
-            users += user
+                Log.d(TAG, "Selected $user Error = $error")
+                users += user
+            }
         }
         Log.d(TAG, "Selected users")
     }

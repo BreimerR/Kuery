@@ -3,19 +3,19 @@ plugins {
     id("kotlin-android")
 }
 
-val composeVersion: String by project
 val kotlinVersion: String by project
+val composeVersion: String by project
+val androidMinSdkVersion: String by project
+val androidTargetSdkVersion: String by project
 val androidCompileSdkVersion: String by project
-val sdkVersion: String by project
-val minSdkVersion: String by project
 
 android {
     compileSdk = androidCompileSdkVersion.toInt()
 
     defaultConfig {
         applicationId = "libetal.libraries.kuery.test"
-        minSdk = minSdkVersion.toInt()
-        targetSdk = sdkVersion.toInt()
+        minSdk = androidMinSdkVersion.toInt()
+        targetSdk = androidTargetSdkVersion.toInt()
         versionCode = 1
         versionName = "1.0"
 

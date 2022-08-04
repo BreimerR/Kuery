@@ -1,11 +1,14 @@
 package libetal.libraries.kuery.core
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.datetime.LocalDate
+import libetal.kotlin.debug.info
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.*
 import libetal.libraries.kuery.core.columns.delegates.ColumnDelegate
 import libetal.libraries.kuery.core.entities.Entity
+import libetal.libraries.kuery.core.entities.Entity.Companion.TAG
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 import kotlin.native.concurrent.ThreadLocal
@@ -112,32 +115,43 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
 
     } as C
 
-    abstract infix fun Create<*, *>.query(
+    suspend infix fun Create<*, *>.query(
         collector: CreateResult.() -> Unit
-    ): Unit
+    ) = query(this).collect(collector)
 
-    abstract infix fun Select.query(
+    abstract infix fun query(statement: Create<*, *>): Flow<CreateResult>
+
+    suspend infix fun Select.query(
         collector: SelectResult.() -> Unit
-    ): Unit
+    ) = query(this).collect(collector)
 
-    abstract infix fun Insert.query(
+    abstract infix fun query(statement: Select): Flow<SelectResult>
+
+    suspend infix fun Insert.query(
         collector: InsertResult.() -> Unit
-    ): Unit
+    ) = query(this).collect(collector)
 
-    abstract infix fun Delete.query(
+    abstract infix fun query(statement: Insert): Flow<InsertResult>
+
+    suspend infix fun Delete.query(
         collector: DeleteResult.() -> Unit
-    ): Unit
+    ) = query(this).collect(collector)
 
-    abstract infix fun Drop.query(
+    abstract infix fun query(statement: Delete): Flow<DeleteResult>
+
+    suspend infix fun Drop.query(
         collector: DropResult.() -> Unit
-    ): Unit
+    ) = query(this).collect(collector)
 
-    abstract infix fun Update.query(
+    abstract infix fun query(statement: Drop): Flow<DropResult>
+
+    suspend infix fun Update.query(
         collector: UpdateResult.() -> Unit
-    ): Unit
+    ) = query(this).collect(collector)
 
-    abstract fun onCreate()
+    abstract infix fun query(statement: Update): Flow<UpdateResult>
 
+    @Deprecated("Use doesn't make proper sense", ReplaceWith("collect(collector)"))
     suspend operator fun <T> Flow<T>.invoke(collector: (T) -> Unit) =
         collect(collector)
 

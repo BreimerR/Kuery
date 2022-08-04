@@ -32,7 +32,4 @@ object Database : Kuery(
     DatabaseConfig["port"]
 ) {
 
-    override fun onCreate() {
-        CREATE TABLE Users
-    }
 }

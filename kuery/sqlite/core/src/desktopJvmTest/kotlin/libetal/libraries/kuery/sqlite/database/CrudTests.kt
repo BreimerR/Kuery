@@ -1,6 +1,7 @@
 package libetal.libraries.kuery.sqlite.database
 
 import libetal.kotlin.debug.info
+import libetal.libraries.kuery.sqlite.coroutines.runBlocking
 import libetal.libraries.kuery.sqlite.data.User
 import libetal.libraries.kuery.sqlite.database.Database.query
 import libetal.libraries.kuery.sqlite.database.StatementTest.Companion.createTableStatement
@@ -22,39 +23,47 @@ class CrudTests {
     @Test
     fun insertUsersTest() = insertUsers()
 
-    private fun insertUsers() = insertStatement query {
-        assertNull(error, "Failed to insert due to : ${error?.message}")
-        TAG info "Inserted: $insertStatement"
+    private fun insertUsers() = runBlocking {
+        insertStatement query {
+            assertNull(error, "Failed to insert due to : ${error?.message}")
+            TAG info "Inserted: $insertStatement"
+        }
     }
 
-    private fun selectUsers() = selectStatement query {
-        val user = User(
-            Users.name.value,
-            Users.age.value
-        )
-        println("$user")
+    private fun selectUsers() = runBlocking {
+        selectStatement query {
+            val user = User(
+                Users.name.value.toString(),
+                Users.age.value
+            )
+            println("$user")
+        }
     }
 
     @BeforeTest
-    fun createTableTests() = createTableStatement query {
-        assertNull(
-            actual = error,
-            message = """Failed to execute query: $createTableStatement 
+    fun createTableTests() = runBlocking {
+        createTableStatement query {
+            assertNull(
+                actual = error,
+                message = """Failed to execute query: $createTableStatement 
                 |Due to${error?.let { " ${it::class.qualifiedName} " } ?: ""}${error?.message ?: ""}""".trimMargin()
-        )
-        TAG info "Executed $createTableStatement"
+            )
+            TAG info "Executed $createTableStatement"
+        }
     }
 
     @AfterTest
-    fun dropTableTests() = dropTableStatement query {
-        assertNull(
-            actual = error,
-            message =
-            """Failed to delete table $dropTableStatement. 
+    fun dropTableTests() = runBlocking {
+        dropTableStatement query {
+            assertNull(
+                actual = error,
+                message =
+                """Failed to delete table $dropTableStatement. 
                |Due to ${error?.let { " ${it::class.qualifiedName} " }}:${error?.message ?: ""}
             """.trimMargin()
-        )
-        TAG info "Executed: $dropTableStatement"
+            )
+            TAG info "Executed: $dropTableStatement"
+        }
     }
 
     private infix fun KFunction0<Unit>.then(then: KFunction0<Unit>) {

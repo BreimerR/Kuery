@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import libetal.kotlin.debug.info
+import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.entities.extensions.type
 import libetal.libraries.kuery.core.statements.*
@@ -26,7 +27,10 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
     var onCreateDb: SQLiteDatabase? = null
 
     val connection: SQLiteDatabase
-        get() = onCreateDb ?: writableDatabase // TODO there is ambiguity here when the database getsCalled recusively
+        get() = if (onCreateDb == null)
+            writableDatabase
+        else
+            onCreateDb!!
 
     @RequiresApi(Build.VERSION_CODES.P)
     constructor(
@@ -75,14 +79,6 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
         onCreateDb = null
     }
 
-    override fun onOpen(db: SQLiteDatabase?) {
-        super.onOpen(db)
-    }
-
-    /*actual fun <R : Result> execute(statement: Statement<R>) {
-       connection.execSQL(statement.sql)
-   }*/
-
     override fun query(sqlStatement: String): Boolean = try {
         connection.execSQL(sqlStatement)
         true
@@ -106,47 +102,98 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
         )
     }
 
+    suspend fun createTable(sql: String, onComplete: CreateResult.() -> Unit) {
+        val error = try {
+            connection.execSQL(sql)
+            null
+        } catch (e: Exception) {
+            e
+        }
+
+        onComplete(
+            CreateResult(
+                sql,
+                Entity.Type.TABLE,
+                error
+            )
+        )
+
+    }
+
     override fun query(statement: Select): Flow<SelectResult> = flow {
         val columns = statement.columns
         val boundWhere = statement.boundWhere
 
-        val cursor = connection.query(
-            statement.entity.name,
-            columns.map { it.name }.toTypedArray(),
-            boundWhere,
-            statement.columnValues.map { it.toString() }.toTypedArray(),
-            statement.groupBy?.name,
-            null, // TODO: String Argument relevance not clear yet
-            statement.orderBy?.name,
-            statement.limit?.toString()
-        ) ?: throw RuntimeException("Java based exception. Not sure why it's null yet.")
+        val cursor = try {
+
+            val selectionColumns = columns.map { it.name }.toTypedArray()
+            val selectionArgs = statement.columnValues.map { it.toString() }.toTypedArray()
+            val selectionGroup =  statement.groupBy?.name
+
+            TAG info "BoundWhere = $boundWhere"
+            TAG info "Entity: ${statement.entity}"
+            TAG info "Group: ${selectionColumns.joinToString(", ")}"
+            TAG info "Columns: ${selectionColumns.joinToString(", ")}"
+            TAG info "SelectionArgs: ${selectionArgs.joinToString(", ")}"
+
+            with(readableDatabase) {
+                query(
+                    statement.entity.name,
+                    selectionColumns,
+                    boundWhere,
+                    selectionArgs,
+                   selectionGroup,
+                    null, // TODO: String Argument relevance not clear yet
+                    statement.orderBy?.name,
+                    statement.limit?.toString()
+                ) ?: throw RuntimeException("Java based exception. Not sure why it's null yet.")
+            }
+
+        } catch (e: Exception) {
+            emit(
+                SelectResult(
+                    emptyList(),
+                    e
+                )
+            )
+            return@flow
+        }
 
         with(cursor) {
 
-
             while (moveToNext()) {
+
                 val row = mutableListOf<Any?>()
 
-                TAG info "Row results are: $row"
+                var error: Exception? = null
 
-                var i = 0
+                try {
 
-                while (i < columns.size) {
-                    val value = getString(i) ?: null
-                    row += columns[i].parse(value)
-                    i++
+                    var i = 0
+
+                    while (i < columns.size) {
+                        columns[i].apply {
+                            TAG info "AT: $name"
+                            val value = getString(getColumnIndexOrThrow(name)) ?: null
+                            row += parse(value)
+                        }
+                        i++
+                    }
+                } catch (e: Exception) {
+                    error = e
                 }
 
                 emit(
                     SelectResult(
                         row,
-                        null,
+                        error,
                         *columns
                     )
                 )
             }
+
+            close()
         }
-        cursor.close()
 
     }
 
@@ -157,15 +204,29 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
 
         }.toTypedArray()
 
-        connection.delete(
-            statement.entity.name,
-            whereClause,
-            whereArgs
-        )
+        val error = try {
+            connection.delete(
+                statement.entity.name,
+                whereClause,
+                whereArgs
+            )
+            null
+        } catch (e: Exception) {
+            e
+        }
 
+        emit(
+            DeleteResult(
+                statement.entity.name,
+                error
+            )
+        )
     }
 
     override fun query(statement: Insert): Flow<InsertResult> = flow {
+
+        TAG info "Executing  $statement"
+
         val values = ContentValues().apply {
             val columns = statement.columns
             val rows = statement.values
@@ -197,7 +258,19 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
 
         }
 
-        connection.insert(statement.entity.name, null, values)
+        val error = try {
+            connection.insert(statement.entity.name, null, values)
+            null
+        } catch (e: Exception) {
+            e
+        }
+
+        emit(
+            InsertResult(
+                statement.entity.name,
+                error
+            )
+        )
 
     }
 

@@ -8,40 +8,47 @@ import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 import libetal.kotlin.io.File
-import java.sql.DriverManager
-import java.sql.ResultSet
-import java.sql.SQLException
-import java.sql.SQLTimeoutException
+import libetal.libraries.kuery.core.statements.Statement
+import libetal.libraries.kuery.sqlite.core.database.extensions.listeners
+import java.sql.*
 import libetal.libraries.kuery.core.Connector as CoreConnector
 
 actual class Connector
 private constructor(actual override val database: String, version: Int) : CoreConnector {
 
+    var exists = false
+
     var exception: Exception? = null
 
-    private val connection by laziest {
+    private val connection by laziest({
+        if (!exists) listeners.forEach { listener ->
+            listener.onCreate(this)
+        }
+        exists = true
+    }) {
+        val fileName = when (database.substringAfterLast(".")) {
+            "db", "sqlite" -> database
+            else -> "$database.sqlite"
+        }
 
-        val connection = try {
+        try {
+
             Class.forName("org.sqlite.JDBC")
-            val fileName = when (database.substringAfterLast(".")) {
-                "db", "sqlite" -> database
-                else -> "$database.sqlite"
+
+            val file = File(fileName).also {
+                if (!it.parentFile.exists()) it.parentFile.mkdirs()
             }
-            val file = File(fileName)
+
+            exists = file.exists()
+
             DriverManager.getConnection("jdbc:sqlite:$fileName") ?: null
         } catch (e: Exception) {
             exception = e
             null
+        }?.also {
+            TAG info "Connection to database $fileName established"
         } ?: throw RuntimeException("Failed to open database: Error = ${exception?.message}")
-
-        TAG info "Connection to database $database established"
-
-        connection
     }
-
-    /*actual fun <R : Result> execute(statement: Statement<R>) {
-        TODO("Not yet implemented")
-    }*/
 
     override fun query(sqlStatement: String): Boolean {
         TODO("Not yet implemented")
@@ -174,7 +181,8 @@ private constructor(actual override val database: String, version: Int) : CoreCo
             instance = it
         }
 
-        actual operator fun invoke(): libetal.libraries.kuery.core.Connector = instance ?: throw RuntimeException("Please call invoke with dbName first")
+        actual operator fun invoke(): libetal.libraries.kuery.core.Connector =
+            instance ?: throw RuntimeException("Please call invoke with dbName first")
 
     }
 
