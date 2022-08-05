@@ -12,4 +12,3 @@ object CREATE : StatementFactory<Create<*, *>>() {
     infix fun <T, E : ViewEntity<T>> VIEW(entity: E) = Create(entity, Entity.Type.VIEW)
 
 }
-

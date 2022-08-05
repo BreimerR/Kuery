@@ -81,17 +81,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         parser: (String) -> N
     ) = registerColumn(name) {
         NumberColumn(
-            if (primary) {
-                when (name) {
-                    "id", "ID", "Id", "iD", "_id" -> "_id"
-                    /**
-                     * TODO
-                     * This is bad I know.
-                     * Solution to be rethought
-                     **/
-                    else -> throw RuntimeException("Android Doesn't support having id as id has to be _id")
-                }
-            } else name,
+            name,
             typeName,
             default,
             size,
@@ -263,7 +253,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
     override fun onCreate(connector: Connector) {
 
         tableEntities.forEach { (entity, _) ->
-            TAG info "Creating table $entity"
+            TAG info "Creating table ${entity::class}"
 
             val statement = when (entity.type) {
                 libetal.libraries.kuery.core.entities.Entity.Type.TABLE -> CREATE TABLE entity as TableEntity

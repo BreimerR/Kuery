@@ -1,9 +1,7 @@
 package libetal.libraries.kuery.mariadb.database
 
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.statements.CREATE
 import libetal.libraries.kuery.mariadb.Kuery
-import libetal.libraries.kuery.mariadb.database.tables.Users
 
 object DatabaseConfig {
 

@@ -23,6 +23,10 @@ include(
 )
 
 include(
+    ":kuery:builders"
+)
+
+include(
     ":kuery:sqlite:core",
     ":kuery:sqlite:android",
 )

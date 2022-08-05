@@ -13,18 +13,6 @@ import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 import kotlin.native.concurrent.ThreadLocal
 
-/**
- * Objects are frozen in kotlin/native
- * The database instance is an object
- * on most cases and thus this value will
- * be frozen as well unless made global
- *
- * Affects JS
- **/
-@ThreadLocal // This is mainly for concurrency in kotlin
-val tableEntities by laziest {
-    mutableMapOf<Entity<*>, MutableList<BaseColumn<*>>>()
-}
 
 abstract class Kuery<AbstractEntity : Entity<*>> {
 
@@ -124,6 +112,8 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
     suspend infix fun Select.query(
         collector: SelectResult.() -> Unit
     ) = query(this).collect(collector)
+
+    suspend infix operator fun Select.invoke(collector: SelectResult.() -> Unit) = query(collector)
 
     abstract infix fun query(statement: Select): Flow<SelectResult>
 
