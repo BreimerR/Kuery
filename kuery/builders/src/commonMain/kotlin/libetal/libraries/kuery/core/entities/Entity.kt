@@ -3,12 +3,12 @@ package libetal.libraries.kuery.core.entities
 import libetal.kotlin.debug.info
 import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.statements.builders.InsertStatementBuilder
+import libetal.libraries.kuery.core.tableEntities
 
 abstract class Entity<T> {
 
     operator fun invoke(vararg columns: BaseColumn<*>): InsertStatementBuilder<T, Entity<T>> =
         InsertStatementBuilder(this, *columns)
-
 
     enum class Type(val identifier: String) {
         TABLE("TABLE"),

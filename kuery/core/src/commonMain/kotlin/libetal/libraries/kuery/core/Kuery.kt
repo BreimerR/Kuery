@@ -1,17 +1,14 @@
 package libetal.libraries.kuery.core
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.datetime.LocalDate
-import libetal.kotlin.debug.info
-import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.columns.*
-import libetal.libraries.kuery.core.columns.delegates.ColumnDelegate
+import libetal.libraries.kuery.core.columns.BaseColumn
+import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.columns.GenericColumn
+import libetal.libraries.kuery.core.columns.NumberColumn
 import libetal.libraries.kuery.core.entities.Entity
-import libetal.libraries.kuery.core.entities.Entity.Companion.TAG
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
-import kotlin.native.concurrent.ThreadLocal
 
 
 abstract class Kuery<AbstractEntity : Entity<*>> {
@@ -23,14 +20,6 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
 
         tableEntities[entity] = mutableListOf()
 
-    }
-
-    operator fun get(entity: AbstractEntity) = tableEntities[entity] ?: mutableListOf<BaseColumn<*>>().also {
-        tableEntities[entity] = it
-    }
-
-    fun <T, C : GenericColumn<T>> column(converter: () -> T = { TODO() }): ColumnDelegate<T, C, AbstractEntity> {
-        TODO()
     }
 
     abstract fun AbstractEntity.long(
@@ -87,21 +76,6 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
 
     abstract infix fun <T : Result> execute(statement: Statement<T>)
 
-    /**
-     * Do not remove the entity
-     * context requirement yet
-     **/
-    fun <ColumnType, C : BaseColumn<ColumnType>> AbstractEntity.registerColumn(
-        name: String,
-        initializer: AbstractEntity.() -> C
-    ) = this@Kuery[this].let { columns ->
-        val columnName = name.ifBlank { null } ?: throw RuntimeException("Can't have an empty column name")
-
-        columns.firstOrNull { it.name == columnName } ?: initializer().also { column ->
-            columns.add(column)
-        }
-
-    } as C
 
     suspend infix fun Create<*, *>.query(
         collector: CreateResult.() -> Unit

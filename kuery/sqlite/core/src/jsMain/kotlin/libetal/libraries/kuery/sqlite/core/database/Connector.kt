@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import libetal.libraries.kuery.core.Connector as CoreConnector
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
+import libetal.libraries.kuery.sqlite.core.CoreKuery
 
 actual class Connector(actual override val database: String) : CoreConnector {
 
@@ -46,6 +47,10 @@ actual class Connector(actual override val database: String) : CoreConnector {
             TODO("Not yet implemented")
         }
 
+    }
+
+    actual operator  fun CoreKuery.invoke() {
+        init()
     }
 
 }

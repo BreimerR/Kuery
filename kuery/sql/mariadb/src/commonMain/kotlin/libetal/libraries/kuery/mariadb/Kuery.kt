@@ -1,18 +1,18 @@
 package libetal.libraries.kuery.mariadb
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.Kuery as CoreKuery
 import libetal.libraries.kuery.core.columns.CharSequenceColumn
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.columns.NumberColumn
 import libetal.libraries.kuery.core.exceptions.MalformedStoredData
 import libetal.libraries.kuery.core.exceptions.UnexpectedNull
+import libetal.libraries.kuery.core.getOrRegisterColumn
 import libetal.libraries.kuery.core.statements.*
-import libetal.libraries.kuery.core.statements.results.*
+import libetal.libraries.kuery.core.statements.results.Result
 import libetal.libraries.kuery.mariadb.entities.TableEntity
+import libetal.libraries.kuery.core.Kuery as CoreKuery
 
 abstract class Kuery(
     private val database: String = "test",
@@ -78,7 +78,7 @@ abstract class Kuery(
         autoIncrement: Boolean = primary,
         default: N? = null,
         parser: (String) -> N
-    ) = registerColumn(name) {
+    ) = getOrRegisterColumn(name) {
         NumberColumn(
             name = name,
             typeName = type,
@@ -97,7 +97,7 @@ abstract class Kuery(
     override fun TableEntity<*>.char(name: String): Column<Char> =
         char(name, null)
 
-    fun TableEntity<*>.char(name: String, default: Char?) = registerColumn(name) {
+    fun TableEntity<*>.char(name: String, default: Char?) = getOrRegisterColumn(name) {
         CharSequenceColumn<Char, Int>(
             name = name,
             typeName = "CHAR",
@@ -108,7 +108,7 @@ abstract class Kuery(
         }
     }
 
-    override fun TableEntity<*>.date(name: String, default: LocalDate?, format: String?) = registerColumn(name) {
+    override fun TableEntity<*>.date(name: String, default: LocalDate?, format: String?) = getOrRegisterColumn(name) {
         GenericColumn(
             name,
             "DATE",
@@ -129,7 +129,7 @@ abstract class Kuery(
         primary: Boolean,
         nullable: Boolean
     ) =
-        registerColumn(name) {
+        getOrRegisterColumn(name) {
             CharSequenceColumn<CharSequence, Int>(
                 name = name,
                 typeName = "VARCHAR",
@@ -143,7 +143,7 @@ abstract class Kuery(
             }
         }
 
-    override fun TableEntity<*>.nullableString(name: String, size: Int, default: String?) = registerColumn(name) {
+    override fun TableEntity<*>.nullableString(name: String, size: Int, default: String?) = getOrRegisterColumn(name) {
         CharSequenceColumn<CharSequence?, Int>(
             name = name,
             typeName = "VARCHAR",
@@ -157,7 +157,7 @@ abstract class Kuery(
         }
     }
 
-    override fun TableEntity<*>.boolean(name: String, default: Boolean?) = registerColumn(name) {
+    override fun TableEntity<*>.boolean(name: String, default: Boolean?) = getOrRegisterColumn(name) {
         val defaultSql = default?.let { " DEFAULT ${if (it) "true" else "false"}" } ?: ""
 
         GenericColumn(name,

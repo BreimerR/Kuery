@@ -8,7 +8,7 @@ import libetal.libraries.kuery.core.entities.TableEntity
  * All Tables in sqlite have an index
  * column to improve performance
  **/
-abstract class Entity<EntityType, IdType> : TableEntity<EntityType>() {
+abstract class Entity<DataClass, IdType> : TableEntity<DataClass>() {
     abstract val id: Column<IdType>
 }
 

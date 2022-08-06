@@ -1,4 +1,4 @@
 package libetal.libraries.kuery.core.entities
 
-abstract class TableEntity<T> : Entity<T>()
+abstract class TableEntity<DataClass> : Entity<DataClass>()
 

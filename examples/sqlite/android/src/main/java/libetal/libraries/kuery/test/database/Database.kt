@@ -1,16 +1,12 @@
 package libetal.libraries.kuery.test.database
 
-import android.util.Log
-import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.statements.INSERT
-import libetal.libraries.kuery.core.statements.extensions.INTO
-import libetal.libraries.kuery.core.statements.extensions.VALUES
-import libetal.libraries.kuery.sqlite.core.Kuery
-import libetal.libraries.kuery.sqlite.core.database.Connector
-import libetal.libraries.kuery.test.models.Users
+import libetal.libraries.kuery.sqlite.core.CoreKuery
+import libetal.libraries.kuery.sqlite.core.entities.Entity
 
-object Database : Kuery() {
+object Database : CoreKuery() {
 
     const val TAG = "Database"
+    override val entities: List<Entity<*, *>>
+        get() = TODO("Not yet implemented")
 
 }

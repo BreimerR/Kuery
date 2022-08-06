@@ -1,3 +1,3 @@
 package libetal.libraries.kuery.sqlite.core
 
-expect abstract class Kuery() : CoreKuery
+actual abstract class Kuery : CoreKuery()

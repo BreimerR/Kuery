@@ -14,7 +14,30 @@ import kotlin.native.concurrent.ThreadLocal
  *
  * Affects JS
  **/
-@ThreadLocal // This is mainly for concurrency in kotlin
-val tableEntities by laziest {
-    mutableMapOf<Entity<*>, MutableList<BaseColumn<*>>>()
+@ThreadLocal // This is mainly for concurrency in kotlin-native
+val tableEntities: MutableMap<Entity<*>, MutableList<BaseColumn<*>>> by laziest {
+    mutableMapOf()
 }
+
+val <T> Entity<T>.columns
+    get() = tableEntities[this] ?: mutableListOf<BaseColumn<*>>().also {
+        tableEntities[this] = it
+    }
+
+/**
+ * Do not remove the entity
+ * context requirement yet
+ **/
+fun <T, ColumnType, C : BaseColumn<ColumnType>> Entity<T>.getOrRegisterColumn(name: String, initializer: Entity<T>.() -> C): C {
+
+    val columnName = name.ifBlank { null } ?: throw RuntimeException("Can't have an empty column name")
+
+    val column = columns.firstOrNull { it.name == columnName } ?: initializer().also { column ->
+        columns.add(column)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return column as C
+
+}
+

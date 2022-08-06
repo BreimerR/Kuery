@@ -3,7 +3,6 @@ package libetal.libraries.kuery.core.columns.delegates
 import libetal.libraries.kuery.core.Kuery
 import libetal.libraries.kuery.core.columns.GenericColumn
 import libetal.libraries.kuery.core.entities.Entity
-import kotlin.reflect.KProperty
 
 class ColumnDelegate<ColumnType, C : GenericColumn<ColumnType>, AbstractEntity : Entity<*>>(
     val database: Kuery<AbstractEntity>,
@@ -26,7 +25,7 @@ class ColumnDelegate<ColumnType, C : GenericColumn<ColumnType>, AbstractEntity :
      * 2. Make Name a required property and utilize solution
      *    > AbstractEntity.delegateBuilder
      **/
-    @Suppress("UNCHECKED_CAST")
+   /* @Suppress("UNCHECKED_CAST")
     operator fun getValue(entity: AbstractEntity, property: KProperty<*>): C = database[entity].let { columns ->
 
         val columnName = name.trim().ifBlank { property.name }
@@ -35,7 +34,7 @@ class ColumnDelegate<ColumnType, C : GenericColumn<ColumnType>, AbstractEntity :
             columns.add(it)
         }
 
-    } as C
+    } as C*/
 
 }
 

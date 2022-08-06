@@ -15,6 +15,7 @@ import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.entities.extensions.type
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
+import libetal.libraries.kuery.sqlite.core.CoreKuery
 import libetal.libraries.kuery.sqlite.core.database.extensions.listeners
 
 actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connector {
@@ -269,6 +270,10 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
         actual operator fun invoke(): libetal.libraries.kuery.core.Connector =
             instance ?: throw RuntimeException("Please refer to the documentation on how to initialize the database")
 
+    }
+
+    actual operator  fun CoreKuery.invoke() {
+        init()
     }
 
 }
