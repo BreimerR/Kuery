@@ -9,7 +9,7 @@ import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 import libetal.kotlin.io.File
 import libetal.libraries.kuery.core.statements.Statement
-import libetal.libraries.kuery.sqlite.core.CoreKuery
+import libetal.libraries.kuery.sqlite.core.Kuery
 import libetal.libraries.kuery.sqlite.core.database.extensions.listeners
 import java.sql.*
 import libetal.libraries.kuery.core.Connector as CoreConnector
@@ -187,7 +187,7 @@ private constructor(actual override val database: String, version: Int) : CoreCo
 
     }
 
-    actual operator fun CoreKuery.invoke() {
+    actual operator fun Kuery.invoke() {
         init()
     }
 

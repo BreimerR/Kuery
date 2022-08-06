@@ -12,7 +12,7 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.Connector
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
-import libetal.libraries.kuery.sqlite.core.CoreKuery
+import libetal.libraries.kuery.sqlite.core.Kuery
 import libetal.libraries.kuery.sqlite.database.query
 
 actual class Connector(actual override val database: String, val version: Int/*TODO: Store value in the database*/) : Connector {
@@ -82,7 +82,7 @@ actual class Connector(actual override val database: String, val version: Int/*T
 
     }
 
-    actual operator fun CoreKuery.invoke() {
+    actual operator fun Kuery.invoke() {
     }
 
 }

@@ -10,7 +10,6 @@ import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 
-
 abstract class Kuery<AbstractEntity : Entity<*>> {
 
     operator fun <ET, E : Entity<ET>> contains(entity: E): Boolean = entity in tableEntities

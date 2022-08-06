@@ -1,9 +1,9 @@
 package libetal.libraries.kuery.test.database
 
-import libetal.libraries.kuery.sqlite.core.CoreKuery
+import libetal.libraries.kuery.sqlite.core.Kuery
 import libetal.libraries.kuery.sqlite.core.entities.Entity
 
-object Database : CoreKuery() {
+object Database : Kuery() {
 
     const val TAG = "Database"
     override val entities: List<Entity<*, *>>

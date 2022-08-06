@@ -10,12 +10,11 @@ import androidx.annotation.RequiresApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import libetal.kotlin.debug.info
-import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.entities.extensions.type
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
-import libetal.libraries.kuery.sqlite.core.CoreKuery
+import libetal.libraries.kuery.sqlite.core.Kuery
 import libetal.libraries.kuery.sqlite.core.database.extensions.listeners
 
 actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connector {
@@ -272,7 +271,7 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
 
     }
 
-    actual operator  fun CoreKuery.invoke() {
+    actual operator  fun Kuery.invoke() {
         init()
     }
 
