@@ -8,3 +8,4 @@ local.properties
 **/yarn.lock
 **/java_pid30112.hprof.928jp4.b.ij/**
 **.sqlite
+**/**.def

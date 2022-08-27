@@ -1,8 +1,0 @@
-# DO NOT EDIT FILE 
-headers = sqlite3.h library.h
-compilerOpts.linux= -I/usr/include \
-                    -I/usr/local/include \
-                    -I/usr/include/x86_64-linux-gnu \
-                    -I/opt/Projects/Kotlin/Krom/staging/kuery/sqlite/core/src/nativeInterop/sqlite3/src
-staticLibraries = libsqlite3_interop.a libsqlite3.a
-libraryPaths = /usr/local/lib /usr/lib /opt/Projects/Kotlin/Krom/staging/kuery/sqlite/core/src/nativeInterop/sqlite3/cmake-build-debug

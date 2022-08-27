@@ -8,4 +8,5 @@ class KueryTest : Application() {
         super.onCreate()
         Connector(applicationContext, "test", 1)
     }
+
 }
