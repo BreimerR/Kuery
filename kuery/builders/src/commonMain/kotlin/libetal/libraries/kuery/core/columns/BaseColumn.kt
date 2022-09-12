@@ -27,7 +27,7 @@ abstract class BaseColumn<T>(
      * `tableName.columnName`
      **/
     override val identifier by laziest {
-        "$name"
+        name
     }
 
     override val sql by laziest {

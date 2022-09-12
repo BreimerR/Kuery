@@ -7,7 +7,7 @@ import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 
 expect class Connector(
-    database: String = "test",
+    name: String = "test",
     user: String = "test",
     password: String = "",
     host: String = "localhost",
@@ -16,7 +16,7 @@ expect class Connector(
     val host: String
     val user: String
     val password: String
-    override val database: String
+    override val name: String
     val port: UInt
 
     infix fun <R : Result> execute(statement: libetal.libraries.kuery.core.statements.Statement<R>): Flow<R>

@@ -15,13 +15,13 @@ object Users : IdEntity<User, Long>() {
 
     override val id = long("id")
 
-    val name = text("id")
+    val name = text("name")
 
-    val blobby = blob("id")
+    val blobby = blob("blobby")
 
-    val keepingItReal = real("id")
+    val keepingItReal = real("keepingItReal")
 
-    val isPuppy = boolean("id")
+    val isPuppy = boolean("isPuppy")
     override fun toString(): String = "users"
 
 }

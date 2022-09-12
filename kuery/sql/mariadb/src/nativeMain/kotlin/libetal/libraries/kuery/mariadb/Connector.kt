@@ -10,11 +10,10 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
-import libetal.libraries.kuery.mariadb.exceptions.MariaDbException
 import libetal.libraries.kuery.mariadb.interop.*
 
 actual class Connector actual constructor(
-    actual override val database: String,
+    actual override val name: String,
     actual val user: String,
     actual val password: String,
     actual val host: String,
@@ -26,7 +25,7 @@ actual class Connector actual constructor(
             host,
             user,
             password,
-            database,
+            name,
             port
         )
     }
@@ -93,7 +92,7 @@ actual class Connector actual constructor(
             @Suppress("UNCHECKED_CAST")
             emit(
                 SelectResult(
-                    row = emission
+                    columnValues = emission
                 )
             )
         }

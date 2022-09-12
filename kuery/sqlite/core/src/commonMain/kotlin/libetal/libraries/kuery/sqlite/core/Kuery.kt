@@ -30,11 +30,14 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
 
     abstract val entities: List<Entity<*, *>>
 
-    val connector: CoreConnector by laziest {
-        Connector().also {
+    init {
+        connector = Connector().also {
             it.addListener(this)
         }
     }
+
+    private val connection
+        get() = connector ?: throw RuntimeException("Shouldn't ever be null")
 
     fun Entity<*, *>.text(
         name: String,
@@ -236,26 +239,26 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
     }
 
     override fun <R : Result> execute(statement: Statement<R>) {
-        connector.query("$statement")
+        connection.query("$statement")
     }
 
     override infix fun query(statement: Create<*, *>) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Select) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Insert) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Delete) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Drop) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Update) =
-        connector.query(statement)
+        connection.query(statement)
 
     override fun onCreate(connector: Connector) {
 

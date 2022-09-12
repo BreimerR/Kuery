@@ -17,11 +17,11 @@ import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.sqlite.core.Kuery
 import libetal.libraries.kuery.sqlite.core.database.extensions.listeners
 
-actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connector {
+actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
 
     private var mName = ""
 
-    actual override val database: String
+    override val name: String
         get() = mName
 
     var onCreateDb: SQLiteDatabase? = null
@@ -90,7 +90,7 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
         val error = try {
             connection.execSQL("$statement")
             null
-        } catch (e: Exception) {
+        } catch (e: RuntimeException) {
             e
         }
         emit(
@@ -271,7 +271,7 @@ actual class Connector : SQLiteOpenHelper, libetal.libraries.kuery.core.Connecto
 
     }
 
-    actual operator  fun Kuery.invoke() {
+    actual operator fun Kuery.invoke() {
         init()
     }
 

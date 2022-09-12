@@ -8,14 +8,14 @@ import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 import libetal.kotlin.io.File
+import libetal.kotlin.io.exists
 import libetal.libraries.kuery.core.statements.Statement
 import libetal.libraries.kuery.sqlite.core.Kuery
 import libetal.libraries.kuery.sqlite.core.database.extensions.listeners
 import java.sql.*
-import libetal.libraries.kuery.core.Connector as CoreConnector
 
 actual class Connector
-private constructor(actual override val database: String, version: Int) : CoreConnector {
+private constructor(path: String?, override val name: String?, version: Int) : KSQLiteConnector {
 
     var exists = false
 
@@ -27,10 +27,7 @@ private constructor(actual override val database: String, version: Int) : CoreCo
         }
         exists = true
     }) {
-        val fileName = when (database.substringAfterLast(".")) {
-            "db", "sqlite" -> database
-            else -> "$database.sqlite"
-        }
+        val fileName = "$path/$name"
 
         try {
 
@@ -40,7 +37,7 @@ private constructor(actual override val database: String, version: Int) : CoreCo
                 if (!it.parentFile.exists()) it.parentFile.mkdirs()
             }
 
-            exists = file.exists()
+            exists = file.exists
 
             DriverManager.getConnection("jdbc:sqlite:$fileName") ?: null
         } catch (e: Exception) {
@@ -48,8 +45,15 @@ private constructor(actual override val database: String, version: Int) : CoreCo
             null
         }?.also {
             TAG info "Connection to database $fileName established"
-        } ?: throw RuntimeException("Failed to open database: Error = ${exception?.message}")
+        } ?: throw RuntimeException("Failed to open database: $fileName Error = ${exception?.message}")
     }
+
+    private constructor(name: String?, version: Int) : this(
+        name?.let { KSQLiteConnector.resolveName(name).first },
+        name?.let { KSQLiteConnector.resolveName(name).second },
+        version
+    )
+
 
     override fun query(sqlStatement: String): Boolean {
         TODO("Not yet implemented")

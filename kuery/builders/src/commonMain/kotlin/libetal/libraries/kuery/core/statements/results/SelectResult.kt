@@ -3,10 +3,10 @@ package libetal.libraries.kuery.core.statements.results
 import libetal.libraries.kuery.core.columns.Column
 
 class SelectResult(
-    val row: List<Any?>,
-    error: Exception? = null,
+    val columnValues: List<Any?>,
+    override val error: Exception? = null,
     vararg columns: Column<*>
-) : Result(error) {
+) : Result {
 
     val columns by lazy {
         buildMap {
@@ -19,10 +19,13 @@ class SelectResult(
     val <T> Column<T>.value: T
         get() = this@SelectResult[this]
 
+    val Column<CharSequence>.stringValue: String
+        get() = value.toString()
+
     operator fun <T> get(column: Column<*>) = get<T>(columns[column.name] ?: throw UnQueriedColumnResultRequest(column))
 
     operator fun <T> get(id: Int): T {
-        val value = row[id]
+        val value = columnValues[id]
 
         @Suppress("UNCHECKED_CAST")
         return try {

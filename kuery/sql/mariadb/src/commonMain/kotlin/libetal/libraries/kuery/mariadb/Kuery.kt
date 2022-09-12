@@ -22,8 +22,8 @@ abstract class Kuery(
     private val port: UInt = 3306u
 ) : CoreKuery<TableEntity<*>>() {
 
-    val connector: Connector by laziest {
-        Connector(
+    init {
+        connector = Connector(
             database,
             user,
             password,
@@ -31,6 +31,10 @@ abstract class Kuery(
             port
         )
     }
+
+    val connection
+        get() = connector ?: throw RuntimeException("Shouldn't be the case.")
+
 
     override fun TableEntity<*>.long(
         name: String,
@@ -174,25 +178,25 @@ abstract class Kuery(
     }
 
     override fun query(statement: Create<*, *>) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Select) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Insert) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Delete) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Drop) =
-        connector.query(statement)
+        connection.query(statement)
 
     override infix fun query(statement: Update) =
-        connector.query(statement)
+        connection.query(statement)
 
     override fun <T : Result> execute(statement: Statement<T>) {
-        connector.execute(statement)
+        connection.execute(statement)
     }
 
 }

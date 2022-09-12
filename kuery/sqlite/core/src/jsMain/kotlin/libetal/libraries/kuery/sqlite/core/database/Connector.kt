@@ -6,7 +6,14 @@ import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.sqlite.core.Kuery
 
-actual class Connector(actual override val database: String) : CoreConnector {
+actual class Connector
+private constructor(path: String?, override val name: String?, version: Int) :  KSQLiteConnector {
+
+    private constructor(name: String?, version: Int) : this(
+        name?.let { KSQLiteConnector.resolveName(name).first },
+        name?.let { KSQLiteConnector.resolveName(name).second },
+        version
+    )
 
     /*actual fun <R : Result> execute(statement: Statement<R>) {
         TODO("Not yet implemented")

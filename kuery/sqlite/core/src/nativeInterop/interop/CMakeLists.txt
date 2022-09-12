@@ -1,15 +1,13 @@
 cmake_minimum_required(VERSION 3.22)
-project(sqlite3 C)
+project(KSQLite C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_library(
-        KSQLite3
+#[[add_library(
+        KuerySQLite
         include/sqlite3.h
         include/shell.h
         include/sqlite3ext.h
-)
+)]]
 
-#[[
-find_package(SQLite3 REQUIRED)
-target_link_libraries(${PROJECT_NAME} SQLite::SQLite3)]]
+add_executable(KuerySQLite   include/sqlite3.c)

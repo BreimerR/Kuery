@@ -2,10 +2,7 @@ package libetal.libraries.kuery.sqlite.core.database
 
 import libetal.libraries.kuery.sqlite.core.Kuery
 
-expect class Connector : libetal.libraries.kuery.core.Connector {
-
-    override val database: String
-
+expect class Connector : KSQLiteConnector {
     operator fun Kuery.invoke()
 
     companion object {

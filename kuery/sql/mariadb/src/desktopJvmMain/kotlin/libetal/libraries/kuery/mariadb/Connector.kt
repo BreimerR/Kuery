@@ -2,13 +2,12 @@ package libetal.libraries.kuery.mariadb
 
 import kotlinx.coroutines.flow.Flow
 import libetal.kotlin.laziest
-import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 import java.sql.DriverManager
 
 actual class Connector actual constructor(
-    actual override val database: String,
+    actual override val name: String,
     actual val user: String,
     actual val password: String,
     actual val host: String,
@@ -16,7 +15,7 @@ actual class Connector actual constructor(
 ) : libetal.libraries.kuery.core.Connector {
 
     val connection by laziest {
-        DriverManager.getConnection("jdbc:mariadb://$host:$port/$database?user=$user&password=$password")
+        DriverManager.getConnection("jdbc:mariadb://$host:$port/$name?user=$user&password=$password")
             ?: throw RuntimeException("Failed to establish connection to database")
     }
 

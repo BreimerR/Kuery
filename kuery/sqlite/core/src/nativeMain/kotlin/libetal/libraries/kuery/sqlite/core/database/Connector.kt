@@ -1,40 +1,59 @@
 package libetal.libraries.kuery.sqlite.core.database
 
+import kotlinx.cinterop.*
 import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.pointed
-import kotlinx.cinterop.staticCFunction
-import kotlinx.cinterop.toKString
 import kotlinx.coroutines.flow.Flow
-import libetal.interop.sqlite3.connect
-import libetal.interop.sqlite3.sqlite3_close
-import libetal.kotlin.debug.info
+import kotlinx.coroutines.flow.flow
+import libetal.interop.sqlite3.*
+import libetal.kotlin.io.File
+import libetal.kotlin.io.exists
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.Connector
+import libetal.libraries.kuery.core.entities.extensions.name
+import libetal.libraries.kuery.core.entities.extensions.type
 import libetal.libraries.kuery.core.statements.*
+import libetal.libraries.kuery.core.statements.Select
 import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.sqlite.core.Kuery
-import libetal.libraries.kuery.sqlite.database.query
+import libetal.libraries.kuery.sqlite.exceptions.KSQLiteQueryException
 
-actual class Connector(actual override val database: String, val version: Int/*TODO: Store value in the database*/) : Connector {
+// import libetal.libraries.kuery.sqlite.exceptions.KSQLiteQueryException
+
+actual class Connector
+private constructor(val path: String?, override val name: String?, version: Int) : KSQLiteConnector {
+
+    var isNewDatabase = false
 
     @Suppress("MemberVisibilityCanBePrivate") // public for current testing should be private
-    val connection by laziest {
-        // TODO: I think databse is created if it doesn't exist
-        connect(database, staticCFunction { code, description ->
-            TAG info (description?.toKString() ?: "Code: $code Undefined Exception: ")
-        })
+    var connection by laziest({ createdConnection ->
+        if (isNewDatabase) {
+
+        }
+    }) {
+        val database = path?.let { name?.let { "${path.trimEnd('/')}$name" } }
+            ?: throw RuntimeException("In Memory database not supported for native. Argument name & path should not be null")
+
+        memScoped {
+
+            val dbPtr = alloc<CPointerVar<sqlite3>>()
+            isNewDatabase = !File(database).exists
+
+            when (val result = sqlite3_open(database, dbPtr.ptr)) {
+                0 -> dbPtr.value ?: throw RuntimeException("Failed to connect to database")
+                else -> throw KSQLiteQueryException(result)
+            }
+
+        }
     }
 
+    private constructor(name: String?, version: Int) : this(
+        name?.let { KSQLiteConnector.resolveName(name).first },
+        name?.let { KSQLiteConnector.resolveName(name).second },
+        version
+    )
 
-    fun close(): Unit = memScoped {
-        val connection = connection.getPointer(this).pointed
-        sqlite3_close(
-            connection.db
-        )
-    }
+    suspend fun <T> execute(sql: String) = flow<T> {
 
-    suspend fun executeSQL(statement: Statement<*>) {
-        connection.query(statement.toString())
     }
 
     /*actual fun <R : Result> execute(statement: Statement<R>) {
@@ -42,15 +61,67 @@ actual class Connector(actual override val database: String, val version: Int/*T
     }*/
 
     override fun query(sqlStatement: String): Boolean {
-        TODO("Not yet implemented")
+        var error: String? = null
+        /*connection.query(sqlStatement) { code, description ->
+            error = description
+        }*/
+        return error == null;
     }
 
-    override fun query(statement: Create<*, *>): Flow<CreateResult> {
-        TODO("Not yet implemented")
+    override fun query(statement: Create<*, *>) = flow<CreateResult> {
+        var exception: RuntimeException? = null
+
+        /*connection.query(statement.sql) { code, desscription ->
+            exception = KSQLiteQueryException(code)
+        }*/
+
+        emit(
+            CreateResult(
+                statement.entity.name,
+                statement.entity.type,
+                exception
+            )
+        )
+
     }
 
-    override fun query(statement: Select): Flow<SelectResult> {
-        TODO("Not yet implemented")
+    override fun query(statement: Select) = flow<SelectResult> {
+
+        val emissions = mutableListOf<SelectResult>()
+        val callbackPointer = StableRef.create { columsCount: Int, rowValues: CStringArray, columnNames: CStringArray? ->
+            /** TODO
+             * I want to pass rowValues as it is to avoid the
+             * conversion loop
+             **/
+            /* SelectResult(
+                 ,
+                 null,
+                 *statement.columns,
+             )*/
+        }
+
+        val results = memScoped {
+
+            sqlite3_exec(connection, statement.sql, staticCFunction { callback, columnsCount, rowValues, columnsNames ->
+                val callbackFunction =
+                    callback?.asStableRef<(Int, CStringArray?, CStringArray?) -> Int>()
+                        ?.get() ?: throw RuntimeException("Failed to assign callback function")
+                callbackFunction(
+                    columnsCount,
+                    columnsNames,
+                    rowValues
+                )
+            }, callbackPointer.asCPointer(), null)
+
+            arrayOf<String>()
+        }
+
+        for (emission in emissions) {
+            emit(emission)
+        }
+
+        emissions.clear()
+
     }
 
     override fun query(statement: Delete): Flow<DeleteResult> {
@@ -69,16 +140,21 @@ actual class Connector(actual override val database: String, val version: Int/*T
         TODO("Not yet implemented")
     }
 
+
+    fun close(): Unit {
+        sqlite3_close(connection)
+    }
+
+
     actual companion object {
 
         const val TAG = "Connector"
 
-        val INSTANCE: Connector
-            get() = TODO("Not yet implemented")
-
-        actual operator fun invoke(): libetal.libraries.kuery.core.Connector {
-            TODO("Not yet implemented")
+        operator fun invoke(path: String?, name: String?, version: Int = 1) = INSTANCE ?: Connector(path, name, version).also {
+            INSTANCE = it
         }
+
+        actual operator fun invoke(): Connector = INSTANCE ?: throw RuntimeException("Please call invoke with dbName first")
 
     }
 

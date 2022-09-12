@@ -50,16 +50,22 @@ kotlin {
         val nativeInteropKotlinDir = File(nativeInteropDir, "kotlin")
         val nativeInteropDefFile = File(nativeInteropKotlinDir, "interop.def")
         val headerFiles = listOf(
-            "library"
+            "sqlite3"
         )
+
         val headers = headerFiles.joinToString(" ") { "$it.h" }
 
         nativeInteropDefFile.outputStream().use { stream ->
             stream.writer().use { writer ->
                 writer.write(
-                    """|# DO NOT EDIT FILE 
+                    """|# DO NOT EDIT FILE
+                       |package=libetal.interop.sqlite3
                        |headers = $headers
-                       |compilerOpts = -I${nativeInteropDir.path}/sqlite3/include
+                       |compilerOpts = -I${nativeInteropDir.path}/interop/include/
+                       |headerFilter = sqlite3*.h
+                       |
+                       |linkerOpts.linux_x64 = -lpthread -ldl
+                       |linkerOpts.macos_x64 = -lpthread -ldl
                     """.trimMargin()
                 )
             }
@@ -68,8 +74,6 @@ kotlin {
         val main by compilations.getting
         val sqlite3Interop by main.cinterops.creating {
             defFile = nativeInteropDefFile
-            packageName = "libetal.interop.sqlite3"
-
         }
     }
 
@@ -77,6 +81,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":kuery:core"))
+                // api("libetal.libraries.kotlin:ksqlite:1.0.0")
                 api("libetal.libraries.kotlin:log:1.0.2")
                 api("libetal.libraries.kotlin:io:1.0.2")
                 api("libetal.libraries.kotlin:library:1.0.2")
@@ -85,7 +90,8 @@ kotlin {
 
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test"))
+                // implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlin:kotlin-test-common:$kotlinVersion")
             }
         }
 
@@ -101,11 +107,12 @@ kotlin {
         val desktopJvmMain by getting {
             dependencies {
                 implementation("org.xerial:sqlite-jdbc:3.36.0.3")
-                // implementation("com.oracle.database.jdbc:ojdbc11:$jdbcVersion")
             }
         }
         val desktopJvmTest by getting {
-
+            dependencies {
+                // implementation(kotlin("test"))
+            }
         }
 
         val nativeMain by getting {
@@ -138,3 +145,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
+/*
+dependencies {
+    testImplementation("org.testng:testng:7.1.0")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+}*/
