@@ -38,7 +38,11 @@ version = projectVersion
 kotlin {
 
 
-    desktopJvm()
+    desktopJvm {
+        testRuns["test"].executionTask.configure {
+            useTestNG()
+        }
+    }
 
     nativeTargets {
         val main by compilations.getting

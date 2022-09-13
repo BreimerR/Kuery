@@ -64,7 +64,7 @@ kotlin {
                 api("libetal.libraries.kotlin:log:1.0.2")
                 api("libetal.libraries.kotlin:library:1.0.2")
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+                // api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
                 // TODO implementation ("org.jetbrains.kotlinx:atomicfu:0.17.1")
 
             }
@@ -80,7 +80,7 @@ kotlin {
         val jsTest by getting
         val nativeMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
+
             }
         }
         val nativeTest by getting

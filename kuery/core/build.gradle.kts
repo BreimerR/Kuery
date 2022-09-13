@@ -41,7 +41,11 @@ version = projectVersion
 kotlin {
 
     jsTarget()
-    desktopJvm()
+    desktopJvm{
+        testRuns["test"].executionTask.configure {
+            useTestNG()
+        }
+    }
 
     isMac {
         iosArm32()
@@ -62,15 +66,15 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":kuery:builders"))
-                // api("libetal.libraries.kotlin:log:1.0.2")
-                // api("libetal.libraries.kotlin:library:1.0.2")
-                // api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
-                // api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+                api("libetal.libraries.kotlin:log:1.0.2")
+                api("libetal.libraries.kotlin:library:1.0.2")
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test"))
+
             }
         }
         val desktopJvmMain by getting

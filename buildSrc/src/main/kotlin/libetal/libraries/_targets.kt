@@ -4,6 +4,7 @@ import libetal.gradle.extensions.crossPlatformNative
 import org.gradle.api.GradleException
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 fun KotlinMultiplatformExtension.commonTargets() {
 
@@ -30,11 +31,13 @@ fun KotlinMultiplatformExtension.nativeTargets(
     }
 }
 
-fun KotlinMultiplatformExtension.desktopJvm(jvmVersion: String = "1.8") = jvm("desktopJvm") {
-    compilations.all {
-        kotlinOptions.jvmTarget = jvmVersion
+fun KotlinMultiplatformExtension.desktopJvm(jvmVersion: String = "1.8", configure: KotlinJvmTarget.() -> Unit = {}) =
+    jvm("desktopJvm") {
+        compilations.all {
+            kotlinOptions.jvmTarget = jvmVersion
+        }
+        configure()
     }
-}
 
 fun KotlinMultiplatformExtension.jsTarget() = js(BOTH) {
     browser {

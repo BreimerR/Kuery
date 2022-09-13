@@ -1,6 +1,8 @@
 package libetal.libraries.kuery.sqlite.database
 
+
 import libetal.kotlin.debug.info
+import libetal.libraries.kuery.sqlite.core.database.Connector
 import libetal.libraries.kuery.sqlite.coroutines.runBlocking
 import libetal.libraries.kuery.sqlite.data.User
 import libetal.libraries.kuery.sqlite.database.Database.query
@@ -9,8 +11,10 @@ import libetal.libraries.kuery.sqlite.database.StatementTest.Companion.dropTable
 import libetal.libraries.kuery.sqlite.database.StatementTest.Companion.insertStatement
 import libetal.libraries.kuery.sqlite.database.StatementTest.Companion.selectStatement
 import libetal.libraries.kuery.sqlite.database.tables.Users
+import org.junit.BeforeClass
 import kotlin.reflect.KFunction0
 import kotlin.test.*
+
 class CrudTests {
 
     @Test
@@ -38,6 +42,7 @@ class CrudTests {
 
     @BeforeTest
     fun createTableTests() = runBlocking {
+        Connector("/opt/Projects/Kotlin/Kuery/staging/kuery/sqlite/core/src/desktopJvmTest/resources/desktop", 1)
         createTableStatement query {
             assertNull(
                 actual = error,
@@ -70,6 +75,7 @@ class CrudTests {
     companion object {
 
         const val TAG = "CrudTest"
+
 
     }
 

@@ -38,7 +38,12 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     jsTarget()
-    desktopJvm()
+    desktopJvm {
+        /** Makes tests not work right
+        testRuns["test"].executionTask.configure {
+        useTestNG()
+        }**/
+    }
     isMac {
         iosArm32()
         iosArm64()
@@ -82,16 +87,14 @@ kotlin {
             dependencies {
                 api(project(":kuery:core"))
                 // api("libetal.libraries.kotlin:ksqlite:1.0.0")
-                api("libetal.libraries.kotlin:log:1.0.2")
                 api("libetal.libraries.kotlin:io:1.0.2")
-                api("libetal.libraries.kotlin:library:1.0.2")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
         }
 
         val commonTest by getting {
             dependencies {
-                // implementation(kotlin("test"))
-                implementation("org.jetbrains.kotlin:kotlin-test-common:$kotlinVersion")
+                implementation(kotlin("test"))
             }
         }
 
@@ -109,25 +112,26 @@ kotlin {
                 implementation("org.xerial:sqlite-jdbc:3.36.0.3")
             }
         }
+
         val desktopJvmTest by getting {
             dependencies {
-                // implementation(kotlin("test"))
+
             }
         }
 
+
         val nativeMain by getting {
-        }
-        val nativeTest by getting
-        /*val androidMain by getting {
-            dependencies {
-                implementation("com.google.android.material:material:1.5.0")
+            dependencies{
+               // api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4-native-mt")
             }
         }
-        val androidTest by getting {
-            dependencies {
-                implementation("junit:junit:4.13.2")
+
+        val nativeTest by getting{
+            dependencies{
+              //  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
             }
-        }*/
+        }
+
     }
 }
 

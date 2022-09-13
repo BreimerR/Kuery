@@ -10,11 +10,17 @@ import libetal.libraries.kuery.core.statements.DELETE.FROM
 import libetal.libraries.kuery.core.statements.extensions.FROM
 import libetal.libraries.kuery.core.statements.extensions.INTO
 import libetal.libraries.kuery.core.statements.extensions.VALUES
+import libetal.libraries.kuery.sqlite.core.database.Connector
 import libetal.libraries.kuery.sqlite.database.tables.Users
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import org.junit.BeforeClass
+import kotlin.test.*
 
 class StatementTest {
+
+    @BeforeTest
+    fun initDb() {
+        Connector("test", 1)
+    }
 
     @Test
     fun createTableStatementTest() {

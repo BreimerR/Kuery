@@ -28,7 +28,7 @@ import libetal.libraries.kuery.core.getOrRegisterColumn
  **/
 abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
 
-    abstract val entities: List<Entity<*, *>>
+   //  abstract val entities: List<Entity<*, *>>
 
     init {
         connector = Connector().also {
@@ -60,9 +60,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
     }
 
     fun init() {
-        entities.forEach {
-            TAG info "Added Entity $it"
-        }
+
     }
 
     override fun Entity<*, *>.string(

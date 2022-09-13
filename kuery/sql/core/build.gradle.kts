@@ -39,7 +39,11 @@ kotlin {
 
 
     jsTarget()
-    desktopJvm()
+    desktopJvm{
+        testRuns["test"].executionTask.configure {
+            useTestNG()
+        }
+    }
     nativeTargets { }
 
     sourceSets {
