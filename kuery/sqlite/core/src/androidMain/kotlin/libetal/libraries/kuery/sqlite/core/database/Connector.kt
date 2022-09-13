@@ -47,7 +47,6 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
     /**
      * @param name String? null if in memory database
      **/
-    @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
     constructor(
         context: Context,
         name: String? = null,
