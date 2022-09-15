@@ -156,6 +156,8 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
                     error = e
                 }
 
+                TAG info "Collected $row."
+
                 emit(
                     SelectResult(
                         row,

@@ -26,8 +26,12 @@ infix fun <T> BaseColumn<T>.greaterOrEqual(value: T) =
 infix fun <T> BaseColumn<T>.equals(value: T) =
     equals(value, ::SimpleExpression)
 
+/*@Suppress("CovariantEquals")
+infix fun <T> BaseColumn<T>.equals(value: Boolean) =
+    SimpleExpression(this, NOT_EQUALS, null)*/
+
 infix fun <T> BaseColumn<T>.equals(value: Select) =
     equals(value, ::StatementExpression)
 
-fun <C, T, F> BaseColumn<C>.equals(value: T, initializer: (BaseColumn<C>, Expression.Operators, T) -> F) =
+internal fun <C, T, F> BaseColumn<C>.equals(value: T, initializer: (BaseColumn<C>, Expression.Operators, T) -> F) =
     initializer(this, EQUALS, value)

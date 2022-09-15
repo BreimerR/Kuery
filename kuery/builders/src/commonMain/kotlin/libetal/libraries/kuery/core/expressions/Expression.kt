@@ -23,6 +23,7 @@ abstract class Expression<L, R>(val left: L, val operator: Operators, val right:
         AND("AND"),
         OR("OR"),
         LIKE("LIKE"),
+        NOT_EQUALS("<>"),
         GREATER_OR_EQUALS(">="),
         LESS_OR_EQUALS("<=");
 
