@@ -1,7 +1,6 @@
 package libetal.libraries.kuery.mariadb
 
 import kotlinx.datetime.LocalDate
-import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.CharSequenceColumn
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.columns.GenericColumn
@@ -130,8 +129,7 @@ abstract class Kuery(
         name: String,
         size: Int,
         default: String?,
-        primary: Boolean,
-        nullable: Boolean
+        primary: Boolean
     ) =
         getOrRegisterColumn(name) {
             CharSequenceColumn<CharSequence, Int>(

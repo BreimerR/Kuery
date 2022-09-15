@@ -20,7 +20,7 @@ infix fun <C : CharSequence, T : BaseColumn<C>> T.contains(content: C) =
 /*infix fun <C : CharSequence, T : BaseColumn<C>> T.equals(value: C) =
     expressionBuilder(value, EQUALS)*/
 
-infix fun <T : BaseColumn<CharSequence>> T.equals(value: Boolean) =
+infix fun BaseColumn<CharSequence>.equals(value: Boolean) =
     SimpleExpression(this, if (value) NOT_EQUALS else EQUALS, "")
 
 fun <T : CharSequence> BaseColumn<T>.LIKE(like: T, prefix: String, postFix: String = "") =

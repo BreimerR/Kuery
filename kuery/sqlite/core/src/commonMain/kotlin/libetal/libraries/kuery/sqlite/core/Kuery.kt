@@ -2,7 +2,6 @@ package libetal.libraries.kuery.sqlite.core
 
 import kotlinx.datetime.LocalDate
 import libetal.kotlin.debug.info
-import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.*
 import libetal.libraries.kuery.core.entities.TableEntity
 import libetal.libraries.kuery.core.entities.ViewEntity
@@ -18,7 +17,6 @@ import libetal.libraries.kuery.sqlite.core.database.listeners.ConnectorListener
 import libetal.libraries.kuery.sqlite.core.entities.Entity
 import libetal.libraries.kuery.sqlite.coroutines.runBlocking
 import libetal.libraries.kuery.core.Kuery as CoreKuery
-import libetal.libraries.kuery.core.Connector as CoreConnector
 import libetal.libraries.kuery.core.getOrRegisterColumn
 
 
@@ -44,19 +42,37 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         name: String,
         size: Int = 55,
         default: String? = null,
-        primary: Boolean = false,
-        nullable: Boolean = true
+        primary: Boolean = false
     ) = getOrRegisterColumn(name) {
         CharSequenceColumn<CharSequence, Int>(
             name,
             "TEXT",
             primary = false,
-            nullable = nullable,
+            nullable = false,
             default = default,
             size = size,
             alias = null
         ) { result ->
             result ?: throw MalformedStoredData(this, name)
+        }
+    }
+
+    fun Entity<*, *>.nullableText(
+        name: String,
+        size: Int = 55,
+        default: String? = null,
+        primary: Boolean = false
+    ) = getOrRegisterColumn(name) {
+        CharSequenceColumn<CharSequence?, Int>(
+            name,
+            "TEXT",
+            primary = false,
+            nullable = true,
+            default = default,
+            size = size,
+            alias = null
+        ) { result ->
+            result
         }
     }
 
@@ -76,15 +92,16 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         name: String,
         size: Int,
         default: String?,
-        primary: Boolean,
-        nullable: Boolean
+        primary: Boolean
     ) = text(
         name,
         size,
         default,
-        primary,
-        nullable
+        primary
     )
+
+    override fun Entity<*, *>.nullableString(name: String, size: Int, default: String?) =
+        nullableText(name, size, default)
 
     fun <N : Number> Entity<*, *>.numeric(
         name: String,

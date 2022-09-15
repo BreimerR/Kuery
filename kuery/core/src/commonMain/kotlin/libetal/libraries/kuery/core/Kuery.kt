@@ -59,8 +59,7 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
         name: String,
         size: Int = 55,
         default: String? = null,
-        primary: Boolean = false,
-        nullable: Boolean = false
+        primary: Boolean = false
     ): Column<CharSequence>
 
     open fun AbstractEntity.nullableString(

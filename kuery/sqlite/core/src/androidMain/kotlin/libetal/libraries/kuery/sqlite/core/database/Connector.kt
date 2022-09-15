@@ -198,13 +198,35 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
         )
     }
 
+
+    /**TODO
+     * Use transactions for multi row insertions
+     * ```
+     * connection.beginTransaction()
+     * try {
+     *     val values = ContentValues()
+     *     for (city in list) {
+     *         values.put(CityId, city.getCityid())
+     *         values.put(CityName, city.getCityName())
+     *         db.insert(TABLE_CITY, null, values)
+     *     }
+     *     db.setTransactionSuccessful()
+     * } finally {
+     *     db.endTransaction()
+     * }
+     * ```
+     **/
+
     override fun query(statement: Insert): Flow<InsertResult> = flow {
 
-        TAG info "Executing  $statement"
+        TAG info "Executing $statement"
+        TAG info "Rows ${statement.values.joinToString(", ")}"
 
-        val values = ContentValues().apply {
+        ContentValues().apply {
+
             val columns = statement.columns
             val rows = statement.values
+
 
             for (row in rows) {
                 var i = 0
@@ -229,23 +251,24 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
 
                     i++
                 }
+
+                val error = try {
+                    connection.insert(statement.entity.name, null, this)
+                    null
+                } catch (e: Exception) {
+                    e
+                }
+
+                emit(
+                    InsertResult(
+                        statement.entity.name,
+                        error
+                    )
+                )
+
             }
 
         }
-
-        val error = try {
-            connection.insert(statement.entity.name, null, values)
-            null
-        } catch (e: Exception) {
-            e
-        }
-
-        emit(
-            InsertResult(
-                statement.entity.name,
-                error
-            )
-        )
 
     }
 

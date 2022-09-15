@@ -3,6 +3,7 @@ package libetal.libraries.kuery.core.columns.extensions
 import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.expressions.Expression
 import libetal.libraries.kuery.core.expressions.Expression.Operators.*
+import libetal.libraries.kuery.core.expressions.NullExpression
 import libetal.libraries.kuery.core.expressions.SimpleExpression
 import libetal.libraries.kuery.core.expressions.StatementExpression
 import libetal.libraries.kuery.core.statements.Select
@@ -26,9 +27,9 @@ infix fun <T> BaseColumn<T>.greaterOrEqual(value: T) =
 infix fun <T> BaseColumn<T>.equals(value: T) =
     equals(value, ::SimpleExpression)
 
-/*@Suppress("CovariantEquals")
+@Suppress("CovariantEquals")
 infix fun <T> BaseColumn<T>.equals(value: Boolean) =
-    SimpleExpression(this, NOT_EQUALS, null)*/
+    NullExpression(this, if (value) NOT_EQUALS else EQUALS)
 
 infix fun <T> BaseColumn<T>.equals(value: Select) =
     equals(value, ::StatementExpression)
