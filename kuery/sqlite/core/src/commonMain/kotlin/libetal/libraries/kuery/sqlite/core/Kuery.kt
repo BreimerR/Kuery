@@ -1,7 +1,7 @@
 package libetal.libraries.kuery.sqlite.core
 
 import kotlinx.datetime.LocalDate
-import libetal.kotlin.debug.info
+import libetal.kotlin.log.info
 import libetal.libraries.kuery.core.columns.*
 import libetal.libraries.kuery.core.entities.TableEntity
 import libetal.libraries.kuery.core.entities.ViewEntity
@@ -35,7 +35,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
 
     }
 
-    private val connection
+    override val connection
         get() = connector ?: throw RuntimeException("Shouldn't ever be null")
 
     fun Entity<*, *>.text(
@@ -159,7 +159,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
     fun Entity<*, *>.blob(name: String = "", primary: Boolean = false) = getOrRegisterColumn(name) {
         GenericColumn(
             name,
-            "`$name` BLOB",
+            "BLOB",
             nullable = false
         ) {
             throw RuntimeException("Not sure of the representation for this one")
@@ -271,6 +271,9 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
 
     override infix fun query(statement: Select) =
         connection.query(statement)
+
+    override suspend infix fun Select.execute(onExec: suspend SelectResult.() -> Unit) =
+        connection.execute(this, onExec)
 
     override infix fun query(statement: Insert) =
         connection.query(statement)

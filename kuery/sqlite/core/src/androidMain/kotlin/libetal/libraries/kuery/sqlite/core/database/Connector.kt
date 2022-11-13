@@ -9,7 +9,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import libetal.kotlin.debug.info
+import libetal.kotlin.log.info
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.entities.extensions.type
 import libetal.libraries.kuery.core.statements.*
@@ -102,6 +102,10 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
     }
 
     override fun query(statement: Select): Flow<SelectResult> = flow {
+        execute(statement, ::emit)
+    }
+
+    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
         val columns = statement.columns
         val boundWhere = statement.boundWhere
 
@@ -124,13 +128,13 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
             }
 
         } catch (e: Exception) {
-            emit(
+            onExec(
                 SelectResult(
                     emptyList(),
                     e
                 )
             )
-            return@flow
+            return
         }
 
         with(cursor) {
@@ -158,7 +162,7 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
 
                 TAG info "Collected $row."
 
-                emit(
+                onExec(
                     SelectResult(
                         row,
                         error,
@@ -170,6 +174,10 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
             close()
         }
 
+    }
+
+    override suspend fun execute(statement: Insert, onExec: suspend SelectResult.() -> Unit) {
+        TODO("Not yet implemented")
     }
 
     override fun query(statement: Delete): Flow<DeleteResult> = flow {

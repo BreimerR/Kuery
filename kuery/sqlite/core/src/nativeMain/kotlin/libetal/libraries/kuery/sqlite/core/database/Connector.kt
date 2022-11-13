@@ -85,8 +85,11 @@ private constructor(val path: String?, override val name: String?, version: Int)
 
     }
 
-    override fun query(statement: Select) = flow<SelectResult> {
+    override fun query(statement: Select) = flow {
+        execute(statement, ::emit)
+    }
 
+    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
         val emissions = mutableListOf<SelectResult>()
         val callbackPointer = StableRef.create { columsCount: Int, rowValues: CStringArray, columnNames: CStringArray? ->
             /** TODO
@@ -100,7 +103,7 @@ private constructor(val path: String?, override val name: String?, version: Int)
              )*/
         }
 
-        val results = memScoped {
+        memScoped {
 
             sqlite3_exec(connection, statement.sql, staticCFunction { callback, columnsCount, rowValues, columnsNames ->
                 val callbackFunction =
@@ -117,11 +120,14 @@ private constructor(val path: String?, override val name: String?, version: Int)
         }
 
         for (emission in emissions) {
-            emit(emission)
+            onExec(emission)
         }
 
         emissions.clear()
+    }
 
+    override suspend fun execute(statement: Insert, onExec: suspend SelectResult.() -> Unit) {
+        TODO("Not yet implemented")
     }
 
     override fun query(statement: Delete): Flow<DeleteResult> {

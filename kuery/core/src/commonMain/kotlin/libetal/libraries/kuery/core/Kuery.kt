@@ -12,6 +12,9 @@ import libetal.libraries.kuery.core.statements.results.*
 
 abstract class Kuery<AbstractEntity : Entity<*>> {
 
+
+    abstract val connection: Connector
+
     operator fun <ET, E : Entity<ET>> contains(entity: E): Boolean = entity in tableEntities
 
     infix fun <ET, E : Entity<ET>> add(entity: E) {
@@ -88,6 +91,8 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
     suspend infix operator fun Select.invoke(collector: SelectResult.() -> Unit) = query(collector)
 
     abstract infix fun query(statement: Select): Flow<SelectResult>
+
+    abstract suspend infix fun Select.execute(onExec: suspend SelectResult.() -> Unit)
 
     suspend infix fun Insert.query(
         collector: InsertResult.() -> Unit

@@ -4,6 +4,7 @@ import kotlinx.cinterop.get
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kuery.interop.mariadb.mysql_free_result
 import libetal.kotlin.laziest
@@ -61,6 +62,13 @@ actual class Connector actual constructor(
     }
 
     override infix fun query(statement: Select) = flow {
+        execute(statement){
+            emit(this)
+        }
+    }
+
+    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+
         query(statement.toString())
 
         val results = connection.useResult() ?: throw NullPointerException("Unexpected null results")
@@ -90,15 +98,20 @@ actual class Connector actual constructor(
             }
 
             @Suppress("UNCHECKED_CAST")
-            emit(
+
+            onExec(
                 SelectResult(
                     columnValues = emission
                 )
             )
+
         }
 
         mysql_free_result(results)
+    }
 
+    override suspend fun execute(statement: Insert, onExec: suspend SelectResult.() -> Unit) {
+        TODO("Not yet implemented")
     }
 
     override infix fun query(statement: Delete) = flow {

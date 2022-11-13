@@ -2,7 +2,7 @@ package libetal.libraries.kuery.sqlite.core.database
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import libetal.kotlin.debug.info
+import libetal.kotlin.log.info
 import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.statements.*
@@ -62,7 +62,7 @@ private constructor(path: String?, override val name: String?, version: Int) : K
     val connectionStatement
         get() = connection.createStatement() ?: throw RuntimeException("Failed to create statement!!")
 
-    fun <R : Result> executeUpdate(statement: Statement<R>) = try {
+    fun <R : Result> executeWithNoResult(statement: Statement<R>) = try {
         connectionStatement.executeUpdate(statement.sql)
         null
     } catch (e: SQLException) {
@@ -84,7 +84,7 @@ private constructor(path: String?, override val name: String?, version: Int) : K
     }
 
     override fun query(statement: Create<*, *>): Flow<CreateResult> = flow {
-        val error = executeUpdate(statement)
+        val error = executeWithNoResult(statement)
 
         emit(
             CreateResult(
@@ -97,6 +97,11 @@ private constructor(path: String?, override val name: String?, version: Int) : K
     }
 
     override fun query(statement: Select): Flow<SelectResult> = flow {
+        execute(statement, ::emit)
+    }
+
+    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+
         var resultSet: ResultSet? = null
 
         val error = statement executeQuery {
@@ -121,7 +126,7 @@ private constructor(path: String?, override val name: String?, version: Int) : K
                         r++
                     }
 
-                    emit(
+                    onExec(
                         SelectResult(
                             row,
                             error,
@@ -136,15 +141,25 @@ private constructor(path: String?, override val name: String?, version: Int) : K
             }
 
         }
-
     }
 
-    override fun query(statement: Delete): Flow<DeleteResult> {
+    override suspend fun execute(statement: Insert, onExec: suspend SelectResult.() -> Unit) {
         TODO("Not yet implemented")
     }
 
+    override fun query(statement: Delete): Flow<DeleteResult> = flow {
+        val error = executeWithNoResult(statement)
+
+        emit(
+            DeleteResult(
+                statement.entity.name,
+                error = error
+            )
+        )
+    }
+
     override fun query(statement: Insert): Flow<InsertResult> = flow {
-        val error = executeUpdate(statement)
+        val error = executeWithNoResult(statement)
 
         emit(
             InsertResult(
@@ -172,8 +187,16 @@ private constructor(path: String?, override val name: String?, version: Int) : K
         )
     }
 
-    override fun query(statement: Update): Flow<UpdateResult> {
-        TODO("Not yet implemented")
+    override fun query(statement: Update): Flow<UpdateResult> = flow {
+        val error = executeWithNoResult(statement)
+
+        emit(
+            UpdateResult(
+                statement.entity.name,
+                error
+            )
+        )
+
     }
 
     actual companion object {

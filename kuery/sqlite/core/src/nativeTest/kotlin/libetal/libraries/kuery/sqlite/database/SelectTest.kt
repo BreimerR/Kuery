@@ -1,8 +1,10 @@
 package libetal.libraries.kuery.sqlite.database
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import libetal.kotlin.debug.info
+import libetal.kotlin.coroutines.IO
+import libetal.kotlin.log.info
 import libetal.libraries.kuery.core.columns.extensions.equals
 import libetal.libraries.kuery.core.expressions.extensions.AND
 import libetal.libraries.kuery.core.expressions.extensions.OR
@@ -26,7 +28,10 @@ class SelectTest {
 
         val statement = SELECT * Users WHERE (Users.name equals "Breimer")
 
-        assertEquals("SELECT id, name, blobby, keepingItReal, isPuppy FROM `users` WHERE name = 'Breimer'", statement.toString())
+        assertEquals(
+            "SELECT id, name, blobby, keepingItReal, isPuppy FROM `users` WHERE name = 'Breimer'",
+            statement.toString()
+        )
     }
 
     @Test
@@ -34,7 +39,7 @@ class SelectTest {
 
         val statement = SELECT * Users WHERE (Users.name equals "Breimer")
 
-        assertEquals("SELECT * FROM `users` WHERE `users.name` = ?", statement.boundSql)
+        assertEquals("SELECT id, name, blobby, keepingItReal, isPuppy FROM `users` WHERE name = ?", statement.boundSql)
     }
 
     @Test
@@ -44,7 +49,10 @@ class SelectTest {
             Users.isPuppy equivalent true
         })
 
-        assertEquals("SELECT * FROM `users` WHERE `users.name` == 'Breimer' AND `users.isPuppy` == 1", statement.toString())
+        assertEquals(
+            "SELECT * FROM `users` WHERE `users.name` == 'Breimer' AND `users.isPuppy` == 1",
+            statement.toString()
+        )
 
     }
 
@@ -59,7 +67,16 @@ class SelectTest {
         val statement = with(Database) {
             CREATE TABLE Users
         }
-        assertEquals("CREATE TABLE `users` ( )", statement.toString())
+
+        assertEquals(
+            """CREATE TABLE users (
+                |    id NUMERIC NOT NULL,
+                |    name TEXT(55) NOT NULL,
+                |    blobby `blobby` BLOB NOT NULL,
+                |    keepingItReal REAL NOT NULL DEFAULT 'false',
+                |    isPuppy NUMERIC NOT NULL
+                |);""".trimMargin(), statement.toString()
+        )
 
     }
 
@@ -71,7 +88,10 @@ class SelectTest {
 
         TAG info statement.toString()
 
-        assertEquals("SELECT * FROM `users` WHERE `users.name` == 'Breimer' OR `users.isPuppy` == 1", statement.toString())
+        assertEquals(
+            "SELECT * FROM `users` WHERE `users.name` == 'Breimer' OR `users.isPuppy` == 1",
+            statement.toString()
+        )
 
     }
 
@@ -96,7 +116,7 @@ class SelectTest {
 
         val statement = SELECT * Users WHERE true
 
-        MainScope().launch {
+        MainScope().launch(Dispatchers.IO) {
             statement query {
                 val user = User(
                     Users.name.stringValue,

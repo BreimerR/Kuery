@@ -1,13 +1,14 @@
 package libetal.libraries.kuery.sqlite.core.database
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import libetal.libraries.kuery.core.Connector as CoreConnector
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.sqlite.core.Kuery
 
 actual class Connector
-private constructor(path: String?, override val name: String?, version: Int) :  KSQLiteConnector {
+private constructor(path: String?, override val name: String?, version: Int) : KSQLiteConnector {
 
     private constructor(name: String?, version: Int) : this(
         name?.let { KSQLiteConnector.resolveName(name).first },
@@ -27,7 +28,15 @@ private constructor(path: String?, override val name: String?, version: Int) :  
         TODO("Not yet implemented")
     }
 
-    override fun query(statement: Select): Flow<SelectResult> {
+    override fun query(statement: Select) = flow {
+        execute(statement, ::emit)
+    }
+
+    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun execute(statement: Insert, onExec: suspend SelectResult.() -> Unit) {
         TODO("Not yet implemented")
     }
 
@@ -56,7 +65,7 @@ private constructor(path: String?, override val name: String?, version: Int) :  
 
     }
 
-    actual operator  fun Kuery.invoke() {
+    actual operator fun Kuery.invoke() {
         init()
     }
 

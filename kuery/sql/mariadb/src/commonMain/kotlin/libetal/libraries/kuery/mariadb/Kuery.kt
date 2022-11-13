@@ -10,6 +10,7 @@ import libetal.libraries.kuery.core.exceptions.UnexpectedNull
 import libetal.libraries.kuery.core.getOrRegisterColumn
 import libetal.libraries.kuery.core.statements.*
 import libetal.libraries.kuery.core.statements.results.Result
+import libetal.libraries.kuery.core.statements.results.SelectResult
 import libetal.libraries.kuery.mariadb.entities.TableEntity
 import libetal.libraries.kuery.core.Kuery as CoreKuery
 
@@ -31,7 +32,7 @@ abstract class Kuery(
         )
     }
 
-    val connection
+    override val connection
         get() = connector ?: throw RuntimeException("Shouldn't be the case.")
 
 
@@ -180,6 +181,9 @@ abstract class Kuery(
 
     override infix fun query(statement: Select) =
         connection.query(statement)
+
+    override suspend infix fun Select.execute(onExec: suspend SelectResult.() -> Unit) =
+        connection.execute(this, onExec)
 
     override infix fun query(statement: Insert) =
         connection.query(statement)

@@ -48,6 +48,7 @@ class CrudTest : TestCase {
             assertEquals(StatementTest.date, user.dateOfBirth)
 
         }
+
     }
 
 }

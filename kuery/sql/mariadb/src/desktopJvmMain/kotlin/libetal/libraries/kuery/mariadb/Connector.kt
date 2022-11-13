@@ -44,6 +44,10 @@ actual class Connector actual constructor(
         TODO("Not yet implemented")
     }
 
+    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+        TODO("Not yet implemented")
+    }
+
     override fun query(statement: Delete): Flow<DeleteResult> {
         TODO("Not yet implemented")
     }

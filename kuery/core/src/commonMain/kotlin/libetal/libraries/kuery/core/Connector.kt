@@ -13,6 +13,10 @@ interface Connector {
 
     infix fun query(statement: Select): Flow<SelectResult>
 
+    suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit)
+
+    suspend fun execute(statement: Insert, onExec: suspend SelectResult.() -> Unit)
+
     infix fun query(statement: Delete): Flow<DeleteResult>
 
     infix fun query(statement: Insert): Flow<InsertResult>

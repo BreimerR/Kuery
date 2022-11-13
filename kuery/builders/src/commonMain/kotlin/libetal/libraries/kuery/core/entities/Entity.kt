@@ -1,6 +1,6 @@
 package libetal.libraries.kuery.core.entities
 
-import libetal.kotlin.debug.info
+import libetal.kotlin.log.info
 import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.statements.builders.InsertStatementBuilder
 import libetal.libraries.kuery.core.tableEntities

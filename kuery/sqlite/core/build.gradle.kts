@@ -87,8 +87,8 @@ kotlin {
             dependencies {
                 api(project(":kuery:core"))
                 // api("libetal.libraries.kotlin:ksqlite:1.0.0")
-                api("libetal.libraries.kotlin:io:1.0.2")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+                implementation("libetal.libraries.kotlin:io:1.0.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
         }
 
@@ -120,17 +120,8 @@ kotlin {
         }
 
 
-        val nativeMain by getting {
-            dependencies{
-               // api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4-native-mt")
-            }
-        }
-
-        val nativeTest by getting{
-            dependencies{
-              //  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
-            }
-        }
+        val nativeMain by getting
+        val nativeTest by getting
 
     }
 }
