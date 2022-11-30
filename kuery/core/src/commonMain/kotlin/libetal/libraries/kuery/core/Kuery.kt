@@ -29,7 +29,7 @@ abstract class Kuery<AbstractEntity : Entity<*>> {
         size: Long? = null,
         default: Long? = null,
         primary: Boolean = false
-    ): Column<Long>
+    ): BaseColumn<Long>
 
     /*Allow for primary:Boolean = false here*/
     abstract fun AbstractEntity.int(

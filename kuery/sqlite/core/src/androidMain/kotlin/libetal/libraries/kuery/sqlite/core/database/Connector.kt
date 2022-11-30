@@ -102,10 +102,10 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
     }
 
     override fun query(statement: Select): Flow<SelectResult> = flow {
-        execute(statement, ::emit)
+        query(statement, ::emit)
     }
 
-    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+    override suspend fun query(statement: Select, onExec: suspend SelectResult.() -> Unit) {
         val columns = statement.columns
         val boundWhere = statement.boundWhere
 
@@ -151,16 +151,13 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
 
                     while (i < columns.size) {
                         columns[i].apply {
-                            val value = getString(i) ?: null
-                            row += parse(value)
+                            row += getString(i) ?: null
                         }
                         i++
                     }
                 } catch (e: Exception) {
                     error = e
                 }
-
-                TAG info "Collected $row."
 
                 onExec(
                     SelectResult(

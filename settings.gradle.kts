@@ -33,13 +33,22 @@ include(
 
 include(
     ":kuery:sql:core",
-    ":kuery:sql:mariadb",
+    // ":kuery:sql:mariadb",
     ":kuery:sql:postgresql"
 )
 
+include(
+    ":plugins:common",
+    ":plugins:sqlite:common",
+
+)
 
 include(
     ":examples:sqlite:android"
+)
+
+include(
+    ":examples:plugins:ksp:common"
 )
 
 /*include(":kotlin:lang")

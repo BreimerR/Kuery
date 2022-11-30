@@ -71,11 +71,15 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test"))
+
             }
         }
         val desktopJvmMain by getting
-        val desktopJvmTest by getting
+        val desktopJvmTest by getting{
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
         val jsMain by getting
         val jsTest by getting
         val nativeMain by getting {

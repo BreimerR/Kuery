@@ -97,10 +97,10 @@ private constructor(path: String?, override val name: String?, version: Int) : K
     }
 
     override fun query(statement: Select): Flow<SelectResult> = flow {
-        execute(statement, ::emit)
+        query(statement, ::emit)
     }
 
-    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+    override suspend fun query(statement: Select, onExec: suspend SelectResult.() -> Unit) {
 
         var resultSet: ResultSet? = null
 
@@ -120,7 +120,7 @@ private constructor(path: String?, override val name: String?, version: Int) : K
                         var i = 0
                         while (i < columnsSize) {
                             val column = columns[i]
-                            this += column parse set.getString(column.name)
+                            this += set.getString(column.name) ?: null
                             i++
                         }
                         r++

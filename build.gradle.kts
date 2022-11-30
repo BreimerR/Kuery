@@ -2,13 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories {
-        gradlePluginPortal()
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
 
 
     val kotlinVersion: String by project
+    val kspVersion: String by project
     val androidBuildToolsVersion: String by project
 
     dependencies {
@@ -17,6 +18,7 @@ buildscript {
     }
 
 }
+
 
 
 allprojects {

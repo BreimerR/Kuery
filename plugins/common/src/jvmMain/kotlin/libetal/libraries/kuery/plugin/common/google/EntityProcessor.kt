@@ -1,29 +1,19 @@
 package libetal.libraries.kuery.plugin.common.google
 
-import com.google.devtools.ksp.processing.Resolver
-import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
-import com.google.devtools.ksp.symbol.KSAnnotated
-import com.google.devtools.ksp.symbol.KSClassDeclaration
-import libetal.libraries.kuery.plugin.common.objects.Annotations
+import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.getAnnotationsByType
+import com.google.devtools.ksp.processing.*
+import com.google.devtools.ksp.symbol.*
+import libetal.libraries.kuery.annotations.common.entities.Table
+import libetal.libraries.kuery.annotations.common.entities.View
 
-class EntityProcessor(environment: SymbolProcessorEnvironment) : com.google.devtools.ksp.processing.SymbolProcessor {
+abstract class EntityProcessor(val environment: SymbolProcessorEnvironment) : SymbolProcessor {
 
-    val codeGenerator by lazy {
+    protected val codeGenerator by lazy {
         environment.codeGenerator
     }
 
-    val options by lazy {
+    protected val options by lazy {
         environment.options
     }
-
-    override fun process(resolver: Resolver): List<KSAnnotated> {
-        val sqliteDatabase = resolver.getSymbolsWithAnnotation(Annotations.SQLITE)
-            .filterIsInstance<KSClassDeclaration>()
-
-        TODO("Not sure of this yet")
-
-    }
-
-
-
 }

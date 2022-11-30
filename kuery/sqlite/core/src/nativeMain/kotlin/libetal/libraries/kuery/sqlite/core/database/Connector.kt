@@ -16,6 +16,7 @@ import libetal.libraries.kuery.core.statements.Select
 import libetal.libraries.kuery.core.statements.results.*
 import libetal.libraries.kuery.sqlite.core.Kuery
 import libetal.libraries.kuery.sqlite.exceptions.KSQLiteQueryException
+import kotlin.native.concurrent.ensureNeverFrozen
 
 // import libetal.libraries.kuery.sqlite.exceptions.KSQLiteQueryException
 
@@ -75,6 +76,7 @@ private constructor(val path: String?, override val name: String?, version: Int)
             exception = KSQLiteQueryException(code)
         }*/
 
+
         emit(
             CreateResult(
                 statement.entity.name,
@@ -89,18 +91,36 @@ private constructor(val path: String?, override val name: String?, version: Int)
         execute(statement, ::emit)
     }
 
-    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+    override suspend fun query(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
         val emissions = mutableListOf<SelectResult>()
-        val callbackPointer = StableRef.create { columsCount: Int, rowValues: CStringArray, columnNames: CStringArray? ->
-            /** TODO
-             * I want to pass rowValues as it is to avoid the
-             * conversion loop
-             **/
-            /* SelectResult(
-                 ,
-                 null,
-                 *statement.columns,
-             )*/
+
+        // RUNS PER INSERT
+        val callbackPointer = StableRef.create { columnsCount: Int, columnNames: CStringArray?, rowValues: CStringArray? ->
+
+            columnNames ?: throw RuntimeException("No Columns Retrieved")
+            rowValues ?: throw RuntimeException("No values retrieved")
+
+            var i = 0
+
+            val values = mutableListOf<String?>()
+
+            while (i < columnsCount) {
+                values.add(
+                    rowValues.get(i++)?.toKString()
+                )
+            }
+
+            emissions.add(
+                SelectResult(
+                    values,
+                    null,
+                    *statement.columns,
+                )
+            )
         }
 
         memScoped {
@@ -134,8 +154,34 @@ private constructor(val path: String?, override val name: String?, version: Int)
         TODO("Not yet implemented")
     }
 
-    override fun query(statement: Insert): Flow<InsertResult> {
-        TODO("Not yet implemented")
+    /**
+     * [Sqlite Select Docs](https://www.tutorialspoint.com/sqlite/sqlite_c_cpp.htm)
+     **/
+    override fun query(statement: Insert) = flow {
+
+        suspend fun insertResultCallback(argumentsCount: Int, arguments: CStringArray, columNames: CStringArray) {
+            emit(
+                InsertResult(
+                    statement.entity.name,
+                    null
+                )
+            )
+        }
+
+        val callback = StableRef.create(::insertResultCallback)
+        val errorMessage = StableRef.create("")
+
+        sqlite3_exec(connection, statement.sql, staticCFunction { callback, columnsCount, rowValues, columnsNames ->
+            val callbackFunction =
+                callback?.asStableRef<(Int, CStringArray?, CStringArray?) -> Int>()
+                    ?.get() ?: throw RuntimeException("Failed to assign callback function")
+            callbackFunction(
+                columnsCount,
+                columnsNames,
+                rowValues
+            )
+        }, callback.asCPointer(), null)
+
     }
 
     override fun query(statement: Drop): Flow<DropResult> {

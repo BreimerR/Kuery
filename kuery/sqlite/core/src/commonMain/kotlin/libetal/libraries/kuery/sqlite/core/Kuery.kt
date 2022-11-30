@@ -32,10 +32,9 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         connector = Connector().also {
             it.addListener(this)
         }
-
     }
 
-    override val connection
+    override val connection /*TODO: Fix once confirmation of lazy frozen is done*/
         get() = connector ?: throw RuntimeException("Shouldn't ever be null")
 
     fun Entity<*, *>.text(
@@ -60,8 +59,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
     fun Entity<*, *>.nullableText(
         name: String,
         size: Int = 55,
-        default: String? = null,
-        primary: Boolean = false
+        default: String? = null
     ) = getOrRegisterColumn(name) {
         CharSequenceColumn<CharSequence?, Int>(
             name,
@@ -167,17 +165,15 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
 
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun Entity<*, *>.long(
         name: String,
         size: Long?,
         default: Long?,
         primary: Boolean
-    ): Column<Long> = numeric(name, "NUMERIC", default, size, primary, false, false, null) {
+    ) = numeric(name, "NUMERIC", default, size, primary, false, false, null) {
         it.toLongOrNull() ?: throw MalformedStoredData(this, name)
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun Entity<*, *>.int(
         name: String,
         size: Int?,
@@ -188,7 +184,6 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         it.toIntOrNull() ?: throw MalformedStoredData(this, name)
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun Entity<*, *>.float(name: String, size: Float?, default: Float?) =
         numeric(name, "", default, size, false, false, false, null) {
             it.toFloatOrNull() ?: throw MalformedStoredData(this, name)
@@ -273,7 +268,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         connection.query(statement)
 
     override suspend infix fun Select.execute(onExec: suspend SelectResult.() -> Unit) =
-        connection.execute(this, onExec)
+        connection.query(this, onExec)
 
     override infix fun query(statement: Insert) =
         connection.query(statement)

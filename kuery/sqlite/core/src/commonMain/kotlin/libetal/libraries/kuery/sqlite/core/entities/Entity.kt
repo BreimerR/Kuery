@@ -1,5 +1,6 @@
 package libetal.libraries.kuery.sqlite.core.entities
 
+import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.entities.Entity
 import libetal.libraries.kuery.core.entities.TableEntity
@@ -9,7 +10,7 @@ import libetal.libraries.kuery.core.entities.TableEntity
  * column to improve performance
  **/
 abstract class Entity<DataClass, IdType> : TableEntity<DataClass>() {
-    abstract val id: Column<IdType>
+    abstract val id: BaseColumn<IdType>
 }
 
 

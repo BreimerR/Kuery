@@ -32,7 +32,11 @@ private constructor(path: String?, override val name: String?, version: Int) : K
         execute(statement, ::emit)
     }
 
-    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+    override suspend fun query(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+     suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
         TODO("Not yet implemented")
     }
 

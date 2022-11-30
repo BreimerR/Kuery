@@ -7,7 +7,6 @@ interface Column<T> {
     val nullable: Boolean
     val sql: String
     val alias: String?
-    infix fun parse(value: String?): T = parser(value)
 
     infix fun <C : Column<T>> copy(alias: String): C
 

@@ -183,7 +183,7 @@ abstract class Kuery(
         connection.query(statement)
 
     override suspend infix fun Select.execute(onExec: suspend SelectResult.() -> Unit) =
-        connection.execute(this, onExec)
+        connection.query(this, onExec)
 
     override infix fun query(statement: Insert) =
         connection.query(statement)

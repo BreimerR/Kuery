@@ -1,7 +1,9 @@
+/*
 package libetal.libraries.kuery.sqlite.database
 
 
-import libetal.kotlin.debug.info
+
+import libetal.kotlin.log.info
 import libetal.libraries.kuery.sqlite.core.database.Connector
 import libetal.libraries.kuery.sqlite.coroutines.runBlocking
 import libetal.libraries.kuery.sqlite.data.User
@@ -79,4 +81,4 @@ class CrudTests {
 
     }
 
-}
+}*/

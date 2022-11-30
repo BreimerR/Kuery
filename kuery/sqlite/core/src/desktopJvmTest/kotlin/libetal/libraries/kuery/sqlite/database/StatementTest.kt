@@ -1,3 +1,4 @@
+/*
 package libetal.libraries.kuery.sqlite.database
 
 import libetal.kotlin.laziest
@@ -124,12 +125,14 @@ class StatementTest {
             SELECT * Users WHERE (Users.age greaterThan (SELECT AVG Users.age FROM Users WHERE true))
         }
 
-        /**
+        */
+/**
          * INSERT INTO Users(vararg column) VALUES {
          *     add(value1, ... column.size)
          *     add(value2, ... column.size)
          * }
-         **/
+         **//*
+
         val insertStatement by laziest {
             INSERT INTO Users(Users.name, Users.age) VALUES {
                 row("Breimer", 12)
@@ -149,4 +152,4 @@ class StatementTest {
 
     }
 
-}
+}*/

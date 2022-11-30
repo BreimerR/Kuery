@@ -63,7 +63,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":kuery:core"))
-                api("libetal.libraries.kotlin:log:1.0.2")
+                api("libetal.libraries.kotlin:log:1.1.0")
                 api("libetal.libraries.kotlin:library:1.0.2")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
             }

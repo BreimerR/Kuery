@@ -62,12 +62,13 @@ actual class Connector actual constructor(
     }
 
     override infix fun query(statement: Select) = flow {
-        execute(statement){
+        query(statement){
             emit(this)
         }
     }
 
-    override suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
+
+    override suspend fun query(statement: Select, onExec: suspend SelectResult.() -> Unit) {
 
         query(statement.toString())
 
@@ -84,7 +85,7 @@ actual class Connector actual constructor(
             while (i < numColumns) {
                 val column = (results fetchFieldDirect i.toUInt())?.pointed ?: break
                 val statementColumn = statement.columns[i]
-                val value = row[i]?.toKString()
+                val value = row.get(i)?.toKString()
 
                 val statementValue = value?.let {
                     statementColumn.parse(it)

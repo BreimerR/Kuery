@@ -11,9 +11,11 @@ import libetal.libraries.kuery.core.statements.Select
 infix fun <T> BaseColumn<T>.lessThan(value: T) =
     SimpleExpression(this, LESSER, value)
 
+// TODO: Doesn't work for longs
 infix fun <T> BaseColumn<T>.greaterThan(value: T) =
     SimpleExpression(this, GREATER, value)
 
+// TODO: Doesn't work for longs
 infix fun <T> BaseColumn<T>.greaterThan(value: Select) =
     StatementExpression(this, GREATER, value)
 

@@ -41,8 +41,11 @@ kotlin {
     desktopJvm {
         /** Makes tests not work right
         testRuns["test"].executionTask.configure {
-        useTestNG()
+
         }**/
+        testRuns["test"].executionTask.configure{
+            useTestNG()
+        }
     }
     isMac {
         iosArm32()
@@ -93,9 +96,7 @@ kotlin {
         }
 
         val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-            }
+
         }
 
         val androidMain by getting {
@@ -115,7 +116,7 @@ kotlin {
 
         val desktopJvmTest by getting {
             dependencies {
-
+               // implementation(kotlin("test"))
             }
         }
 
@@ -144,7 +145,8 @@ android {
 dependencies {
     testImplementation("org.testng:testng:7.1.0")
 }
-
 tasks.withType<Test> {
     useJUnitPlatform()
-}*/
+}
+*/
+

@@ -13,7 +13,10 @@ interface Connector {
 
     infix fun query(statement: Select): Flow<SelectResult>
 
-    suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit)
+    /**TODO
+     * Why suspend while item has a callback
+     **/
+    suspend fun query(statement: Select, onExec: suspend SelectResult.() -> Unit)
 
     suspend fun execute(statement: Insert, onExec: suspend SelectResult.() -> Unit)
 
