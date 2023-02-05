@@ -1,3 +1,4 @@
+
 package libetal.libraries.kuery.sqlite.core
 
 import kotlinx.datetime.LocalDate

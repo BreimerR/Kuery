@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import libetal.kotlin.log.info
+import libetal.libraries.kuery.core.columns.Column
 import libetal.libraries.kuery.core.entities.extensions.name
 import libetal.libraries.kuery.core.entities.extensions.type
 import libetal.libraries.kuery.core.statements.*
@@ -130,7 +131,7 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
         } catch (e: Exception) {
             onExec(
                 SelectResult(
-                    emptyList(),
+                    emptyMap(),
                     e
                 )
             )
@@ -141,7 +142,7 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
 
             while (moveToNext()) {
 
-                val row = mutableListOf<Any?>()
+                val results = mutableMapOf<Column<*>, String?>()
 
                 var error: Exception? = null
 
@@ -150,8 +151,9 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
                     var i = 0
 
                     while (i < columns.size) {
-                        columns[i].apply {
-                            row += getString(i) ?: null
+                        val column = columns[i]
+                        column.apply {
+                            results[column] = getString(i) ?: null
                         }
                         i++
                     }
@@ -161,9 +163,8 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
 
                 onExec(
                     SelectResult(
-                        row,
+                        results,
                         error,
-                        *columns
                     )
                 )
             }

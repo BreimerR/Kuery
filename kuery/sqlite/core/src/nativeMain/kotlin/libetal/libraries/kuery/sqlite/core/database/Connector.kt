@@ -5,6 +5,8 @@ import kotlinx.cinterop.memScoped
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import libetal.interop.sqlite3.*
+import libetal.interop.sqlite3.Column as SqliteColumn
+import libetal.libraries.kuery.core.columns.Column
 import libetal.kotlin.io.File
 import libetal.kotlin.io.exists
 import libetal.kotlin.laziest
@@ -97,6 +99,7 @@ private constructor(val path: String?, override val name: String?, version: Int)
 
     suspend fun execute(statement: Select, onExec: suspend SelectResult.() -> Unit) {
         val emissions = mutableListOf<SelectResult>()
+        val cols = statement.columns
 
         // RUNS PER INSERT
         val callbackPointer = StableRef.create { columnsCount: Int, columnNames: CStringArray?, rowValues: CStringArray? ->
@@ -106,19 +109,17 @@ private constructor(val path: String?, override val name: String?, version: Int)
 
             var i = 0
 
-            val values = mutableListOf<String?>()
-
-            while (i < columnsCount) {
-                values.add(
-                    rowValues.get(i++)?.toKString()
-                )
+            val values = buildMap {
+                while (i < columnsCount) {
+                    this[cols[i]] = rowValues[i]?.toKString()
+                    i++
+                }
             }
 
             emissions.add(
                 SelectResult(
                     values,
-                    null,
-                    *statement.columns,
+                    null
                 )
             )
         }

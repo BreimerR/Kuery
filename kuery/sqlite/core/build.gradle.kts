@@ -90,7 +90,7 @@ kotlin {
             dependencies {
                 api(project(":kuery:core"))
                 // api("libetal.libraries.kotlin:ksqlite:1.0.0")
-                implementation("libetal.libraries.kotlin:io:1.0.2")
+                implementation("libetal.libraries.kotlin:io:1.0.3")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
         }

@@ -1,20 +1,12 @@
 package libetal.libraries.kuery.core.statements.results
 
 import libetal.libraries.kuery.core.columns.Column
+import libetal.libraries.kuery.core.exceptions.KueryException
 
 class SelectResult(
-    val columnValues: List<Any?>,
-    override val error: Exception? = null,
-    vararg columns: Column<*>
+    val results: Map<Column<*>, String?>,
+    override val error: Exception? = null
 ) : Result {
-
-    val columns by lazy {
-        buildMap {
-            columns.forEachIndexed { i, col ->
-                this += col.name to i
-            }
-        }
-    }
 
     val <T> Column<T>.value: T
         get() = this@SelectResult[this]
@@ -22,18 +14,31 @@ class SelectResult(
     val Column<CharSequence>.stringValue: String
         get() = value.toString()
 
-    operator fun <T> get(column: Column<*>) = get<T>(columns[column.name] ?: throw UnQueriedColumnResultRequest(column))
+    operator fun <T> get(column: Column<T>): T {
+        val result = if (column in results.keys) results[column] else throw UnQueriedColumnResultRequestException(column)
 
-    operator fun <T> get(id: Int): T {
-        val value = columnValues[id]
-
-        @Suppress("UNCHECKED_CAST")
-        return try {
-            value as T
-        } catch (e: ClassCastException) {
-            throw RuntimeException("Invalid value the column requested isn't of the requested type")
-        }
+        return column.parser(result)
     }
+
+    /**
+     * This might cause unnecessary errors  at runtime
+     * and avoiding it is best?
+     **/
+    operator fun <T> get(id: Int): T {
+
+        val col =
+            if (id > 0 && id < results.keys.size) results.keys.toList()[id] else throw KueryException("Invalid column id used")
+
+        return get(
+            try {
+                col as Column<T>
+            } catch (e: Exception) {
+                throw KueryException("Invalid column type passed")
+            }
+        )
+
+    }
+
 
 }
 

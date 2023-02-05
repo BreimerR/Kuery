@@ -116,11 +116,11 @@ private constructor(path: String?, override val name: String?, version: Int) : K
                 var r = 0
 
                 while (set.next()) {
-                    val row = buildList {
+                    val results = buildMap {
                         var i = 0
                         while (i < columnsSize) {
                             val column = columns[i]
-                            this += set.getString(column.name) ?: null
+                            this[column] = set.getString(column.name) ?: null
                             i++
                         }
                         r++
@@ -128,9 +128,8 @@ private constructor(path: String?, override val name: String?, version: Int) : K
 
                     onExec(
                         SelectResult(
-                            row,
-                            error,
-                            *columns
+                            results,
+                            error
                         )
                     )
 
