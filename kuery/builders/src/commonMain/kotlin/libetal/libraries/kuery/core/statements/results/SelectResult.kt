@@ -16,7 +16,7 @@ class SelectResult(
 
     operator fun <T> get(column: Column<T>): T {
         val result = if (column in results.keys) results[column] else throw UnQueriedColumnResultRequestException(column)
-
+ 
         return column.parser(result)
     }
 
@@ -24,6 +24,7 @@ class SelectResult(
      * This might cause unnecessary errors  at runtime
      * and avoiding it is best?
      **/
+    @ExperimentalMultiplatform
     operator fun <T> get(id: Int): T {
 
         val col =
@@ -41,4 +42,3 @@ class SelectResult(
 
 
 }
-

@@ -1,4 +1,3 @@
-
 package libetal.libraries.kuery.sqlite.core
 
 import kotlinx.datetime.LocalDate
@@ -286,32 +285,38 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
     override fun onCreate(connector: Connector) {
 
         tableEntities.forEach { (entity, _) ->
-            TAG info "Creating table ${entity::class}"
-
-            val statement = when (entity.type) {
-                libetal.libraries.kuery.core.entities.Entity.Type.TABLE -> CREATE TABLE entity as TableEntity
-                libetal.libraries.kuery.core.entities.Entity.Type.VIEW -> CREATE VIEW entity as ViewEntity
-            }
-
-            runBlocking {
-
-                statement query {
-                    if (error != null) {
-                        throw RuntimeException(error)
-                    } else TAG info "Created Table $entity"
-                }
-
-                entity.onCreate()
-
-            }
+            onCreateEntity(entity)
         }
 
+        entities.forEach(::onCreateEntity)
+
     }
+
+    private fun onCreateEntity(entity: libetal.libraries.kuery.core.entities.Entity<*>) {
+        "$TAG.onCreateEntity" info "Creating table ${entity::class}"
+
+        val statement = when (entity.type) {
+            libetal.libraries.kuery.core.entities.Entity.Type.TABLE -> CREATE TABLE entity as TableEntity<*>
+            libetal.libraries.kuery.core.entities.Entity.Type.VIEW -> CREATE VIEW entity as ViewEntity<*>
+        }
+
+        runBlocking {
+
+            "$TAG.onCreateEntity" info "$statement"
+            statement IF (Existence.EXISTS) query {
+                if (error != null) {
+                    throw RuntimeException(error)
+                } else TAG info "Created Table $entity"
+            }
+
+            entity.onCreate()
+
+        }
+    }
+
 
     companion object {
         const val TAG = "KuerySqlite"
     }
 
 }
-
-
