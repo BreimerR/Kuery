@@ -46,7 +46,7 @@ abstract class Kuery : CoreKuery<Entity<*, *>>(), ConnectorListener {
         CharSequenceColumn<CharSequence, Int>(
             name,
             "TEXT",
-            primary = false,
+            primary = primary,
             nullable = false,
             default = default,
             size = size,
