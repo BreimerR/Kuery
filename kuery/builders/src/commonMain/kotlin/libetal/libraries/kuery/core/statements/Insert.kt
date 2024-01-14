@@ -12,6 +12,16 @@ class Insert(val entity: Entity<*>, vararg val columns: BaseColumn<*>) : Argumen
         mutableListOf<List<Any?>>()
     }
 
+    override val arguments by laziest {
+        mutableListOf<Any?>().apply {
+            for (row in values) {
+                for (value in row) {
+                    add(value)
+                }
+            }
+        }
+    }
+
     private val columnsSql by laziest {
         "`${columns.joinToString("`, `") { it.name }}`"
     }
@@ -55,8 +65,8 @@ class Insert(val entity: Entity<*>, vararg val columns: BaseColumn<*>) : Argumen
 
     fun row(vararg value: Any?) {
         if (value.size != columns.size) throw RuntimeException("Inserted lesser values than passed columns")
-        val row = listOf(*value)
-        values.add(row)
+
+        values.add(value.toList())
     }
 
     operator fun invoke(vararg value: Any?) {
@@ -64,4 +74,3 @@ class Insert(val entity: Entity<*>, vararg val columns: BaseColumn<*>) : Argumen
     }
 
 }
-

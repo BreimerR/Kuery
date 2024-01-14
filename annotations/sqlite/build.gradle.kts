@@ -64,6 +64,7 @@ kotlin {
 }
 
 android {
+    namespace = "libetal.libraries.kuery.annotations.sqlite"
     compileSdk = androidCompileSdkVersion
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {

@@ -28,7 +28,6 @@ abstract class WhereStatementBuilder<T, E : Entity<T>, S : Statement<*>> : Entit
     )
 
 
-    infix fun WHERE(boolean: Boolean): S =
-        build("$boolean","?",boolean)
+    infix fun WHERE(boolean: Boolean): S = build("$boolean","?",boolean)
 
 }

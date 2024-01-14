@@ -12,6 +12,11 @@ import libetal.kotlin.io.exists
 import libetal.libraries.kuery.core.statements.Statement
 import libetal.libraries.kuery.sqlite.core.Kuery
 import libetal.libraries.kuery.sqlite.core.database.extensions.listeners
+import java.io.InputStream
+import java.io.Reader
+import kotlin.Byte
+import java.math.BigDecimal
+import java.net.URL
 import java.sql.*
 
 actual class Connector
@@ -62,8 +67,65 @@ private constructor(path: String?, override val name: String?, version: Int) : K
     val connectionStatement
         get() = connection.createStatement() ?: throw RuntimeException("Failed to create statement!!")
 
-    fun <R : Result> executeWithNoResult(statement: Statement<R>) = try {
-        connectionStatement.executeUpdate(statement.sql)
+    inline fun <reified T> isInstance(item: Any) = item is T
+
+    fun <R : Result> executeWithNoResult(statement: Statement<R>, vararg arguments: Any) = try {
+        TAG info statement.sql
+
+        @Suppress("SqlSourceToSinkFlow")
+        when (statement) {
+            is ArgumentsStatement<R> -> {
+                TAG info statement.boundSql
+
+                val preparedStatement = connection.prepareStatement(statement.boundSql)
+
+                preparedStatement.apply {
+
+                    for ((i, argument) in statement.arguments.withIndex()) {
+                        TAG info "Argument is $i $argument"
+                        val c = i + 1
+
+                        when (argument) {
+                            null -> setNull(c, Types.NULL)
+                            is Boolean -> setBoolean(c, argument)
+                            is Byte -> setByte(c, argument)
+                            is Short -> setShort(c, argument)
+                            is Int -> setInt(c, argument)
+                            is Long -> setLong(c, argument)
+                            is Float -> setFloat(c, argument)
+                            is Double -> setDouble(c, argument)
+                            is BigDecimal -> setBigDecimal(c, argument)
+                            is String -> setString(c, argument)
+                            is ByteArray -> setBytes(c, argument)
+                            is Date -> setDate(c, argument)
+                            is Time -> setTime(c, argument)
+                            is Timestamp -> setTimestamp(c, argument)
+                            is Ref -> setRef(c, argument)
+                            is Blob -> setBlob(c, argument)
+                            is Clob -> setClob(c, argument)
+                            is java.sql.Array -> setArray(c, argument)
+                            is URL -> setURL(c, argument)
+                            is RowId -> setRowId(c, argument)
+                            is Reader -> setCharacterStream(c, argument)
+                            is SQLXML -> setSQLXML(c, argument)
+                            else -> setObject(c, argument)
+                            // TODO: is InputStream -> setAsciiStream(i, argument)
+                            // TODO: is CharacterStream -> setCharacterStream(i, argument)
+                            // TODO: is NString -> setNString(i, argument)
+                            // TODO: is NCharacterStream -> setNCharacterStream(i, argument)
+                            // TODO: is InputStream -> setAsciiStream(i, argument)
+                            // TODO: is BinaryStream -> setBinaryStream(i, argument)
+                            // TODO: is BinaryStream -> setBinaryStream(i, argument)
+                        }
+                    }
+                }
+
+                preparedStatement.execute()
+            }
+
+            else -> connectionStatement.executeUpdate(statement.sql)
+        }
+
         null
     } catch (e: SQLException) {
         e
@@ -169,6 +231,7 @@ private constructor(path: String?, override val name: String?, version: Int) : K
     }
 
     override fun query(statement: Drop): Flow<DropResult> = flow {
+        TAG info statement.sql
         val error = try {
             connectionStatement.executeUpdate(statement.sql)
             null

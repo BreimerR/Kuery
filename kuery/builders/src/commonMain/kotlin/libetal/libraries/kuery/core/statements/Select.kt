@@ -18,12 +18,6 @@ class Select(
     vararg val columns: Column<*>
 ) : ArgumentsStatement<SelectResult>(), WhereStatement {
 
-    val columnValues by laziest {
-        mutableListOf<Any>().apply {
-            addAll(columnValues)
-        }
-    }
-
     var orderBy: GenericColumn<*>? = null
 
     private val orderBySql by laziest {
@@ -32,8 +26,7 @@ class Select(
         } ?: ""
     }
 
-    var limit: Long? = null
-        private set
+    private var limit: Long? = null
 
     private val limitSql by laziest {
         limit?.let {
@@ -41,25 +34,14 @@ class Select(
         } ?: ""
     }
 
-    val boundLimitSql by laziest {
+    private val boundLimitSql by laziest {
         limit?.let {
             " LIMIT ?"
         } ?: ""
     }
 
-    val columnsSql by laziest {
-        var i = 0
-        buildString {
-            for (column in columns) {
-                val identifier = column.identifier
-                append(
-                    if (i == 0) {
-                        identifier
-                    } else ", $identifier"
-                )
-                i++
-            }
-        }
+    private val columnsSql by laziest {
+        columns.joinToString(", ") { it.identifier }
     }
 
     private val boundOrderBySql by laziest {
@@ -68,33 +50,42 @@ class Select(
         } ?: ""
     }
 
-    var groupBy: GenericColumn<*>? = null
+    private var groupBy: GenericColumn<*>? = null
 
-    var groupBySql by laziest {
+    private var groupBySql by laziest {
         groupBy?.let { " $GROUP_BY $it" } ?: ""
     }
 
-    var boundGroupBySql by laziest {
+    private var boundGroupBySql by laziest {
         groupBy?.let { " $GROUP_BY ?" } ?: ""
     }
 
+    private val bareSql by laziest {
+        "SELECT $columnsSql FROM ${entity.identifier} WHERE"
+    }
+
     override val sql by laziest {
-        "SELECT $columnsSql FROM ${entity.identifier} WHERE $where$groupBySql$orderBySql$limitSql"
+        "$bareSql $where$groupBySql$orderBySql$limitSql"
+    }
+
+    init {
+        for (value in columnValues) {
+            arguments.add(value)
+        }
     }
 
     infix fun LIMIT(limit: Long): Select = this.also {
         it.limit = limit
-        it.columnValues.add(limit)
+        it.arguments.add(limit)
     }
 
     override val boundSql by laziest {
-        "SELECT $columnsSql FROM ${entity.identifier} WHERE $boundWhere$boundGroupBySql$boundOrderBySql$boundLimitSql"
+        "$bareSql $boundWhere$boundGroupBySql$boundOrderBySql$boundLimitSql"
     }
 
     companion object {
         const val GROUP_BY = "GROUP BY"
         const val ORDER_BY = "ORDER BY"
     }
+
 }
-
-

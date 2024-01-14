@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import libetal.libraries.kuery.core.statements.SELECT
 import libetal.libraries.kuery.sqlite.core.database.Connector
+import libetal.libraries.kuery.sqlite.coroutines.runBlocking
 import libetal.libraries.kuery.test.activities.MainActivity
 import libetal.libraries.kuery.test.data.User
 import libetal.libraries.kuery.test.database.Database.query
@@ -40,15 +41,17 @@ class ExampleInstrumentedTest {
 
             Connector(it, "test", 1)
 
-            SELECT * Users WHERE true query {
-                assertNull("Failed to fetch users $error", error)
-                val user = User(
-                    Users.name.value,
-                    Users.age.value
-                )
+            runBlocking {
+                (SELECT * Users) WHERE true query {
+                    assertNull("Failed to fetch users $error", error)
+                    val user = User(
+                        Users.name.value.toString(),
+                        Users.age.value
+                    )
 
-                println(user)
+                    println(user)
 
+                }
             }
 
 

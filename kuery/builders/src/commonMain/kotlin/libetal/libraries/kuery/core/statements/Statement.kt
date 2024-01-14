@@ -15,16 +15,19 @@ abstract class Statement<R : Result> {
 
     abstract val sql: String
 
-    abstract val boundSql: String
-
     override fun toString() = sql
 
 }
 
 abstract class ArgumentsStatement<T : Result> : Statement<T>() {
-    val arguments by laziest {
-        mutableListOf<Any>()
+
+    open val arguments by laziest {
+        mutableListOf<Any?>()
     }
+
+    open val boundSql: String
+        get() = sql
+
 }
 
 /**

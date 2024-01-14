@@ -43,7 +43,7 @@ kotlin {
         testRuns["test"].executionTask.configure {
 
         }**/
-        testRuns["test"].executionTask.configure{
+        testRuns["test"].executionTask.configure {
             useTestNG()
         }
     }
@@ -116,7 +116,7 @@ kotlin {
 
         val desktopJvmTest by getting {
             dependencies {
-               // implementation(kotlin("test"))
+                // implementation(kotlin("test"))
             }
         }
 
@@ -129,6 +129,7 @@ kotlin {
 
 
 android {
+    namespace = "libetal.libraries.kuery.sqlite.core"
     compileSdk = androidCompileSdkVersion
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
@@ -149,4 +150,3 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 */
-

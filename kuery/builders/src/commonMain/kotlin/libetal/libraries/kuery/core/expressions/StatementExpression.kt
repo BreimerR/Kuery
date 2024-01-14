@@ -4,13 +4,8 @@ import libetal.kotlin.laziest
 import libetal.libraries.kuery.core.columns.BaseColumn
 import libetal.libraries.kuery.core.statements.Select
 
-class StatementExpression<T> : Expression<BaseColumn<T>, Select> {
-
-    constructor(
-        left: BaseColumn<T>,
-        operator: Operators,
-        right: Select
-    ) : super(left, operator, right)
+class StatementExpression<T>(left: BaseColumn<T>, operator: Operators, right: Select) :
+    Expression<BaseColumn<T>, Select>(left, operator, right) {
 
     override val sql: String by laziest {
         "${left.identifier} = (${right.sql})"
@@ -23,7 +18,7 @@ class StatementExpression<T> : Expression<BaseColumn<T>, Select> {
     override val columnValues: List<*> by laziest {
         buildList {
             addAll(
-                right.columnValues
+                right.arguments
             )
         }
     }

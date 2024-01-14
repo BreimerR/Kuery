@@ -27,8 +27,4 @@ class Create<Class, E : Entity<Class>>(
         safe = existence.state
     }
 
-    override val boundSql: String
-        get() = sql
 }
-
-

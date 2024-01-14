@@ -113,7 +113,7 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
         val cursor = try {
 
             val selectionColumns = columns.map { it.name }.toTypedArray()
-            val selectionArgs = statement.columnValues.map { it.toString() }.toTypedArray()
+            val selectionArgs = statement.arguments.map { it.toString() }.toTypedArray()
 
             TAG info "BoundWhere = $boundWhere"
             TAG info "Entity: ${statement.entity}"
@@ -226,7 +226,7 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
     override fun query(statement: Insert): Flow<InsertResult> = flow {
 
         TAG info "Executing $statement"
-        TAG info "Rows ${statement.values.joinToString(", ")}"
+        TAG info "Rows ${statement.values.joinToString(", ") { "?" }}"
 
         ContentValues().apply {
 
@@ -282,8 +282,25 @@ actual class Connector : SQLiteOpenHelper, KSQLiteConnector {
         val result = query("$statement")
     }
 
-    override fun query(statement: Update): Flow<UpdateResult> {
-        TODO("Not yet implemented")
+    override fun query(statement: Update): Flow<UpdateResult> = flow {
+        ContentValues().apply {
+            val tableName = statement.entity.name
+            val columns = statement.columnValues
+
+            val error: Exception? = try {
+                connection.update(tableName, this, "", statement.arguments.map { it?.toString() }.toTypedArray())
+                null
+            } catch (e: Exception) {
+                e
+            }
+
+            emit(
+                UpdateResult(
+                    statement.entity.name,
+                    error
+                )
+            )
+        }
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {

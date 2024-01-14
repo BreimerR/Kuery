@@ -13,11 +13,22 @@ class Delete(
     vararg val columnValues: Any
 ) : ArgumentsStatement<DeleteResult>(), WhereStatement {
 
+    init {
+        for (value in columnValues) {
+            arguments.add(value)
+        }
+    }
+
+    private val bareSql: String by laziest {
+        "DELETE FROM ${entity.identifier} WHERE"
+    }
+
     override val sql by laziest {
-        "DELETE FROM ${entity.identifier} WHERE $where"
+        "$bareSql $where"
     }
 
     override val boundSql by laziest {
-        "DELETE FROM ${entity.identifier} WHERE $boundWhere"
+        "$bareSql $boundWhere"
     }
+
 }

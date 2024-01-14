@@ -75,7 +75,7 @@ kotlin {
             }
         }
         val desktopJvmMain by getting
-        val desktopJvmTest by getting{
+        val desktopJvmTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
@@ -105,6 +105,7 @@ kotlin {
 
 
 android {
+    namespace = "libetal.libraries.kuery.builders"
     compileSdk = androidCompileSdkVersion
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 

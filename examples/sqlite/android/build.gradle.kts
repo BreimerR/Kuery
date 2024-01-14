@@ -10,6 +10,7 @@ val androidTargetSdkVersion: String by project
 val androidCompileSdkVersion: String by project
 
 android {
+    namespace = "libetal.libraries.kuery.test"
     compileSdk = androidCompileSdkVersion.toInt()
 
     defaultConfig {

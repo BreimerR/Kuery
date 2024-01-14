@@ -9,12 +9,8 @@ class Drop(val entity: Entity<*>, var safe: Boolean = false, val type: Entity.Ty
     override val sql
         get() = """DROP $type ${if (safe) "IF EXISTS " else ""}`${entity.name}`"""
 
-    override val boundSql
-        get() = """DROP $type ${if (safe) "IF EXISTS " else ""}`${entity.name}`"""
-
     infix fun IF(existence: Existence) = this.apply {
         safe = existence.state
     }
 
 }
-

@@ -18,10 +18,8 @@ class UpdateStatementBuilder<T, E : Entity<T>>(val entity: E) : WhereStatementBu
         where: String,
         boundWhere: String,
         vararg columnValues: Any
-    ) = Update(where, boundWhere, *columnValues).also { statement ->
+    ) = Update(where, boundWhere, expressions, *columnValues).also { statement ->
         statement.entity = entity
-        statement.set.addAll(expressions)
     }
 
 }
-

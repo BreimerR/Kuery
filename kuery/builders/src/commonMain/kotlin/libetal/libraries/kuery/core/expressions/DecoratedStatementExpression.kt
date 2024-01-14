@@ -21,10 +21,10 @@ class DecoratedStatementExpression<T : Any> : DecoratedExpressions<BaseColumn<T>
         "${left.identifier} $operator (${right.boundSql})"
     }
     // TODO NEED TO Concatnate this string such that CONCAT(CONCAT('\'',SELECT SOME_VALUE FROM SOME_TABLE WHERE SOME_EXPRESSION),'\'')
-    override val columnValues: List<*> by laziest {
+    override val columnValues by laziest {
         buildList {
             addAll(
-                right.columnValues
+                right.arguments
             )
         }
     }

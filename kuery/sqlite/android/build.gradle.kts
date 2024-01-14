@@ -67,6 +67,7 @@ kotlin {
 }
 
 android {
+    namespace = "libetal.libraries.kuery.sqlite.android.core"
     compileSdk = androidCompileSdkVersion
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
@@ -79,4 +80,3 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
-
